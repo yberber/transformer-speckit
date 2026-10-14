@@ -369,7 +369,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T073 [P] [US3] Write `frontend/tests/unit/model/params.test.ts`:
+- [X] T073 [P] [US3] Write `frontend/tests/unit/model/params.test.ts`:
   - For every group `paramGroups(modelConfig)`, the shape equals `frontend/tests/reference/param-shapes.json[name]`, and the set of names equals the reference set.
   - `totalParams` equals the `gpt2-small.md` total.
   - The per-block, wte, wpe and ln_f counts equal the references.
