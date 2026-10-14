@@ -1,0 +1,67 @@
+{
+  "format_version": "1.0.0",
+  "model": {
+    "id": "openai-community/gpt2",
+    "revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e",
+    "versions": {
+      "torch": "2.14.1",
+      "transformers": "5.19.0"
+    }
+  },
+  "examples": [
+    {
+      "id": "short-once-upon",
+      "length": "short",
+      "core": "short-once-upon/core.json"
+    },
+    {
+      "id": "short-coffee",
+      "length": "short",
+      "core": "short-coffee/core.json"
+    },
+    {
+      "id": "medium-sun",
+      "length": "medium",
+      "core": "medium-sun/core.json"
+    },
+    {
+      "id": "medium-train",
+      "length": "medium",
+      "core": "medium-train/core.json"
+    },
+    {
+      "id": "long-lighthouse",
+      "length": "long",
+      "core": "long-lighthouse/core.json"
+    },
+    {
+      "id": "long-library",
+      "length": "long",
+      "core": "long-library/core.json"
+    }
+  ],
+  "position_embeddings": [
+    {
+      "path": "../model/wpe-0000-0063.f32",
+      "dtype": "float32",
+      "shape": [
+        64,
+        768
+      ],
+      "bytes": 196608,
+      "sha256": "b1db8bb0a73327217527517abf70043979d4c601d6d214a0403c94b320a851e4",
+      "first_position": 0
+    },
+    {
+      "path": "../model/wpe-0064-0127.f32",
+      "dtype": "float32",
+      "shape": [
+        64,
+        768
+      ],
+      "bytes": 196608,
+      "sha256": "ab6aff683faa98484d6a068b3ca8309ce08e1e5ddf450696b037569f3426e849",
+      "first_position": 64
+    }
+  ]
+}
