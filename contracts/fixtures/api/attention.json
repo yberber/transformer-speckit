@@ -1,0 +1,28 @@
+{
+  "request": {
+    "token_ids": [
+      464,
+      2068,
+      7586,
+      21831,
+      274,
+      389,
+      257
+    ],
+    "layer": 1
+  },
+  "status": 200,
+  "body": {
+    "layer": 1,
+    "n_tokens": 7,
+    "weights": {
+      "dtype": "uint16",
+      "shape": [
+        12,
+        28
+      ],
+      "scale": 1.5259021896696422e-05,
+      "data": "//9e5aEaIJJIE5daHWC0L0hc5hOVYtsdZiBcSc0VIm1iIBs5hSI7CKAOdlPbGzs/zjXLCDQLpgf//w8A8P8QAFoAlf8DABIAeQBx/w0APQAoAFkDM/ydAFMANQAWACkAnP7fAekANgChASYAFwAi+///YvedCPTOhx6EEs+5NhH8Gf4aKLCAL44GnAstDld3ih9mD4IUVBHiM8VlABv+EfcZxxIcMWIP//+IF3foMwhTC3rsaAERAI4H+PYZADMAUgH772YOhAyiAu4AZAKFBAHpFgxnAy8C3QUFBIQs7Lf//8eGOHmVCREEWfLICQUCRhPr4LcC3QMQH924fiHZNg8cMhO+J40Zm1g5INUXIxvzF2cMSkkqP///sw5M8foAAgAD/94AAQALABX/lQIIAAYAGQBD/Y4OIgDlAU8ADAEO7u42zQW2A7sCdwRgBPyz///g2B8njLN1JP4n5JwsD/wa8jg7QD0aGDMlY0oPUyW8M71OUkFRDI8K1h2vOzlIlEY1C7YJwQL//+P8HAP1iStY3x1nfvg+/DSjDYQGIgKiAKzzCwPINIcncw9JFCA41Uc1H5IJVQ1NFAoXNE1aUf//WPGnDhiLDC7bRmqUZiDVNlkUl4v+G1chURzBGt5AGAqgEFwLsQ5biuAXsQPbBX0EgwX5OZqa//9h3Z4i070JMCMSEKNmLNEruQSVelQnACFnGa4jDWWaId0hgxWGGnMnNlt2GzEdHRNuFqUd8iT//za4yUfRnq0agUYnlMIROhPbRvd2ExxSEOQNvk6BaVETrxFwEOsRI09/a50cphBQEkoLVA9OOv//u6xEU/CG3EwzLBlPdD6lL81CWnhjHLAgvSvVHtZycR3OF7YZdgq+M4lYlRyRGGEalgqGKdMj"
+    }
+  }
+}

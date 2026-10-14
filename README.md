@@ -130,6 +130,14 @@ the pinned GPT-2 weights, about 550 MB, into the Hugging Face cache):
   probabilities, change percentages and attention are compared with tolerances far below the
   verification tolerances.
 
+The API fixtures are recorded the same way, from `backend/`:
+
+- `uv run python -m tools.record_api_fixtures`: record the shared API fixtures in
+  `contracts/fixtures/api/` (`health`, `run`, `attention`, `token-embeddings` and one
+  `error-<code>.json` per error code) from real responses of the service, run in-process. Rerun
+  it whenever the API or the model output changes; both test suites validate the fixtures
+  against the contract, and the frontend's API client tests and live-mode e2e mocks use them.
+
 ## Deploy
 
 **Static site (GitHub Pages).** Every push to `main` runs the `frontend` workflow; its `deploy`

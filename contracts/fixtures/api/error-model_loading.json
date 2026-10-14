@@ -1,0 +1,11 @@
+{
+  "status": 503,
+  "headers": {
+    "retry-after": "5"
+  },
+  "body": {
+    "error": {
+      "code": "model_loading"
+    }
+  }
+}

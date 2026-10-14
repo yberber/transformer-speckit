@@ -620,7 +620,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - Non-root user; `EXPOSE 7860`; `CMD uv run uvicorn app.main:app --host 0.0.0.0 --port 7860 --no-access-log`.
 
   Also create `backend/README.md` with the HF Space front matter (`title`, `sdk: docker`, `app_port: 7860`) and a short description with a privacy statement.
-- [ ] T111 [US6] Implement `backend/tools/record_api_fixtures.py`: use TestClient against the real app to write `contracts/fixtures/api/health.json`, `run.json` (text "The quick brown fox", `max_new_tokens` 3), `attention.json` (layer 1 of that run), `token-embeddings.json` and one `error-<code>.json` per error code (`{status, headers?, body}`). Run it and commit the fixtures. T099 validates them. Add `uv run python -m tools.record_api_fixtures` to the README.
+- [X] T111 [US6] Implement `backend/tools/record_api_fixtures.py`: use TestClient against the real app to write `contracts/fixtures/api/health.json`, `run.json` (text "The quick brown fox", `max_new_tokens` 3), `attention.json` (layer 1 of that run), `token-embeddings.json` and one `error-<code>.json` per error code (`{status, headers?, body}`). Run it and commit the fixtures. T099 validates them. Add `uv run python -m tools.record_api_fixtures` to the README.
 
 ### Tests for User Story 6 (frontend) ⚠️
 

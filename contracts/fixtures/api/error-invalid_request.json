@@ -1,0 +1,15 @@
+{
+  "request": {
+    "text": "The quick brown fox",
+    "max_new_tokens": 65
+  },
+  "status": 400,
+  "body": {
+    "error": {
+      "code": "invalid_request",
+      "params": {
+        "field": "max_new_tokens"
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "request": {
+    "text": "a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a",
+    "max_new_tokens": 3
+  },
+  "status": 422,
+  "body": {
+    "error": {
+      "code": "input_too_long_tokens",
+      "params": {
+        "limit": 64,
+        "actual": 65
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "request": {
+    "text": " \n ",
+    "max_new_tokens": 3
+  },
+  "status": 422,
+  "body": {
+    "error": {
+      "code": "empty_input"
+    }
+  }
+}

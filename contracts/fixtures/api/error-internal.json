@@ -1,0 +1,12 @@
+{
+  "request": {
+    "text": "The quick brown fox",
+    "max_new_tokens": 3
+  },
+  "status": 500,
+  "body": {
+    "error": {
+      "code": "internal"
+    }
+  }
+}
