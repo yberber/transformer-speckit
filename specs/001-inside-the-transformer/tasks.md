@@ -523,7 +523,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 ### Implementation for User Story 5
 
 - [X] T096 [US5] Implement `frontend/src/lib/i18n/resolveLocale.ts`: `resolveLocale({ urlLang?, stored?, navigatorLanguages }) -> { locale, urlLangInvalid: boolean }` per T094, used by `main.ts` at startup (US7 passes `urlLang`)
-- [ ] T097 [US5] Create `frontend/src/components/LanguageSwitch.svelte` and mount it in the App header (FR-029):
+- [X] T097 [US5] Create `frontend/src/components/LanguageSwitch.svelte` and mount it in the App header (FR-029):
   - Options are labelled in their own language (English, Türkçe, Deutsch) with `lang` attributes.
   - It calls `setLocale` and persists `itt.lang` in localStorage (try/catch).
   - It updates `document.documentElement.lang` and leaves every other `viewState` field untouched.

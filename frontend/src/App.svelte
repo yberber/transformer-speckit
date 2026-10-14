@@ -9,6 +9,7 @@
   import FlowIndicator from './components/FlowIndicator.svelte';
   import GenerationControls from './components/GenerationControls.svelte';
   import IntroNote from './components/IntroNote.svelte';
+  import LanguageSwitch from './components/LanguageSwitch.svelte';
   import ThemeSwitch from './components/ThemeSwitch.svelte';
   import ViewNav from './components/ViewNav.svelte';
   import {
@@ -138,7 +139,7 @@
     <div class="container header-inner">
       <h1 class="title">{t('app.title')}</h1>
       <div class="controls">
-        <div data-slot="language"></div>
+        <LanguageSwitch />
         {#if liveAvailable}
           <div data-slot="mode"></div>
         {/if}
