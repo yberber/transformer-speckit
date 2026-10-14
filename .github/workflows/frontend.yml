@@ -83,7 +83,8 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      # Default projects (chromium + mobile) run every spec present, including @a11y.
+      # Default projects: chromium + mobile run every spec present, including @a11y; live runs
+      # @live and @privacy against a second build with a mocked API (no server needed).
       - run: npm run test:e2e
       - if: failure()
         uses: actions/upload-artifact@v7

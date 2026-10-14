@@ -637,7 +637,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - `onWaking` fires on the first waking attempt
   - a revision ≠ `index.json` revision → `version_mismatch`
   - a truncated/invalid body → `invalid_response`, and nothing partial is returned
-- [ ] T113 [P] [US6] Write `frontend/tests/e2e/live.spec.ts` (`@live`), using `page.route` mocks fed by `contracts/fixtures/api/` and building with `VITE_API_BASE_URL=http://api.test`. Check:
+- [X] T113 [P] [US6] Write `frontend/tests/e2e/live.spec.ts` (`@live`), using `page.route` mocks fed by `contracts/fixtures/api/` and building with `VITE_API_BASE_URL=http://api.test`. Check:
   - enter live mode → the text field with the hint, English note, privacy note and stated limits (64 tokens / 64 steps)
   - run → every explore view and the Cost view render, and stepping works
   - a text ending in `?` shows the tip without blocking

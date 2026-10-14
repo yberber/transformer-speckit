@@ -71,12 +71,18 @@ Frontend (run from `frontend/`):
 - `npm run test:unit`: Vitest unit tests in `tests/unit/`.
 - `npm run test:contract`: Vitest contract tests in `tests/contract/` (data files and fixtures
   against the JSON Schema in `contracts/`).
-- `npm run test:e2e`: Playwright end-to-end tests in `tests/e2e/` on the `chromium` (1280×800)
-  and `mobile` (360×780) projects, against a production build served by `vite preview`. Run
-  `npx playwright install chromium` once before the first run.
-- `npm run test:e2e:fullstack`: Playwright `@fullstack` tests against a build that talks to a
-  local backend on port 7860. It sets `E2E_FULLSTACK=1` and starts the backend with
-  `uv run uvicorn` in `../backend`, so it works only once the service exists.
+- `npm run test:e2e`: Playwright end-to-end tests in `tests/e2e/` against production builds
+  served by `vite preview`, with no server: the `chromium` (1280×800) and `mobile` (360×780)
+  projects use a build without an API (live mode hidden); the `live` project runs the `@live`
+  and `@privacy` specs against a second build in `frontend/dist-live/` whose API
+  (`VITE_API_BASE_URL=http://api.test`) is mocked in the browser from
+  `contracts/fixtures/api/`. Run one group with `--grep`, e.g.
+  `npm run test:e2e -- --grep @live`. Run `npx playwright install chromium` once before the
+  first run.
+- `npm run test:e2e:fullstack`: Playwright `@fullstack` tests against a build that talks to the
+  real backend on port 7860 (needs the GPT-2 weights). It sets `E2E_FULLSTACK=1` and starts the
+  backend itself with `uv run uvicorn` in `../backend` and `ALLOWED_ORIGINS` set to the test
+  site's origin.
 - `npm run gen:api-types`: regenerate `src/generated/api-types.ts` from
   `contracts/inference-api.openapi.yaml`.
 - `npm run check:api-types`: fail if the committed API types differ from a fresh generation.
