@@ -159,7 +159,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - there are exactly 2 short, 2 medium and 2 long examples, each with `n_input` within its band and ≤ `limits.max_input_tokens`
   - no example text ends with `?`
   - `index.json` `model.revision` equals every `core.json` `model.revision`
-- [ ] T030 [P] Implement `frontend/src/lib/tokens/display.ts`:
+- [X] T030 [P] Implement `frontend/src/lib/tokens/display.ts`:
   - `tokenDisplay(bytes, id)` → `{ kind: 'text'|'partial'|'eos', text, leadingSpace, newline, hex }`, decoding with `new TextDecoder('utf-8', {fatal: true})`
   - Leading space becomes the visible marker `␣` and newline becomes `⏎` (exposed as separate flags so CSS can style them subtly)
   - On a decode failure → `partial` with byte values formatted `⟨E2 80⟩`
