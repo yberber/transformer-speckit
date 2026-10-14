@@ -215,7 +215,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
   It prints a table of the sizes.
 - [X] T048 [P] Write `frontend/tests/unit/no-arch-literals.test.ts`: scan `frontend/src/**/*.{ts,svelte}` excluding `src/generated/` for the regex `\b(768|3072|50257|1024|124439808)\b` and fail with file:line (Quality Gate 2)
-- [ ] T049 [P] Write `frontend/tests/reference/gpt2-small.md` with hand derivations from the official config values (d=768, L=12, H=12, f=3072, V=50257, P=1024):
+- [X] T049 [P] Write `frontend/tests/reference/gpt2-small.md` with hand derivations from the official config values (d=768, L=12, H=12, f=3072, V=50257, P=1024):
   - **Parameters**: wte 38,597,376; wpe 786,432; per block 7,087,872 (ln_1 1,536 + c_attn 1,771,776 + attn.c_proj 590,592 + ln_2 1,536 + c_fc 2,362,368 + mlp.c_proj 2,360,064); 12 blocks 85,054,464; ln_f 1,536; total 124,439,808 (tied LM head counted once).
   - **Per-layer decode components**: QKV 6d² = 3,538,944; output projection 2d² = 1,179,648; MLP 4df = 9,437,184; per-layer matmuls per token = 14,155,776; ×12 = 169,869,312; scores and weighting 2dt each; LM head 2dV = 77,194,752; position add d = 768.
   - **Totals**: decode(1) = 247,101,696; decode(10) = 247,433,472; decode(1024) = 284,813,568; prefill(10) = 1,777,923,072; prefill(64) = 11,025,556,992.
