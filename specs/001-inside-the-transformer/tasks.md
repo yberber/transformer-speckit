@@ -225,7 +225,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
 ### Automated quality gates (Principles VI, VII, IX; in place before any user story)
 
-- [ ] T049a [P] Write `frontend/tests/unit/readme-doc-check.test.ts` (Principle IX). It reads the root `README.md` and fails, naming each missing item, unless the README contains:
+- [X] T049a [P] Write `frontend/tests/unit/readme-doc-check.test.ts` (Principle IX). It reads the root `README.md` and fails, naming each missing item, unless the README contains:
   - `npm run <name>` for every key in `frontend/package.json` `scripts`
   - `python -m tools.<name>` for every module in `backend/tools/*.py` (excluding `__init__.py`)
   - `uvicorn app.main:app` once `backend/app/main.py` exists
