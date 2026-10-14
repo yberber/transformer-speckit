@@ -301,7 +301,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - An `ExampleLoadError` shows `error.example_load` for that example only; the picker and the other examples keep working.
   - Pass the `RunData` and the current step to all views; mount IntroNote, ExamplePicker and GenerationControls.
   - Hide live mode when `import.meta.env.VITE_API_BASE_URL` is empty.
-- [ ] T059 [US1] Add all US1 strings to `frontend/src/lib/i18n/{en,tr,de}.json`: the intro note, picker labels, the six `example.<id>.title` entries, Tokens/Prediction intros, details column headers, step counter (plural), end messages, the repetition note, EOS and partial-character explanations. T034 must pass.
+- [X] T059 [US1] Add all US1 strings to `frontend/src/lib/i18n/{en,tr,de}.json`: the intro note, picker labels, the six `example.<id>.title` entries, Tokens/Prediction intros, details column headers, step counter (plural), end messages, the repetition note, EOS and partial-character explanations. T034 must pass.
 
 **Checkpoint**: The MVP works offline: pick an example, see tokens and predictions, and step forward and back.
 
