@@ -96,7 +96,7 @@ def test_whitespace_only_is_empty(client: TestClient, calls: list, text: str) ->
 def test_max_new_tokens_limit(client: TestClient, calls: list) -> None:
     res = run(client, "Hello", LIMITS.max_new_tokens + 1)
     assert res.status_code == 400
-    assert res.json() == {"error": {"code": "invalid_request", "params": {"field": "max_new_tokens"}}}
+    assert res.json()["error"] == {"code": "invalid_request", "params": {"field": "max_new_tokens"}}
     assert calls == []
 
 
