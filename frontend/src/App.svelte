@@ -24,7 +24,7 @@
 
   type ViewModule = { default: Component<ViewProps> };
 
-  // Each story replaces its placeholder with the real view module here.
+  // One module per view, loaded when the view is first shown.
   const views: Record<ViewId, () => Promise<ViewModule>> = {
     tokens: () => import('./views/Tokens.svelte'),
     embeddings: () => import('./views/Embeddings.svelte'),
@@ -33,7 +33,7 @@
     prediction: () => import('./views/Prediction.svelte'),
     architecture: () => import('./views/Architecture.svelte'),
     cost: () => import('./views/Cost.svelte'),
-    method: () => import('./views/Placeholder.svelte'),
+    method: () => import('./views/Method.svelte'),
   };
 
   /** Views that show a run, and so the generation controls; the others need only the config. */

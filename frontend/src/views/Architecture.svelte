@@ -23,6 +23,7 @@
     type ParamKind,
   } from '../lib/model/params';
   import { reducedMotion } from '../lib/motion';
+  import { methodHref, openFormula } from '../lib/state/methodLink';
   import { viewState, type ViewId } from '../lib/state/viewState.svelte';
   import type { ViewProps } from './types';
 
@@ -305,6 +306,15 @@
       })}
     </p>
     <p class="muted note">{t('architecture.summary.total_note')}</p>
+    <p class="note">
+      <a
+        class="formula-link"
+        href={methodHref('params-total')}
+        data-formula-link="params-total"
+        aria-label={t('estimate.how_label', { what: t('architecture.summary.total') })}
+        onclick={(e) => openFormula(e, 'params-total')}>{t('estimate.how')}</a
+      >
+    </p>
   </div>
 
   <p class="help">{t('architecture.diagram_help')}</p>
@@ -590,6 +600,15 @@
             {t('architecture.tied_note', { name: current.tiedTo })}
           </p>
         {/if}
+        <p class="note">
+          <a
+            class="formula-link"
+            href={methodHref(current.formulaId)}
+            data-formula-link={current.formulaId}
+            aria-label={t('estimate.how_label', { what: current.name })}
+            onclick={(e) => current && openFormula(e, current.formulaId)}>{t('estimate.how')}</a
+          >
+        </p>
         {#if target}
           <button
             type="button"
@@ -704,6 +723,12 @@
   .per-block,
   .note {
     font-size: var(--text-sm);
+  }
+
+  .formula-link {
+    font-weight: 600;
+    color: var(--color-accent);
+    text-underline-offset: 0.15em;
   }
 
   .help {

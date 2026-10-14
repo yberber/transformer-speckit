@@ -9,7 +9,7 @@ import type { ModelConfig } from './config';
 import { decodeFlops, FORMULA_IDS, prefillFlops, runningTotalFlops } from './flops';
 import type { FlopBreakdown, LayerComponent } from './flops';
 import { kvCacheBytes } from './kvcache';
-import { paramGroups, perBlockParams, totalParams } from './params';
+import { BLOCK_COMPONENTS, paramGroups, perBlockParams, totalParams } from './params';
 import type { ParamComponent, ParamKind } from './params';
 
 /** Config fields (by their config key) and token counts a formula can use. */
@@ -41,6 +41,8 @@ export interface Formula {
   variants: FormulaVariant[];
   /** The value is a theoretical estimate (FLOPs, memory), not an exact count. */
   isEstimate: boolean;
+  /** The value is for one transformer block; every block has the same size. */
+  perLayer: boolean;
 }
 
 /** The symbol of each input in the expressions. */
@@ -76,6 +78,21 @@ export function inputValue(config: ModelConfig, input: FormulaInput, args: Worke
 /** i18n key of the plain-language name of an input. */
 export function inputLabelKey(input: FormulaInput): MessageKey {
   return `method.input.${input}`;
+}
+
+const SYMBOL_INPUTS = new Map(
+  Object.entries(INPUT_SYMBOLS).map(([input, symbol]) => [symbol, input as FormulaInput]),
+);
+
+/**
+ * The expression with every symbol replaced by its value (with n = 10, "d · n" becomes the
+ * config's n_embd followed by "· 10"), so a visitor can recompute the worked example by hand. Function names (prefill, decode) and
+ * the summation indices j and k are left as they are.
+ */
+export function substitute(expression: string, value: (input: FormulaInput) => string): string {
+  return expression.replace(/(?<![\p{L}\p{Nd}_])[dLHfVPnt](?![\p{L}\p{Nd}_(])/gu, (symbol) =>
+    value(SYMBOL_INPUTS.get(symbol)!),
+  );
 }
 
 /** Generated tokens in a context of t tokens after n input tokens. */
@@ -118,6 +135,7 @@ function paramFormula(
     variants:
       bias === null ? [part('weight', weight)] : [part('weight', weight), part('bias', bias)],
     isEstimate: false,
+    perLayer: (BLOCK_COMPONENTS as readonly ParamComponent[]).includes(component),
   };
 }
 
@@ -125,7 +143,13 @@ const PARAMS: Formula[] = [
   paramFormula('wte', 'method.formula.params_wte', ['vocab_size', 'n_embd'], 'V · d', null),
   paramFormula('wpe', 'method.formula.params_wpe', ['n_positions', 'n_embd'], 'P · d', null),
   paramFormula('ln_1', 'method.formula.params_ln_1', ['n_embd'], 'd', 'd'),
-  paramFormula('attn.c_attn', 'method.formula.params_attn_c_attn', ['n_embd'], 'd · 3d', '3d'),
+  paramFormula(
+    'attn.c_attn',
+    'method.formula.params_attn_c_attn',
+    ['n_embd'],
+    'd · 3 · d',
+    '3 · d',
+  ),
   paramFormula('attn.c_proj', 'method.formula.params_attn_c_proj', ['n_embd'], 'd · d', 'd'),
   paramFormula('ln_2', 'method.formula.params_ln_2', ['n_embd'], 'd', 'd'),
   paramFormula('mlp.c_fc', 'method.formula.params_mlp_c_fc', ['n_embd', 'n_inner'], 'd · f', 'f'),
@@ -152,6 +176,7 @@ const PARAMS: Formula[] = [
       },
     ],
     isEstimate: false,
+    perLayer: false,
   },
   {
     id: 'params-total',
@@ -166,6 +191,7 @@ const PARAMS: Formula[] = [
       },
     ],
     isEstimate: false,
+    perLayer: false,
   },
 ];
 
@@ -205,6 +231,7 @@ function phased(
       },
     ],
     isEstimate: true,
+    perLayer: component !== 'pos_add',
   };
 }
 
@@ -247,6 +274,7 @@ const FLOPS: Formula[] = [
       },
     ],
     isEstimate: true,
+    perLayer: false,
   },
   {
     id: FORMULA_IDS.prefill,
@@ -261,6 +289,7 @@ const FLOPS: Formula[] = [
       },
     ],
     isEstimate: true,
+    perLayer: false,
   },
   {
     id: FORMULA_IDS.decode,
@@ -275,6 +304,7 @@ const FLOPS: Formula[] = [
       },
     ],
     isEstimate: true,
+    perLayer: false,
   },
   {
     id: FORMULA_IDS.running,
@@ -289,6 +319,7 @@ const FLOPS: Formula[] = [
       },
     ],
     isEstimate: true,
+    perLayer: false,
   },
 ];
 
@@ -308,6 +339,7 @@ const MEMORY: Formula[] = [
       },
     ],
     isEstimate: true,
+    perLayer: false,
   },
 ];
 

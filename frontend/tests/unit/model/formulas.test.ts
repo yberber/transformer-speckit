@@ -7,7 +7,7 @@ import en from '../../../src/lib/i18n/en.json';
 import tr from '../../../src/lib/i18n/tr.json';
 import { modelConfig } from '../../../src/lib/model/config';
 import { decodeFlops, prefillFlops, runningTotalFlops } from '../../../src/lib/model/flops';
-import { FORMULAS, inputLabelKey } from '../../../src/lib/model/formulas';
+import { FORMULAS, inputLabelKey, substitute } from '../../../src/lib/model/formulas';
 import { kvCacheBytes } from '../../../src/lib/model/kvcache';
 import { paramGroups } from '../../../src/lib/model/params';
 import { gpt2Small as ref } from '../../reference/gpt2-small';
@@ -151,6 +151,57 @@ describe('worked GPT-2 small examples', () => {
   it('equal the KV-cache references', () => {
     expect(worked('kv-cache-bytes', 1, 1)).toBe(ref.kv_cache_bytes.per_token);
     expect(worked('kv-cache-bytes', 1, 1024)).toBe(ref.kv_cache_bytes['1024']);
+  });
+});
+
+describe('substitute', () => {
+  const values: Record<string, string> = { n_embd: '768', n_inner: '3,072', n: '10', t: '13' };
+  const value = (input: string) => values[input] ?? `<${input}>`;
+
+  it('replaces every symbol with its value', () => {
+    expect(substitute('6 · d² · n', value)).toBe('6 · 768² · 10');
+    expect(substitute('d · n · (n + 1)', value)).toBe('768 · 10 · (10 + 1)');
+    expect(substitute('4 · d · f', value)).toBe('4 · 768 · 3,072');
+  });
+
+  it('leaves function names and summation indices alone', () => {
+    expect(substitute('prefill(n) + Σⱼ₌₁..ₖ decode(n + j), k = t − n', value)).toBe(
+      'prefill(10) + Σⱼ₌₁..ₖ decode(10 + j), k = 13 − 10',
+    );
+  });
+
+  it('substitutes every symbol of every expression in the registry', () => {
+    for (const f of Object.values(FORMULAS)) {
+      for (const v of f.variants) {
+        const used = new Set<string>();
+        substitute(v.expression, (input) => (used.add(input), '1'));
+        for (const input of used) expect(f.inputs, `${f.id}: ${v.expression}`).toContain(input);
+      }
+    }
+  });
+});
+
+describe('per-layer formulas', () => {
+  it('are the block components and the layer FLOP items', () => {
+    const perLayer = Object.values(FORMULAS)
+      .filter((f) => f.perLayer)
+      .map((f) => f.id)
+      .sort();
+    expect(perLayer).toEqual(
+      [
+        'params-ln_1',
+        'params-attn.c_attn',
+        'params-attn.c_proj',
+        'params-ln_2',
+        'params-mlp.c_fc',
+        'params-mlp.c_proj',
+        'flops-qkv',
+        'flops-attn-scores',
+        'flops-attn-weighting',
+        'flops-attn-out',
+        'flops-mlp',
+      ].sort(),
+    );
   });
 });
 
