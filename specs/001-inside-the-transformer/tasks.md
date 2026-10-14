@@ -90,7 +90,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - `max_new_tokens=0` gives `steps == 0` and one prediction
   - `tokenize("<|endoftext|>")` does not contain `eos_token_id()` (R8)
   - two runs of the same input are bit-identical (FR-006)
-- [ ] T015 [P] Create `backend/tools/examples.toml` with exactly six `[[example]]` entries (`id`, `length`, `text`). Rules: id matches `^[a-z0-9-]{1,40}$`; length is `short` | `medium` | `long` (exactly 2 of each); the text is English to continue with no trailing `?`. The first entry is the default. Start from these drafts and adjust the wording until T016's rules pass:
+- [X] T015 [P] Create `backend/tools/examples.toml` with exactly six `[[example]]` entries (`id`, `length`, `text`). Rules: id matches `^[a-z0-9-]{1,40}$`; length is `short` | `medium` | `long` (exactly 2 of each); the text is English to continue with no trailing `?`. The first entry is the default. Start from these drafts and adjust the wording until T016's rules pass:
   - `short-once-upon` = "Once upon a time, there was a little"
   - `short-coffee` = "The best way to make a cup of coffee is to"
   - `medium-sun` = "The Sun is a huge ball of hot gas at the center of our solar system. Every day, it gives the Earth light and heat, which"
