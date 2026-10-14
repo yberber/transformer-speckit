@@ -46,7 +46,7 @@
   }
 </script>
 
-<ol class="token-sequence" aria-label={label}>
+<ol class="token-sequence" aria-label={label} data-token-sequence>
   {#each tokens as token, position (position)}
     {@const origin = position < run.nInput ? 'input' : 'generated'}
     <li in:appear={{ position }}>

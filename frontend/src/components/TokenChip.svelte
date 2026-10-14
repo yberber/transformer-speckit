@@ -59,6 +59,7 @@
   style:background-color={tokenColor(position, theme)}
   style:color={tokenTextColor(position, theme)}
   data-position={position}
+  data-token-id={token.id}
 >
   <span class="visual" aria-hidden="true"
     >{#each visual as v, i (i)}<span class={v.cls}>{v.text}</span>{/each}</span

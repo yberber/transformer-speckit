@@ -286,7 +286,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - At k = steps, "Next token" is `disabled` with the end message from `endMessageKey`. For EOS, the end-of-text marker is explained.
   - An optional `liveOffer` snippet prop is filled by US6.
   - When `detectRepetition` is true, show a short note that repetition is normal for greedy decoding.
-- [ ] T056 [US1] Create `frontend/src/views/Tokens.svelte` (FR-014):
+- [X] T056 [US1] Create `frontend/src/views/Tokens.svelte` (FR-014):
   - ViewIntro, `<Term id="token">`, a `TokenSequence` at the current step, and the token count.
   - A `ShowDetails` table with columns position, token ID, exact text (with `␣`/`⏎` markers), byte values for partial characters, and origin (input/generated).
   - A translated explanation when any token is `partial`.
