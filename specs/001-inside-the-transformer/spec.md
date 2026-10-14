@@ -8,6 +8,16 @@
 
 **Input**: User description: "PART A — Product specification for 'Inside the Transformer': a public website that lets curious non-experts see how a language model (GPT-2 small) turns text into new text, step by step, with real numbers — example mode with six precomputed texts, opt-in live mode, six explore views (tokenization, embeddings, transformer blocks, attention, next-token prediction, architecture), compute-cost statistics, three UI languages, shareable view URLs, accessible and polished visual design." (Full text supplied with the `/speckit-specify` command; every section is reflected below.)
 
+## Clarifications
+
+### Session 2026-10-14
+
+- Q: How closely must the other model values on the site (attention weights, embedding numbers, and the "how much this layer changed each token" summaries) match the reference GPT-2 run? → A: Attention weights within 0.001 (absolute); embedding and other vector values within 0.1% (relative). Probabilities keep 0.0001 (absolute).
+- Q: Should the Embeddings view show all 768 numbers of each token's vectors, or only a labelled subset? → A: All values: a compact color strip per vector, with the full number table under "Show details"; embedding data may load when the view is first opened.
+- Q: Where should the live-mode input limit be checked: in the visitor's browser before the text is sent, or by the inference service? → A: The service counts tokens exactly before running the model and returns the count in a translated error; the browser applies only a rough character cap. Live-mode limits changed to 64 input tokens and 64 generation steps.
+- Q: The long examples are 80–120 tokens, over the new 64-token live input limit. How should the spec resolve this? → A: Shorten the length bands so every example fits the live limit (short about 5–15, medium about 20–35, long about 50–64 tokens); "continue in live mode" re-runs the example's original text.
+- Q: How should the Blocks view measure "how strongly the attention part or MLP part changed each token"? → A: Relative size of the change: length of the added update ÷ length of the token's vector before that part, shown as a percentage.
+
 ## User Scenarios & Testing *(mandatory)*
 
 Priority mapping: the user's **Must** items are P1, **Should** items are P2, **Could** items are P3.
@@ -28,7 +38,7 @@ A curious visitor with no ML background opens the site. They learn in one or two
 4. **Given** a selected example at generation step 0, **When** the Prediction view is shown, **Then** the ten most likely next tokens appear with their probabilities, ordered from highest to lowest. The top candidate is marked as the one greedy decoding will pick.
 5. **Given** the Prediction view, **When** the visitor activates "Next token", **Then** the top candidate is appended to the text with a new color, the step counter advances by one, and every view now reflects the new step.
 6. **Given** generation step k > 0, **When** the visitor steps back, **Then** the views return exactly to step k−1. Results are deterministic, so stepping forward again reproduces the same token.
-7. **Given** the last precomputed step of an example, **When** the visitor looks at "Next token", **Then** the control is disabled and a message says the example ends here. If live mode is available, the message offers it as a way to continue.
+7. **Given** the last precomputed step of an example, **When** the visitor looks at "Next token", **Then** the control is disabled and a message says the example ends here. If live mode is available, the message offers it as a way to continue: this re-runs the example's original text in live mode, where generation can go up to the live-mode step limit (64).
 
 ---
 
@@ -42,9 +52,9 @@ The visitor follows their text deeper into the model. They see how every token b
 
 **Acceptance Scenarios**:
 
-1. **Given** a selected example, **When** the Embeddings view is shown, **Then** each token's token embedding, position embedding and their sum are shown as vectors in a compact visual form. "Show details" reveals the exact numbers.
+1. **Given** a selected example, **When** the Embeddings view is shown, **Then** each token's token embedding, position embedding and their sum are shown as compact color strips covering every dimension (the hidden size from the model config). "Show details" reveals the exact numbers for every dimension.
 2. **Given** the Blocks view, **When** the visitor moves to the next or previous layer, **Then** the layer indicator updates (layer 1 to 12, counted from the model config) and the view shows that block's attention part and MLP part for the current tokens.
-3. **Given** the MLP part of a block, **When** it is shown, **Then** it shows that each token's vector is expanded to a larger hidden size, passed through an activation and compressed back, using sizes read from the model config. It also shows how strongly the MLP changed each token's representation.
+3. **Given** the MLP part of a block, **When** it is shown, **Then** it shows that each token's vector is expanded to a larger hidden size, passed through an activation and compressed back, using sizes read from the model config. It also shows how strongly the MLP changed each token's representation, as a percentage: the length of the MLP's added update divided by the length of the token's vector before the MLP part.
 4. **Given** the Attention view, **When** the visitor picks a layer and a head, **Then** a heatmap shows the attention weight from every token (row) to every earlier or same token (column). Future positions are visibly masked, and each row sums to 1 within display rounding.
 5. **Given** a heatmap cell or token, **When** the visitor focuses or hovers it, **Then** the two tokens involved are highlighted in their own colors and the exact weight is available on demand.
 6. **Given** any generation step, **When** the visitor opens Embeddings, Blocks or Attention, **Then** the data shown covers all tokens up to and including that step.
@@ -161,7 +171,7 @@ A developer wants to check the numbers. The "How we calculate" page documents ev
 - **Leading spaces and line breaks**: these belong to tokens and are shown visibly (e.g. as a subtle marker), so that splits like " the" make sense.
 - **End-of-text token**: if the most likely next token is GPT-2's end-of-text token, it is shown as a labelled marker and generation stops with an explanation.
 - **Repetitive output**: greedy decoding often makes GPT-2 repeat itself. When the generated text repeats, a short note explains that this is normal for greedy decoding, not a bug.
-- **Live input limits**: empty or whitespace-only input cannot be run. Input longer than the live-mode token limit is rejected before sending, with a message that gives the limit and the current count. Generation stops at the generation-step limit or at the model's maximum context length, whichever comes first.
+- **Live input limits**: empty or whitespace-only input cannot be run. Input longer than 1,000 characters cannot be sent (rough cap in the browser). The inference service counts tokens exactly before running the model: input over 64 tokens is rejected without running the model, and a translated message gives the limit and the actual token count. Generation stops at the generation-step limit or at the model's maximum context length, whichever comes first.
 - **Literal special-token text typed by the user** (e.g. "<|endoftext|>"): it is treated as ordinary text so live mode and example mode behave the same; the treatment is documented.
 - **Service busy or rate-limited**: the visitor sees a translated "busy, try again shortly" message, and example mode stays available.
 - **Slow or dropped connection mid-request**: the request times out with a clear message. A partially received result is never shown as if it were complete.
@@ -179,7 +189,7 @@ A developer wants to check the numbers. The "How we calculate" page documents ev
 
 - **FR-001**: The site MUST support exactly one model in this version: GPT-2 small. All architecture numbers it shows (layer count, head count, hidden size, MLP size, vocabulary size, maximum context length, parameter counts) MUST be derived from the official model configuration and weights, not entered by hand.
 - **FR-002**: The site MUST explain, on first visit and in live mode, that GPT-2 is a text-completion model and not a chat assistant.
-- **FR-003**: Example mode MUST be the default. It MUST offer exactly six example texts (two short, two medium, two long), each written as text to continue.
+- **FR-003**: Example mode MUST be the default. It MUST offer exactly six example texts (two short, two medium, two long), each written as text to continue. Every example's input MUST be within the live-mode input limit (64 tokens), so each can also be run in live mode.
 - **FR-004**: All example-mode values MUST be real GPT-2 outputs, precomputed offline and shipped with the site. Example mode MUST work without any server call and without downloading a model.
 - **FR-005**: Each example MUST include enough precomputed data to step through every view for its input and for each of its precomputed generation steps.
 - **FR-006**: Generation MUST use greedy decoding only: at each step the single most likely token is appended. Results MUST be deterministic.
@@ -189,13 +199,13 @@ A developer wants to check the numbers. The "How we calculate" page documents ev
 - **FR-010**: For the same input, live mode MUST produce identical tokens to example mode, and probabilities within an absolute difference of 0.0001.
 - **FR-011**: If the inference service is waking up, the site MUST show a translated progress status with a cancel option. If the service is unavailable, slow beyond the wait limit, busy or returns an error, the site MUST show a clear translated message and keep example mode fully usable.
 - **FR-012**: User-entered text MUST NOT be stored or logged anywhere: not on the service, in logs, analytics, error reports, shared links, or persistent browser storage. It MAY be held only in memory while it is being processed and displayed.
-- **FR-013**: Live mode MUST enforce a maximum input length and a maximum number of generation steps, and MUST state both limits in the UI.
+- **FR-013**: Live mode MUST enforce a maximum input length of 64 tokens and a maximum of 64 generation steps, and MUST state both limits in the UI. The inference service is the only place where tokens are counted: it MUST check the exact token count before running the model and return the count when rejecting input. The browser MUST NOT tokenize text itself; it only applies a 1,000-character cap before sending.
 
 **Explore views**
 
 - **FR-014** (Tokenization): The site MUST show how the text is split into tokens, with each token's text (leading spaces and line breaks visible) and, on demand, its token ID.
-- **FR-015** (Embeddings): The site MUST show each token's token embedding, position embedding and their combined vector in a compact visual form. Exact values MUST be available on demand.
-- **FR-016** (Transformer blocks): Users MUST be able to step through every transformer block, one at a time and by direct selection. Each block MUST show its attention part and its MLP part for the current tokens.
+- **FR-015** (Embeddings): The site MUST show each token's token embedding, position embedding and their combined vector as a compact color strip covering every dimension (hidden size from the model config); no subset or sample of dimensions. Exact values for every dimension MUST be available on demand through "Show details". Embedding data MAY be loaded when the view is first opened rather than with the initial page.
+- **FR-016** (Transformer blocks): Users MUST be able to step through every transformer block, one at a time and by direct selection. Each block MUST show its attention part and its MLP part for the current tokens, including for each token a change percentage per part: the length (Euclidean norm) of the update that part adds to the token's vector, divided by the length of the token's vector before that part, × 100.
 - **FR-017** (Attention): The site MUST show an attention heatmap for a user-selected layer and head. It MUST cover every layer and every head of the model, with causal masking shown visibly.
 - **FR-018** (Prediction): The site MUST show the ten most likely next tokens with their probabilities at the current step. The greedy choice MUST be marked.
 - **FR-019** (Architecture): The site MUST show a diagram of the whole model. Every weight matrix and bias in it MUST be selectable, showing its name, shape, parameter count and share of total parameters. Tied weights (LM head and token embedding) MUST be explained and counted once.
@@ -235,7 +245,7 @@ A developer wants to check the numbers. The "How we calculate" page documents ev
 
 **Verification**
 
-- **FR-041**: Precomputed example data MUST be verified against a reference GPT-2 run (Hugging Face transformers): tokens identical, probabilities within an absolute tolerance of 0.0001. The check MUST be repeatable and MUST fail when the tolerance is exceeded.
+- **FR-041**: Precomputed example data MUST be verified against a reference GPT-2 run (Hugging Face transformers): tokens identical, probabilities within an absolute tolerance of 0.0001, attention weights within an absolute tolerance of 0.001, and embedding values and other per-token vector values (including layer-change summaries) within a relative tolerance of 0.1%. The check MUST be repeatable and MUST fail when any tolerance is exceeded.
 - **FR-042**: Every parameter, FLOP and memory calculation MUST have automated tests against hand-computed GPT-2 small reference values. The derivation of those values MUST be recorded next to them.
 - **FR-043**: End-to-end tests MUST cover: open an example, step through layers, change the attention head, generate the next token, switch language, open a shared link, use live mode, and use live mode with the service unavailable.
 - **FR-044**: Automated accessibility checks MUST run on every main view and report zero violations.
@@ -247,8 +257,8 @@ A developer wants to check the numbers. The "How we calculate" page documents ev
 - **Token**: One unit of text. It has its text (possibly part of a character), its ID in the vocabulary, its position in the sequence, an assigned color, and whether it came from the input or was generated.
 - **Generation step**: The state after k generated tokens (k = 0 is the input alone). It has the token sequence and the prediction for the next token.
 - **Prediction**: The ten most likely next tokens at a step, each with token, ID and probability. The greedy choice is marked.
-- **Layer snapshot**: For one transformer block at one step, the attention weights for every head and summaries of how the attention and MLP parts changed each token's representation.
-- **Embedding vectors**: For each token, its token embedding, its position embedding and their sum.
+- **Layer snapshot**: For one transformer block at one step, the attention weights for every head and, for each token, the change percentage of the attention part and of the MLP part (length of the added update ÷ length of the token's vector before that part).
+- **Embedding vectors**: For each token, its token embedding, its position embedding and their sum, each with one value per dimension of the hidden size (all dimensions, no subset).
 - **Weight matrix**: A named parameter group in the architecture. It has a shape, a parameter count, a share of the total, its location in the model, and whether its weights are shared with another matrix.
 - **Cost estimate**: A theoretical value (FLOPs or memory) for a component, layer, step or total. It has its formula, its inputs and a label marking it as an estimate.
 - **View state**: Mode (example or live), selected example, active view, layer, head, generation step, language and theme. Everything except live text and theme is shareable.
@@ -258,7 +268,7 @@ A developer wants to check the numbers. The "How we calculate" page documents ev
 
 ### Measurable Outcomes
 
-- **SC-001**: For all six examples and all of their precomputed steps, 100% of tokens are identical to the reference GPT-2 run, and 100% of shown probabilities are within 0.0001 of it.
+- **SC-001**: For all six examples and all of their precomputed steps, 100% of tokens are identical to the reference GPT-2 run, 100% of shown probabilities are within 0.0001 of it, 100% of attention weights are within 0.001 of it, and 100% of embedding and other vector values are within 0.1% (relative) of it.
 - **SC-002**: For the text of each of the six examples run in live mode, tokens are 100% identical to example mode, and all probabilities are within 0.0001.
 - **SC-003**: Every parameter, FLOP and memory value shown matches its hand-computed reference value. For example, the total parameter count of GPT-2 small, with tied embeddings counted once, equals 124,439,808.
 - **SC-004**: With the inference service switched off, 100% of example-mode features work, and a live-mode attempt shows a clear message within 10 seconds of the failure being detected.
@@ -274,8 +284,8 @@ A developer wants to check the numbers. The "How we calculate" page documents ev
 ## Assumptions
 
 - **Example language**: All six examples are in English, because GPT-2 was trained mostly on English. Example titles and explanations are translated, but the model input and output stay as they are.
-- **Example lengths**: "Short" means about 5–15 input tokens, "medium" about 25–50, and "long" about 80–120. Each example includes 20 precomputed generation steps, or fewer if it reaches the end-of-text token first.
-- **Live-mode limits**: To keep the service small and responses quick, live input is limited to 120 tokens (the longest example's size) and up to 20 generation steps, the same as example mode. The service wait limit, including wake-up from sleep, is 60 seconds.
+- **Example lengths**: "Short" means about 5–15 input tokens, "medium" about 20–35, and "long" about 50–64 (never more than the 64-token live-mode input limit). Each example includes 20 precomputed generation steps, or fewer if it reaches the end-of-text token first.
+- **Live-mode limits**: To keep the service small and responses quick, live input is limited to 64 tokens and up to 64 generation steps (set during clarification; example mode keeps its own 20 precomputed steps). The service wait limit, including wake-up from sleep, is 60 seconds.
 - **Probabilities**: Shown probabilities are the model's raw next-token distribution (softmax of the final output, no temperature or other changes). Greedy decoding picks the highest one, with ties broken by the lowest token ID.
 - **Special-token text**: Literal special-token text typed by a user is tokenized as ordinary text, in both modes.
 - **FLOP counting convention**: Forward pass only. One multiply-add counts as 2 FLOPs. Matrix multiplications are counted, including the attention score and weighting steps. Element-wise operations (layer norm, softmax, activation, residual additions) are small and are left out of the totals; this is stated on "How we calculate". The embedding lookup costs no FLOPs. Adding the position embedding is shown as a small separate item.
