@@ -102,6 +102,7 @@
   "error.generic": "Something went wrong.",
   "error.view_failed": "This view could not be shown. The other views still work.",
   "error.example_load": "This example could not be loaded. The other examples still work.",
+  "error.index_load": "The example texts could not be loaded. Please check your connection and try again.",
   "action.retry": "Try again",
   "error.empty_input": "Please enter some text first.",
   "error.input_too_long_chars": "The text is too long: {actual} characters, at most {limit} are allowed.",

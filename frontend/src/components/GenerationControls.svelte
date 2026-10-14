@@ -2,7 +2,8 @@
   Step through generation one token at a time (FR-007): Back, "Next token" and a "Step k of N"
   counter. Each press is announced politely, naming the token that was added. At the last step
   "Next token" is disabled and a message says why the text ends there; live mode can offer to
-  continue through the `liveOffer` snippet (US6).
+  continue through the `liveOffer` snippet (US6). While the run loads, the bar is shown at its
+  final size with both buttons disabled, so the view below it does not move when data arrives.
 -->
 <script lang="ts">
   import { tick, type Snippet } from 'svelte';
@@ -13,11 +14,11 @@
   import { viewState } from '../lib/state/viewState.svelte';
   import { tokenLabel } from '../lib/tokens/describe';
 
-  let { run, liveOffer }: { run: RunData; liveOffer?: Snippet } = $props();
+  let { run, liveOffer }: { run: RunData | null; liveOffer?: Snippet } = $props();
 
   const step = $derived(viewState.step);
-  const atEnd = $derived(!canAdvance(run, step));
-  const repeating = $derived(detectRepetition(run.tokens, run.nInput, step));
+  const atEnd = $derived(run !== null && !canAdvance(run, step));
+  const repeating = $derived(run !== null && detectRepetition(run.tokens, run.nInput, step));
 
   let announcement = $state('');
   let backButton: HTMLButtonElement | undefined = $state();
@@ -31,7 +32,7 @@
   }
 
   function next(): void {
-    if (!canAdvance(run, step)) return;
+    if (!run || !canAdvance(run, step)) return;
     const position = run.nInput + step;
     markAppended(position);
     viewState.setStep(step + 1);
@@ -51,13 +52,19 @@
   }
 </script>
 
-<div class="generation" role="group" aria-label={t('generation.label')} data-generation-controls>
+<div
+  class="generation"
+  role="group"
+  aria-label={t('generation.label')}
+  aria-busy={run === null}
+  data-generation-controls
+>
   <div class="bar">
     <button
       type="button"
       class="back"
       data-action="back"
-      disabled={step === 0}
+      disabled={!run || step === 0}
       onclick={back}
       bind:this={backButton}
     >
@@ -65,19 +72,28 @@
       {t('generation.back')}
     </button>
 
-    <div class="counter" data-step-counter data-step={step}>
-      <span class="step">{t('generation.step', { step, total: run.steps })}</span>
-      <span class="generated">{t('generation.generated', { count: step })}</span>
-      <span class="progress" aria-hidden="true">
-        <span class="fill" style:width="{run.steps === 0 ? 100 : (step / run.steps) * 100}%"></span>
-      </span>
-    </div>
+    {#if run}
+      <div class="counter" data-step-counter data-step={step}>
+        <span class="step">{t('generation.step', { step, total: run.steps })}</span>
+        <span class="generated">{t('generation.generated', { count: step })}</span>
+        <span class="progress" aria-hidden="true">
+          <span class="fill" style:width="{run.steps === 0 ? 100 : (step / run.steps) * 100}%"
+          ></span>
+        </span>
+      </div>
+    {:else}
+      <div class="counter">
+        <span class="step" role="status">{t('status.loading')}</span>
+        <span class="generated">&nbsp;</span>
+        <span class="progress" aria-hidden="true"></span>
+      </div>
+    {/if}
 
     <button
       type="button"
       class="next"
       data-action="next"
-      disabled={atEnd}
+      disabled={!run || atEnd}
       onclick={next}
       bind:this={nextButton}
     >
@@ -86,7 +102,7 @@
     </button>
   </div>
 
-  {#if atEnd}
+  {#if run && atEnd}
     <div class="message end" data-end-message data-stop-reason={run.stopReason}>
       <p>{t(endMessageKey(run.stopReason))}</p>
       {#if run.stopReason === 'eos'}

@@ -41,7 +41,8 @@
   );
   const share = $derived(candidates.reduce((sum, c) => sum + c.candidate.prob, 0));
 
-  const percent = (p: number) => formatNumber(p, { style: 'percent', maximumSignificantDigits: 3 });
+  const percent = (p: number) =>
+    formatNumber(p, { style: 'percent', minimumSignificantDigits: 3, maximumSignificantDigits: 3 });
   const exact = (p: number) =>
     formatNumber(p, { minimumSignificantDigits: 7, maximumSignificantDigits: 7 });
 </script>

@@ -112,9 +112,7 @@ for (const core of cores) {
   const { id } = core.example;
   const { n_input: n, steps, tokens, predictions } = core.run;
 
-  test(`@example-mode ${id}: tokens, prediction and stepping match core.json`, async ({
-    page,
-  }) => {
+  test(`@example-mode ${id}: tokens, prediction and stepping match core.json`, async ({ page }) => {
     await page.goto('/');
     await page.locator(`[data-example-picker] input[value="${id}"]`).check();
     await expectStep(page, 0);

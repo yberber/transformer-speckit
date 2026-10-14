@@ -296,7 +296,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - An EOS candidate renders as a labelled "end-of-text" marker.
   - A `ShowDetails` table with rank, ID, token and the probability to 7 significant digits.
   - GenerationControls.
-- [ ] T058 [US1] Wire example mode into `frontend/src/App.svelte`:
+- [X] T058 [US1] Wire example mode into `frontend/src/App.svelte`:
   - On start, `loadIndex()` and then `loadExample(first id)`. Show translated loading and error states.
   - An `ExampleLoadError` shows `error.example_load` for that example only; the picker and the other examples keep working.
   - Pass the `RunData` and the current step to all views; mount IntroNote, ExamplePicker and GenerationControls.

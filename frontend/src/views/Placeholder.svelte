@@ -5,9 +5,9 @@
 <script lang="ts">
   import ViewIntro from '../components/ViewIntro.svelte';
   import { t } from '../lib/i18n/index';
-  import type { ViewId } from '../lib/state/viewState.svelte';
+  import type { ViewProps } from './types';
 
-  let { view }: { view: ViewId } = $props();
+  let { view }: ViewProps = $props();
   const headingId = $props.id();
 </script>
 

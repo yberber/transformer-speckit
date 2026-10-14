@@ -31,8 +31,8 @@
 
 {#if first}
   <span class="term"
-    ><dfn lang="en">{label ?? entry.term}</dfn><span class="explanation">
-      ({entry.explanation})</span
+    ><dfn lang="en">{label ?? entry.term}</dfn>&#32;<span class="explanation"
+      >({entry.explanation})</span
     ></span
   >
 {:else}

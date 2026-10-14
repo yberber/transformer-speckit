@@ -102,6 +102,7 @@
   "error.generic": "Bir şeyler ters gitti.",
   "error.view_failed": "Bu görünüm gösterilemedi. Diğer görünümler çalışmaya devam ediyor.",
   "error.example_load": "Bu örnek yüklenemedi. Diğer örnekler çalışmaya devam ediyor.",
+  "error.index_load": "Örnek metinler yüklenemedi. Lütfen bağlantınızı kontrol edip tekrar deneyin.",
   "action.retry": "Tekrar dene",
   "error.empty_input": "Lütfen önce bir metin girin.",
   "error.input_too_long_chars": "Metin çok uzun: {actual} karakter, en fazla {limit} karaktere izin veriliyor.",

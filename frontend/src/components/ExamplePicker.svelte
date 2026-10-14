@@ -1,7 +1,9 @@
 <!--
   Choose one of the six examples, grouped by length (FR-003). A native radio group: arrow keys
   move between examples and screen readers announce the group and the choice. Selecting an
-  example goes back to step 0 and keeps the view, layer and head.
+  example goes back to step 0 and keeps the view, layer and head. Until index.json arrives it
+  shows empty cards of the final size (the data contract fixes two examples per length), so
+  nothing below it moves when the examples appear (Lighthouse layout shift, Principle VII).
 -->
 <script lang="ts">
   import type { ExampleEntry, ExampleLength } from '../lib/data/exampleSource';
@@ -12,14 +14,19 @@
     examples,
     tokenCounts = {},
   }: {
-    examples: ExampleEntry[];
+    /** null while index.json is loading. */
+    examples: ExampleEntry[] | null;
     /** Input token count per example ID, for the examples loaded so far. */
     tokenCounts?: Record<string, number>;
   } = $props();
 
   const LENGTHS: readonly ExampleLength[] = ['short', 'medium', 'long'];
+  const PER_LENGTH = 2;
   const groups = $derived(
-    LENGTHS.map((length) => ({ length, examples: examples.filter((e) => e.length === length) })),
+    LENGTHS.map((length) => ({
+      length,
+      examples: examples?.filter((e) => e.length === length) ?? null,
+    })),
   );
 
   // Example IDs come from index.json; the i18n completeness test checks each has a title.
@@ -28,7 +35,7 @@
   const uid = $props.id();
 </script>
 
-<fieldset class="example-picker" data-example-picker>
+<fieldset class="example-picker" data-example-picker aria-busy={examples === null}>
   <legend>{t('example.picker.label')}</legend>
   <div class="groups">
     {#each groups as group (group.length)}
@@ -41,7 +48,18 @@
         <span class="group-label" id="{uid}-{group.length}">
           {t(`example.length.${group.length}`)}
         </span>
-        {#each group.examples as example (example.id)}
+        {#if group.examples === null}
+          {#each { length: PER_LENGTH }, i (i)}
+            <div class="option skeleton" aria-hidden="true">
+              <span class="dot"></span>
+              <span class="text">
+                <span class="title">&nbsp;</span>
+                <span class="count">&nbsp;</span>
+              </span>
+            </div>
+          {/each}
+        {/if}
+        {#each group.examples ?? [] as example (example.id)}
           {@const count = tokenCounts[example.id]}
           <label class="option" data-example-option={example.id}>
             <input
@@ -53,9 +71,10 @@
             />
             <span class="text">
               <span class="title">{t(titleKey(example.id))}</span>
-              {#if count !== undefined}
-                <span class="count">{t('example.token_count', { count })}</span>
-              {/if}
+              <!-- The line is always there, so the card does not grow when the count arrives. -->
+              <span class="count">
+                {#if count !== undefined}{t('example.token_count', { count })}{:else}&nbsp;{/if}
+              </span>
             </span>
           </label>
         {/each}
@@ -126,6 +145,25 @@
     height: 1.1rem;
     margin: 0.2rem 0 0;
     accent-color: var(--color-accent);
+  }
+
+  .skeleton .dot {
+    flex: none;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-top: 0.2rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 50%;
+  }
+
+  .skeleton .text {
+    flex: 1;
+  }
+
+  .skeleton .title {
+    width: 60%;
+    background: var(--color-border);
+    border-radius: var(--radius-sm);
   }
 
   .text {

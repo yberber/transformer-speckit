@@ -102,6 +102,7 @@
   "error.generic": "Etwas ist schiefgelaufen.",
   "error.view_failed": "Diese Ansicht konnte nicht angezeigt werden. Die anderen Ansichten funktionieren weiter.",
   "error.example_load": "Dieses Beispiel konnte nicht geladen werden. Die anderen Beispiele funktionieren weiter.",
+  "error.index_load": "Die Beispieltexte konnten nicht geladen werden. Bitte prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
   "action.retry": "Erneut versuchen",
   "error.empty_input": "Bitte geben Sie zuerst einen Text ein.",
   "error.input_too_long_chars": "Der Text ist zu lang: {actual} Zeichen, höchstens {limit} sind erlaubt.",
