@@ -1,6 +1,7 @@
 // SC-008: every user-facing string exists in English, Turkish and German.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { CLIENT_ERROR_CODES, SERVER_ERROR_CODES } from '../../../src/lib/api/client';
 import de from '../../../src/lib/i18n/de.json';
 import en from '../../../src/lib/i18n/en.json';
 import glossaryDe from '../../../src/lib/i18n/glossary.de.json';
@@ -28,14 +29,6 @@ function apiErrorCodes(): string[] {
     .map((l) => l.replace(/^\s*- /, ''));
 }
 
-const CLIENT_ERROR_CODES = [
-  'timeout',
-  'network',
-  'wake_timeout',
-  'version_mismatch',
-  'invalid_response',
-];
-
 describe('locale catalogs', () => {
   it.each(['tr', 'de'])('%s has exactly the keys of en', (locale) => {
     expect(Object.keys(catalogs[locale]!).sort()).toEqual(Object.keys(en).sort());
@@ -58,8 +51,25 @@ describe('locale catalogs', () => {
   it('has a message for every API and client error code', () => {
     const codes = apiErrorCodes();
     expect(codes.length).toBeGreaterThan(0);
+    // The client knows exactly the contract's server codes.
+    expect([...SERVER_ERROR_CODES].sort()).toEqual([...codes].sort());
     for (const code of [...codes, ...CLIENT_ERROR_CODES]) {
       expect(en, `error.${code}`).toHaveProperty([`error.${code}`]);
+    }
+  });
+
+  it.each(['en', 'tr', 'de'])('%s error messages show the numbers the service sends', (locale) => {
+    // data-model.md "ApiError": the params of each code.
+    const params: Record<string, string[]> = {
+      input_too_long_chars: ['actual', 'limit'],
+      input_too_long_tokens: ['actual', 'limit'],
+      rate_limited: ['retry_after_s'],
+      busy: ['retry_after_s'],
+    };
+    for (const code of [...SERVER_ERROR_CODES, ...CLIENT_ERROR_CODES]) {
+      expect(placeholders(catalogs[locale]![`error.${code}`]!), `${locale}: error.${code}`).toEqual(
+        params[code] ?? [],
+      );
     }
   });
 

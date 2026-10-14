@@ -33,7 +33,7 @@ export class ApiError extends Error {
   }
 }
 
-const SERVER_CODES: readonly ServerErrorCode[] = [
+export const SERVER_ERROR_CODES: readonly ServerErrorCode[] = [
   'empty_input',
   'input_too_long_chars',
   'input_too_long_tokens',
@@ -42,6 +42,14 @@ const SERVER_CODES: readonly ServerErrorCode[] = [
   'busy',
   'model_loading',
   'internal',
+];
+
+export const CLIENT_ERROR_CODES: readonly ClientErrorCode[] = [
+  'timeout',
+  'network',
+  'wake_timeout',
+  'version_mismatch',
+  'invalid_response',
 ];
 
 /** Each health attempt (research R13). */
@@ -163,7 +171,7 @@ function serverError(status: number, text: string): ApiError {
     return new ApiError('invalid_response', {}, status);
   }
   const error = isRecord(body) ? body.error : undefined;
-  if (!isRecord(error) || !SERVER_CODES.includes(error.code as ServerErrorCode)) {
+  if (!isRecord(error) || !SERVER_ERROR_CODES.includes(error.code as ServerErrorCode)) {
     return new ApiError('invalid_response', {}, status);
   }
   const params = isRecord(error.params) ? (error.params as ErrorParams) : {};
