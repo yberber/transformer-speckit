@@ -654,7 +654,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
 ### Implementation for User Story 6 (frontend)
 
-- [ ] T116 [US6] Implement `frontend/src/lib/api/client.ts`, using the types from `src/generated/api-types.ts`:
+- [X] T116 [US6] Implement `frontend/src/lib/api/client.ts`, using the types from `src/generated/api-types.ts`:
   - `getHealth(signal)` has a 5 s timeout per attempt. `waitForService({signal, onWaking})` polls every 3 s and classifies each attempt per the R13 table:
     - 200 with a valid `Health` body → ready
     - non-200, non-JSON or a 5 s timeout → waking
