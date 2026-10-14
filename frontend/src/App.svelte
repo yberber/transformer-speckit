@@ -32,7 +32,7 @@
     attention: () => import('./views/Attention.svelte'),
     prediction: () => import('./views/Prediction.svelte'),
     architecture: () => import('./views/Architecture.svelte'),
-    cost: () => import('./views/Placeholder.svelte'),
+    cost: () => import('./views/Cost.svelte'),
     method: () => import('./views/Placeholder.svelte'),
   };
 

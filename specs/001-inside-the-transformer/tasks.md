@@ -446,7 +446,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - **Formula ids**: `flops-qkv`, `flops-attn-scores`, `flops-attn-weighting`, `flops-attn-out`, `flops-mlp`, `flops-pos-add`, `flops-lm-head`, `flops-prefill-total`, `flops-decode-total`, `flops-running-total`.
 - [X] T082 [P] [US4] Implement `frontend/src/lib/model/kvcache.ts`: `kvCacheBytes(config, t, bytesPerValue = 4)` = `2·L·t·d·bytesPerValue` as a CostEstimate with `phase 'kv_cache'` and `formulaId 'kv-cache-bytes'`
 - [X] T083 [P] [US4] Create `frontend/src/components/EstimateLabel.svelte`: a visible "theoretical estimate" badge (text, not icon-only) plus a link "How we calculate". The link's `href` is the serialized current state with `view=method` and `#<formulaId>`; clicking it sets `viewState.view = 'method'` and scrolls to and focuses the anchor (FR-027).
-- [ ] T084 [US4] Create `frontend/src/views/Cost.svelte` (FR-022–FR-024, US4-1..3):
+- [X] T084 [US4] Create `frontend/src/views/Cost.svelte` (FR-022–FR-024, US4-1..3):
   - ViewIntro, `<Term id="flops">`, `<Term id="prefill">`, `<Term id="decode">`.
   - Three headline figures from `costAtStep`: prefill for `nInput` tokens; decode for the token at step k (at k = 0, explain that no token has been generated yet); the running total for input plus k generated tokens. Each uses `formatCompact` with the exact integer in `ShowDetails`.
   - A per-layer table: rows = layers 1..`nLayer` plus "Embeddings (position add)" and "LM head" as separate non-layer rows; columns = the components, for the selected phase (toggle prefill/decode).
