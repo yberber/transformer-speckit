@@ -382,5 +382,7 @@
   "live.load_failed": "Der Live-Modus konnte nicht geladen werden. Die Beispiele funktionieren weiterhin.",
   "live.end.step_limit": "Der Text endet hier: Im Live-Modus fügt das Modell höchstens so viele neue Tokens hinzu.",
   "live.end.eos": "Das Modell hat das Textende-Zeichen gewählt, deshalb endet der Text hier.",
-  "live.end.context_limit": "Der Text hat die größte Länge erreicht, die das Modell auf einmal lesen kann, deshalb endet er hier."
+  "live.end.context_limit": "Der Text hat die größte Länge erreicht, die das Modell auf einmal lesen kann, deshalb endet er hier.",
+  "live.continue": "Im Live-Modus fortsetzen",
+  "live.continue_hint": "Mehr sehen? Der Live-Modus führt diesen Text erneut aus und lässt das Modell bis zu {steps} neue Tokens schreiben."
 }

@@ -23,6 +23,7 @@
   } from './lib/data/exampleSource';
   import type { RunData } from './lib/data/runData';
   import { t } from './lib/i18n/index';
+  import { limits } from './lib/limits';
   import { notices } from './lib/state/notices.svelte';
   import { viewState, type Mode, type ViewId } from './lib/state/viewState.svelte';
   import type { ViewProps } from './views/types';
@@ -150,13 +151,18 @@
 
   /** The current live run; it exists only in memory and only while live mode is on. */
   let liveRun = $state.raw<RunData | null>(null);
+  /** "Continue in live mode": the example text to run, and the step to stay at. */
+  let continueFrom = $state.raw<{ text: string; step: number } | null>(null);
 
   function setMode(mode: Mode): void {
     if (mode === viewState.mode || (mode === 'live' && !liveAvailable)) return;
     viewState.setMode(mode);
     // Leaving live mode discards the live run (the panel discards the text as it closes).
     liveRun = null;
-    if (mode === 'example') viewState.setRunSteps(exampleRun?.steps ?? 0);
+    if (mode === 'example') {
+      continueFrom = null;
+      viewState.setRunSteps(exampleRun?.steps ?? 0);
+    }
   }
 
   function onLiveRun(next: RunData | null): void {
@@ -164,14 +170,32 @@
     liveRun = next;
     if (next) {
       viewState.setRunSteps(next.steps);
-      viewState.setStep(0);
+      // After "Continue in live mode" the visitor stays at the step they reached.
+      viewState.setStep(continueFrom?.step ?? 0);
+      continueFrom = null;
     }
+  }
+
+  /** At the last step of an example: run the same text in live mode, up to the live limit. */
+  function continueInLive(): void {
+    if (!exampleRun) return;
+    continueFrom = { text: exampleRun.example.text, step: viewState.step };
+    setMode('live');
   }
 
   const live = $derived(liveAvailable && viewState.mode === 'live');
   const run = $derived(live ? liveRun : exampleRun);
   const needsRun = $derived(RUN_VIEWS.includes(current));
 </script>
+
+{#snippet liveOffer()}
+  <div class="live-offer" data-live-offer>
+    <p>{t('live.continue_hint', { steps: limits.max_new_tokens })}</p>
+    <button type="button" onclick={continueInLive} data-action="continue-live">
+      {t('live.continue')}
+    </button>
+  </div>
+{/snippet}
 
 {#snippet liveFailed()}
   <div class="load-error" role="alert" data-live-load-error>
@@ -207,7 +231,11 @@
         {#await loadLiveMode()}
           <p class="status" role="status">{t('status.loading')}</p>
         {:then module}
-          <module.default onrun={onLiveRun} onbacktoexamples={() => setMode('example')} />
+          <module.default
+            onrun={onLiveRun}
+            onbacktoexamples={() => setMode('example')}
+            startText={continueFrom?.text ?? null}
+          />
         {:catch}
           {@render liveFailed()}
         {/await}
@@ -244,7 +272,7 @@
         </div>
       {:else if !indexFailed}
         <!-- Shown while the run loads too, at its final size, so the view below does not move. -->
-        <GenerationControls {run} />
+        <GenerationControls {run} liveOffer={liveAvailable ? liveOffer : undefined} />
       {/if}
     {/if}
 
@@ -341,6 +369,28 @@
 
   .load-error {
     margin-block: var(--space-3);
+  }
+
+  .live-offer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+    margin-top: var(--space-3);
+  }
+
+  .live-offer p {
+    margin: 0;
+  }
+
+  .live-offer button {
+    min-height: 2.5rem;
+    padding: var(--space-1) var(--space-4);
+    font-weight: 700;
+    color: var(--color-accent-contrast);
+    background: var(--color-accent);
+    border: 0;
+    border-radius: var(--radius-pill);
   }
 
   .live-empty {

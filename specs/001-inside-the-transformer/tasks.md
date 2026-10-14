@@ -679,7 +679,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - Switching to live dynamically imports `LiveMode.svelte` inside `<svelte:boundary>`; any thrown error shows a translated message and keeps example mode usable (Principle V).
   - On entering live mode, call `waitForService`; `version_mismatch` disables live mode with a message.
   - Switching back to example mode discards the live run and text.
-- [ ] T121 [US6] Fill `GenerationControls.svelte`'s `liveOffer` slot (US1-7): when live mode is available and an example is at its last step, show "Continue in live mode". It switches to live mode, puts the example's original text in the field and runs it; generation can then go up to the live step limit.
+- [X] T121 [US6] Fill `GenerationControls.svelte`'s `liveOffer` slot (US1-7): when live mode is available and an example is at its last step, show "Continue in live mode". It switches to live mode, puts the example's original text in the field and runs it; generation can then go up to the live step limit.
 - [ ] T122 [US6] Add all US6 strings to `frontend/src/lib/i18n/{en,tr,de}.json` and check T034 passes: live hints, privacy note, limit statements, chat tip, non-English note, waking status, Cancel, Back to examples, and `error.<code>` for every server and client code with `{limit}`, `{actual}` and `{retry_after_s}` placeholders.
 
 **Checkpoint**: Live mode works end to end, and every failure is contained.

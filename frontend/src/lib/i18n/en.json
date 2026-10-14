@@ -382,5 +382,7 @@
   "live.load_failed": "Live mode could not be loaded. The examples still work.",
   "live.end.step_limit": "The text ends here: in live mode the model adds at most this many new tokens.",
   "live.end.eos": "The model chose the end-of-text marker, so the text ends here.",
-  "live.end.context_limit": "The text has reached the longest length the model can read at once, so it ends here."
+  "live.end.context_limit": "The text has reached the longest length the model can read at once, so it ends here.",
+  "live.continue": "Continue in live mode",
+  "live.continue_hint": "Want more? Live mode runs this text again and lets the model write up to {steps} new tokens."
 }

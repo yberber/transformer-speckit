@@ -382,5 +382,7 @@
   "live.load_failed": "Canlı mod yüklenemedi. Örnekler çalışmaya devam ediyor.",
   "live.end.step_limit": "Metin burada bitiyor: canlı modda model en fazla bu kadar yeni token ekler.",
   "live.end.eos": "Model metin sonu işaretini seçti, bu yüzden metin burada bitiyor.",
-  "live.end.context_limit": "Metin, modelin bir kerede okuyabileceği en büyük uzunluğa ulaştı, bu yüzden burada bitiyor."
+  "live.end.context_limit": "Metin, modelin bir kerede okuyabileceği en büyük uzunluğa ulaştı, bu yüzden burada bitiyor.",
+  "live.continue": "Canlı modda devam et",
+  "live.continue_hint": "Daha fazlasını mı istiyorsunuz? Canlı mod bu metni yeniden çalıştırır ve modelin en fazla {steps} yeni token yazmasına izin verir."
 }
