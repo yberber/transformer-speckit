@@ -417,7 +417,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - `decodeFlops` at t = 1, 10, 1024 and `prefillFlops` at n = 10, 64
   - `runningTotal(n, k) = prefill(n) + Σⱼ₌₁..ₖ decode(n + j)` for n = 10, k = 3
   - every value satisfies `Number.isSafeInteger`
-- [ ] T079 [P] [US4] Write `frontend/tests/unit/model/kvcache.test.ts`: `kvCacheBytes(config, 1)` and `kvCacheBytes(config, 1024)` equal the references. The formula is `2·L·t·d·4`.
+- [X] T079 [P] [US4] Write `frontend/tests/unit/model/kvcache.test.ts`: `kvCacheBytes(config, 1)` and `kvCacheBytes(config, 1024)` equal the references. The formula is `2·L·t·d·4`.
 - [ ] T080 [P] [US4] Write `frontend/tests/e2e/cost.spec.ts` (`@cost`):
   - at step 0, prefill shows and decode shows "no new token yet"
   - at step 3, decode equals `decodeFlops(n_input+3)` (formatted) and the running total is correct
