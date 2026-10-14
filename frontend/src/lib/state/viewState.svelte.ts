@@ -91,6 +91,17 @@ export class ViewState {
     this.step = clampInt(step, 0, this.runSteps) ?? this.step;
   }
 
+  /**
+   * Restore view, layer, head and step from a link (contracts/url-state.md). The step is not
+   * clamped here, since the run may not be loaded yet: `setRunSteps` clamps it when it is.
+   */
+  restore(state: { view: ViewId; layer: number; head: number; step: number }): void {
+    this.setView(state.view);
+    this.setLayer(state.layer);
+    this.setHead(state.head);
+    if (Number.isFinite(state.step)) this.step = Math.max(0, Math.floor(state.step));
+  }
+
   setLang(lang: string): boolean {
     if (!isLocale(lang)) return false;
     this.lang = lang;

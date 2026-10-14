@@ -3,7 +3,8 @@
   panel, the flow indicator and view navigation, and the current view. Views load lazily and each
   sits in its own error boundary, so one failing view never breaks the others. Live mode is a
   lazily loaded chunk in a boundary of its own: whatever goes wrong there, example mode keeps
-  working (Principle V).
+  working (Principle V). The address always holds the shareable state (contracts/url-state.md):
+  changing view, example or mode adds a history entry, the rest replaces the current one.
 -->
 <script lang="ts">
   import type { Component } from 'svelte';
@@ -24,9 +25,24 @@
   import type { RunData } from './lib/data/runData';
   import { t } from './lib/i18n/index';
   import { limits } from './lib/limits';
-  import { notices } from './lib/state/notices.svelte';
+  import { modelConfig } from './lib/model/config';
+  import { notices, raiseLinkNotice } from './lib/state/notices.svelte';
+  import {
+    clampExample,
+    clampStep,
+    parseUrl,
+    serializeUrl,
+    type ShareableState,
+  } from './lib/state/url';
   import { viewState, type Mode, type ViewId } from './lib/state/viewState.svelte';
   import type { ViewProps } from './views/types';
+
+  let {
+    linkExample = null,
+  }: {
+    /** The example named by the address at startup, not yet checked against index.json. */
+    linkExample?: string | null;
+  } = $props();
 
   type ViewModule = { default: Component<ViewProps> };
 
@@ -55,6 +71,12 @@
   /** Live mode exists only in builds that name an API (Principle V: the site works without). */
   const liveAvailable = Boolean(import.meta.env.VITE_API_BASE_URL);
 
+  // A link to live mode in a build without it opens example mode.
+  if (viewState.mode === 'live' && !liveAvailable) {
+    viewState.setMode('example');
+    raiseLinkNotice();
+  }
+
   let attempt = $state(0);
   const current = $derived(viewState.view);
   const loading = $derived.by(() => {
@@ -70,6 +92,8 @@
   /** ID of the example whose data failed to load; only that example is affected. */
   let failedId = $state<string | null>(null);
   let reload = $state(0);
+  /** The step from the link is checked against the first run that loads. */
+  let linkStepPending = true;
   /** Input token counts for the picker, filled in as examples load. */
   const tokenCounts: Record<string, number> = $state({});
 
@@ -82,7 +106,12 @@
       return;
     }
     const ids = index.examples.map((e) => e.id);
-    if (!viewState.exampleId || !ids.includes(viewState.exampleId)) {
+    if (!viewState.exampleId) {
+      // The example from the link, or the first one. Set directly: the link's step stays.
+      const { exampleId, replaced } = clampExample(linkExample, ids);
+      viewState.exampleId = exampleId;
+      if (replaced) raiseLinkNotice();
+    } else if (!ids.includes(viewState.exampleId)) {
       viewState.setExample(ids[0]!);
     }
   }
@@ -99,7 +128,12 @@
         if (cancelled) return;
         loaded = { id, run };
         tokenCounts[id] = run.nInput;
-        viewState.setRunSteps(run.steps);
+        // In live mode the steps come from the live run (onLiveRun).
+        if (viewState.mode === 'example') {
+          if (linkStepPending && clampStep(viewState.step, run).replaced) raiseLinkNotice();
+          viewState.setRunSteps(run.steps);
+        }
+        linkStepPending = false;
         prefetchOthers();
       },
       () => {
@@ -183,6 +217,57 @@
     setMode('live');
   }
 
+  // --- shareable address (contracts/url-state.md) -------------------------------------------
+
+  /** The state last written to (or read from) the address. */
+  let shown: (ShareableState & { checked: boolean }) | null = null;
+
+  $effect(() => {
+    const state: ShareableState = {
+      mode: viewState.mode,
+      // Until index.json is in, the link's example stays in the address unchecked.
+      exampleId: viewState.exampleId ?? linkExample,
+      view: viewState.view,
+      layer: viewState.layer,
+      head: viewState.head,
+      step: viewState.step,
+      lang: viewState.lang,
+    };
+    const checked = viewState.exampleId !== null;
+    const next = serializeUrl(state, location.hash);
+    const prev = shown;
+    shown = { ...state, checked };
+    if (next === location.search + location.hash) return;
+    // The first write normalizes the link; replacing an unchecked example is a correction too.
+    const push =
+      prev !== null &&
+      (prev.view !== state.view ||
+        prev.mode !== state.mode ||
+        (prev.checked && prev.exampleId !== state.exampleId));
+    try {
+      if (push) history.pushState(null, '', next);
+      else history.replaceState(null, '', next);
+    } catch {
+      // Browsers limit how often the address may change (e.g. while stepping fast); the next
+      // change writes it again.
+    }
+  });
+
+  /** Back and Forward: show the state of that address. */
+  function onPopState(): void {
+    const { state } = parseUrl(location.search, {
+      exampleIds: index?.examples.map((e) => e.id) ?? null,
+      nLayer: modelConfig.nLayer,
+      nHead: modelConfig.nHead,
+    });
+    setMode(state.mode);
+    if (state.exampleId !== null && state.exampleId !== viewState.exampleId) {
+      viewState.exampleId = state.exampleId;
+    }
+    viewState.restore(state);
+    if (state.lang && state.lang !== viewState.lang) viewState.setLang(state.lang);
+  }
+
   const live = $derived(liveAvailable && viewState.mode === 'live');
   const run = $derived(live ? liveRun : exampleRun);
   const needsRun = $derived(RUN_VIEWS.includes(current));
@@ -203,6 +288,8 @@
     <button type="button" onclick={() => setMode('example')}>{t('live.back_to_examples')}</button>
   </div>
 {/snippet}
+
+<svelte:window onpopstate={onPopState} />
 
 <div class="app" data-app data-mode={viewState.mode}>
   <a class="skip-link" href="#main">{t('app.skip_to_content')}</a>

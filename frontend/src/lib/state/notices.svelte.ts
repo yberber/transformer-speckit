@@ -19,3 +19,21 @@ export function notify(message: string, ms = 6000): void {
     if (i >= 0) notices.splice(i, 1);
   }, ms);
 }
+
+/**
+ * The "part of the link could not be restored" notice (US7-3). It is raised at most once per
+ * page load, however many parts of the link turn out to be invalid, and stays until dismissed.
+ */
+export const linkNotice = $state({ visible: false });
+
+let linkNoticeRaised = false;
+
+export function raiseLinkNotice(): void {
+  if (linkNoticeRaised) return;
+  linkNoticeRaised = true;
+  linkNotice.visible = true;
+}
+
+export function dismissLinkNotice(): void {
+  linkNotice.visible = false;
+}

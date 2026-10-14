@@ -109,6 +109,16 @@ describe('ViewState', () => {
     expect([s.view, s.layer, s.head]).toEqual(['attention', 5, 3]);
   });
 
+  it('restores a link without resetting the step, and clamps it only once the run is known', () => {
+    const s = new ViewState();
+    s.restore({ view: 'attention', layer: 4, head: 2, step: 7 });
+    expect([s.view, s.layer, s.head, s.step]).toEqual(['attention', 4, 2, 7]);
+    s.setRunSteps(5);
+    expect(s.step).toBe(5);
+    s.restore({ view: 'nope' as never, layer: modelConfig.nLayer + 1, head: 0, step: -2 });
+    expect([s.view, s.layer, s.head, s.step]).toEqual(['attention', modelConfig.nLayer, 1, 0]);
+  });
+
   it('persists and applies the theme', () => {
     const storage = memoryStorage();
     vi.stubGlobal('localStorage', storage);

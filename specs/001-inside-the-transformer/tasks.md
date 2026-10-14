@@ -716,7 +716,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 ### Implementation for User Story 7
 
 - [X] T125 [US7] Implement `frontend/src/lib/state/url.ts` per `contracts/url-state.md`. `parseUrl(search, ctx: { exampleIds, nLayer, nHead }) -> { state: Partial<ViewState>, replaced: string[] }` and `clampStep(step, run) -> { step, replaced }` (applied after the example's `core.json` loads). `serializeUrl(state: Pick<ViewState,'mode'|'exampleId'|'view'|'layer'|'head'|'step'|'lang'>, hash?) -> string` writes the keys in contract order, omits defaults except `ex` and `lang`, and never accepts live text.
-- [ ] T126 [US7] Wire URL sync in `frontend/src/main.ts` and `frontend/src/App.svelte`:
+- [X] T126 [US7] Wire URL sync in `frontend/src/main.ts` and `frontend/src/App.svelte`:
   - At startup, parse the URL, pass `urlLang` to `resolveLocale`, apply the state, clamp the step after the core loads, `history.replaceState` the normalized URL, and raise the notice if anything was replaced.
   - On state change, `view`/`ex`/`mode` changes call `history.pushState` and `layer`/`head`/`step`/`lang` changes call `replaceState`.
   - A `popstate` listener re-applies the parsed state.
