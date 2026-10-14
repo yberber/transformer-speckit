@@ -1,6 +1,7 @@
 // What the visitor is looking at (data-model.md "ViewState"). Everything here except the theme
 // is shareable through the URL (contracts/url-state.md). Live-mode text is deliberately NOT
 // part of this class: it must never reach the URL or storage (FR-012, FR-034).
+import { MediaQuery } from 'svelte/reactivity';
 import { isLocale, setLocale, type Locale } from '../i18n/index';
 import { modelConfig } from '../model/config';
 
@@ -25,6 +26,8 @@ export type ThemePreference = 'light' | 'dark' | 'system';
 export const THEMES: readonly ThemePreference[] = ['system', 'light', 'dark'];
 
 export const THEME_STORAGE_KEY = 'itt.theme';
+
+const prefersDark = new MediaQuery('(prefers-color-scheme: dark)', false);
 
 export function isView(v: unknown): v is ViewId {
   return VIEWS.includes(v as ViewId);
@@ -61,6 +64,12 @@ export class ViewState {
   constructor() {
     this.theme = readStoredTheme();
     this.applyTheme();
+  }
+
+  /** The theme actually shown: the system setting when the preference is "system". */
+  get resolvedTheme(): 'light' | 'dark' {
+    if (this.theme !== 'system') return this.theme;
+    return prefersDark.current ? 'dark' : 'light';
   }
 
   setMode(mode: Mode): boolean {

@@ -124,6 +124,16 @@ describe('ViewState', () => {
     expect(s.setTheme('sepia')).toBe(false);
   });
 
+  it('resolves the shown theme', () => {
+    const s = new ViewState();
+    // No matchMedia in the node environment: "system" falls back to light.
+    expect(s.resolvedTheme).toBe('light');
+    s.setTheme('dark');
+    expect(s.resolvedTheme).toBe('dark');
+    s.setTheme('light');
+    expect(s.resolvedTheme).toBe('light');
+  });
+
   it('keeps working when localStorage throws', () => {
     vi.stubGlobal('localStorage', throwingStorage);
     const s = new ViewState();
