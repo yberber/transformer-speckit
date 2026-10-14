@@ -550,7 +550,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - Validate each error code: `empty_input`, `input_too_long_chars`, `input_too_long_tokens`, `invalid_request`, `rate_limited`, `busy`, `model_loading` (model not yet loaded), and `internal` (monkeypatch `compute_run` to raise).
   - Assert the status codes and the `Retry-After` header for 429/503.
   - Also validate every file in `contracts/fixtures/api/` against its schema.
-- [ ] T100 [P] [US6] Write `backend/tests/integration/test_limits.py`. Check that:
+- [X] T100 [P] [US6] Write `backend/tests/integration/test_limits.py`. Check that:
   - 64 input tokens → 200; 65 → 422 `{"error":{"code":"input_too_long_tokens","params":{"limit":64,"actual":65}}}`, and the model is never called (spy on `compute_run`)
   - 1,000 code points (including astral emoji) → passes the char check; 1,001 → 422 `input_too_long_chars`
   - whitespace-only text → 422 `empty_input`
