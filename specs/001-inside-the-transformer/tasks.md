@@ -81,7 +81,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - **Change percentages**: `attn_change_pct = ‖a_i‖/‖x_i‖·100` and `mlp_change_pct = ‖m_i‖/‖(x+a)_i‖·100` per position. Do not use `output_hidden_states` (its last entry has `ln_f` applied).
   - **Other functions**: `attention_layer(token_ids, layer_1based) -> ndarray[H,T,T]` and `token_embeddings(token_ids) -> (unique_ids in first-appearance order, wte rows float32)`.
   - **Serialization**: `Run.to_core()` returns the `RunCore` dict from `contracts/example-data.schema.json`, with tokens as `{id, bytes}` and floats via `sig7`.
-- [ ] T014 Write `backend/tests/unit/test_run.py` (marker `model`) and check that:
+- [X] T014 Write `backend/tests/unit/test_run.py` (marker `model`) and check that:
   - `len(tokens) == n_input + steps` and `len(predictions) == steps + 1`
   - `predictions[k-1].candidates[0].id == tokens[n_input+k-1].id`
   - candidates are "sorted by prob desc, ties by id asc" and every prob satisfies "0 < prob ≤ 1"
