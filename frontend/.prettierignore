@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+coverage/
+playwright-report/
+test-results/
+.lighthouseci/
+package-lock.json
+# Generated: written by scripts, never formatted by hand
+src/generated/
+public/data/
+tests/reference/param-shapes.json
