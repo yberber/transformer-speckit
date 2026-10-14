@@ -89,6 +89,8 @@
   "prediction.col.prob": "Wahrscheinlichkeit",
   "status.loading": "Wird geladen…",
   "notices.label": "Hinweise",
+  "notice.link_partial": "Ein Teil des Links konnte nicht wiederhergestellt werden. Sie sehen die nächstliegende gültige Ansicht.",
+  "notice.dismiss": "Schließen",
   "share.copy_link": "Link kopieren",
   "share.copied": "Link kopiert. Wer ihn öffnet, sieht genau diese Ansicht.",
   "share.copy_manual": "Dieser Browser hat das Kopieren nicht erlaubt. Der Link ist im Feld markiert und kann kopiert werden.",

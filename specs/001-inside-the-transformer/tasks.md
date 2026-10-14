@@ -722,7 +722,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - A `popstate` listener re-applies the parsed state.
   - The fragment is preserved for `view=method`.
 - [X] T127 [P] [US7] Create `frontend/src/components/CopyLinkButton.svelte` (US7-1/4). In example mode it copies `location.href` (already normalized) via `navigator.clipboard.writeText`, falling back to a read-only selected `<input>`, and confirms with a polite `aria-live` message. In live mode it does not copy; it explains that the visitor's own text is never put into links, to protect their privacy.
-- [ ] T128 [P] [US7] Create `frontend/src/components/Notice.svelte`: a one-time, dismissible, polite `aria-live` notice "Part of the link could not be restored", shown in the App notice region
+- [X] T128 [P] [US7] Create `frontend/src/components/Notice.svelte`: a one-time, dismissible, polite `aria-live` notice "Part of the link could not be restored", shown in the App notice region
 - [ ] T129 [US7] Add all US7 strings (copy link, copied confirmation, live-share explanation, link notice) to `frontend/src/lib/i18n/{en,tr,de}.json`
 
 **Checkpoint**: All user stories are complete.

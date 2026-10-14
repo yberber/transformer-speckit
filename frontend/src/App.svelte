@@ -15,6 +15,7 @@
   import IntroNote from './components/IntroNote.svelte';
   import LanguageSwitch from './components/LanguageSwitch.svelte';
   import ModeSwitch from './components/ModeSwitch.svelte';
+  import Notice from './components/Notice.svelte';
   import ThemeSwitch from './components/ThemeSwitch.svelte';
   import ViewNav from './components/ViewNav.svelte';
   import {
@@ -27,7 +28,12 @@
   import { t } from './lib/i18n/index';
   import { limits } from './lib/limits';
   import { modelConfig } from './lib/model/config';
-  import { notices, raiseLinkNotice } from './lib/state/notices.svelte';
+  import {
+    dismissLinkNotice,
+    linkNotice,
+    notices,
+    raiseLinkNotice,
+  } from './lib/state/notices.svelte';
   import {
     clampExample,
     clampStep,
@@ -394,8 +400,11 @@
   </main>
 
   <div class="notices" role="status" aria-live="polite" aria-label={t('notices.label')}>
+    {#if linkNotice.visible}
+      <Notice message={t('notice.link_partial')} ondismiss={dismissLinkNotice} data-link-notice />
+    {/if}
     {#each notices as notice (notice.id)}
-      <p class="notice">{notice.message}</p>
+      <Notice message={notice.message} />
     {/each}
   </div>
 </div>
@@ -518,17 +527,5 @@
     justify-items: center;
     gap: var(--space-2);
     pointer-events: none;
-  }
-
-  .notice {
-    max-width: 40rem;
-    margin: 0;
-    padding: var(--space-3) var(--space-4);
-    color: var(--color-text);
-    background: var(--color-surface-raised);
-    border: 1px solid var(--color-border-strong);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-panel);
-    pointer-events: auto;
   }
 </style>

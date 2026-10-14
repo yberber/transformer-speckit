@@ -89,6 +89,8 @@
   "prediction.col.prob": "Probability",
   "status.loading": "Loading…",
   "notices.label": "Notifications",
+  "notice.link_partial": "Part of the link could not be restored. You are seeing the nearest valid view.",
+  "notice.dismiss": "Dismiss",
   "share.copy_link": "Copy link",
   "share.copied": "Link copied. Anyone who opens it sees exactly this view.",
   "share.copy_manual": "This browser did not allow copying. The link is selected in the field, ready to copy.",

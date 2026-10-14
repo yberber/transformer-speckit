@@ -89,6 +89,8 @@
   "prediction.col.prob": "Olasılık",
   "status.loading": "Yükleniyor…",
   "notices.label": "Bildirimler",
+  "notice.link_partial": "Bağlantının bir kısmı geri yüklenemedi. En yakın geçerli görünümü görüyorsunuz.",
+  "notice.dismiss": "Kapat",
   "share.copy_link": "Bağlantıyı kopyala",
   "share.copied": "Bağlantı kopyalandı. Açan herkes tam olarak bu görünümü görür.",
   "share.copy_manual": "Bu tarayıcı kopyalamaya izin vermedi. Bağlantı alanda seçili, kopyalamaya hazır.",

@@ -1,5 +1,5 @@
-// Short messages announced politely to screen readers and shown briefly on screen, e.g. "part of
-// the link could not be restored". Rendered by App.svelte in an aria-live region.
+// Short messages announced politely to screen readers and shown briefly on screen, and the
+// one-time link notice. App.svelte renders both with Notice.svelte in an aria-live region.
 
 export interface Notice {
   id: number;
