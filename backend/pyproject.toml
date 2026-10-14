@@ -1,0 +1,49 @@
+[project]
+name = "inside-the-transformer-backend"
+version = "0.1.0"
+description = "GPT-2 small inference service, example-data generator and verifier for Inside the Transformer"
+requires-python = "==3.12.*"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic>=2",
+    "torch",
+    "transformers",
+    "numpy",
+    "huggingface_hub",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "httpx",
+    "jsonschema",
+    "referencing",
+    "pyyaml",
+    "ruff",
+]
+
+[tool.uv]
+# Application, not a library: run modules from this directory (`python -m app.…`, `-m tools.…`).
+package = false
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "model: needs GPT-2 weights",
+]
