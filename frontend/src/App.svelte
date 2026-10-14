@@ -1,7 +1,9 @@
 <!--
-  App shell: header (title, language/mode/theme switches), intro, example picker, the flow
-  indicator and view navigation, and the current view. Views load lazily and each sits in its
-  own error boundary, so one failing view never breaks the others (Principle V).
+  App shell: header (title, language/mode/theme switches), intro, example picker or live mode
+  panel, the flow indicator and view navigation, and the current view. Views load lazily and each
+  sits in its own error boundary, so one failing view never breaks the others. Live mode is a
+  lazily loaded chunk in a boundary of its own: whatever goes wrong there, example mode keeps
+  working (Principle V).
 -->
 <script lang="ts">
   import type { Component } from 'svelte';
@@ -10,6 +12,7 @@
   import GenerationControls from './components/GenerationControls.svelte';
   import IntroNote from './components/IntroNote.svelte';
   import LanguageSwitch from './components/LanguageSwitch.svelte';
+  import ModeSwitch from './components/ModeSwitch.svelte';
   import ThemeSwitch from './components/ThemeSwitch.svelte';
   import ViewNav from './components/ViewNav.svelte';
   import {
@@ -18,9 +21,10 @@
     type ExampleIndex,
     type ExampleRun,
   } from './lib/data/exampleSource';
+  import type { RunData } from './lib/data/runData';
   import { t } from './lib/i18n/index';
   import { notices } from './lib/state/notices.svelte';
-  import { viewState, type ViewId } from './lib/state/viewState.svelte';
+  import { viewState, type Mode, type ViewId } from './lib/state/viewState.svelte';
   import type { ViewProps } from './views/types';
 
   type ViewModule = { default: Component<ViewProps> };
@@ -128,9 +132,53 @@
     });
   }
 
-  const run = $derived(loaded && loaded.id === viewState.exampleId ? loaded.run : null);
+  const exampleRun = $derived(loaded && loaded.id === viewState.exampleId ? loaded.run : null);
+
+  // --- live mode ----------------------------------------------------------------------------
+
+  type LiveModeModule = typeof import('./components/live/LiveMode.svelte');
+  let liveModule: Promise<LiveModeModule> | null = null;
+
+  /** The live mode chunk, loaded on first use; a failed load can be retried. */
+  function loadLiveMode(): Promise<LiveModeModule> {
+    liveModule ??= import('./components/live/LiveMode.svelte').catch((e: unknown) => {
+      liveModule = null;
+      throw e;
+    });
+    return liveModule;
+  }
+
+  /** The current live run; it exists only in memory and only while live mode is on. */
+  let liveRun = $state.raw<RunData | null>(null);
+
+  function setMode(mode: Mode): void {
+    if (mode === viewState.mode || (mode === 'live' && !liveAvailable)) return;
+    viewState.setMode(mode);
+    // Leaving live mode discards the live run (the panel discards the text as it closes).
+    liveRun = null;
+    if (mode === 'example') viewState.setRunSteps(exampleRun?.steps ?? 0);
+  }
+
+  function onLiveRun(next: RunData | null): void {
+    if (next === liveRun) return;
+    liveRun = next;
+    if (next) {
+      viewState.setRunSteps(next.steps);
+      viewState.setStep(0);
+    }
+  }
+
+  const live = $derived(liveAvailable && viewState.mode === 'live');
+  const run = $derived(live ? liveRun : exampleRun);
   const needsRun = $derived(RUN_VIEWS.includes(current));
 </script>
+
+{#snippet liveFailed()}
+  <div class="load-error" role="alert" data-live-load-error>
+    <p>{t('live.load_failed')}</p>
+    <button type="button" onclick={() => setMode('example')}>{t('live.back_to_examples')}</button>
+  </div>
+{/snippet}
 
 <div class="app" data-app data-mode={viewState.mode}>
   <a class="skip-link" href="#main">{t('app.skip_to_content')}</a>
@@ -141,7 +189,7 @@
       <div class="controls">
         <LanguageSwitch />
         {#if liveAvailable}
-          <div data-slot="mode"></div>
+          <ModeSwitch mode={viewState.mode} onselect={setMode} />
         {/if}
         <ThemeSwitch />
       </div>
@@ -154,7 +202,21 @@
       <IntroNote />
     </section>
 
-    {#if indexFailed}
+    {#if live}
+      <svelte:boundary>
+        {#await loadLiveMode()}
+          <p class="status" role="status">{t('status.loading')}</p>
+        {:then module}
+          <module.default onrun={onLiveRun} onbacktoexamples={() => setMode('example')} />
+        {:catch}
+          {@render liveFailed()}
+        {/await}
+
+        {#snippet failed()}
+          {@render liveFailed()}
+        {/snippet}
+      </svelte:boundary>
+    {:else if indexFailed}
       <div class="load-error" role="alert" data-index-error>
         <p>{t('error.index_load')}</p>
         <button type="button" onclick={startExamples}>{t('action.retry')}</button>
@@ -169,7 +231,13 @@
     </div>
 
     {#if needsRun}
-      {#if failedId !== null && failedId === viewState.exampleId}
+      {#if live}
+        {#if liveRun}
+          <GenerationControls run={liveRun} />
+        {:else}
+          <p class="live-empty" data-live-empty>{t('live.empty')}</p>
+        {/if}
+      {:else if failedId !== null && failedId === viewState.exampleId}
         <div class="load-error" role="alert" data-example-error>
           <p>{t('error.example_load')}</p>
           <button type="button" onclick={() => reload++}>{t('action.retry')}</button>
@@ -239,10 +307,6 @@
     gap: var(--space-3);
   }
 
-  .controls > div:empty {
-    display: none;
-  }
-
   main {
     padding-block: var(--space-5) var(--space-7);
   }
@@ -277,6 +341,15 @@
 
   .load-error {
     margin-block: var(--space-3);
+  }
+
+  .live-empty {
+    margin-block: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    color: var(--color-text-muted);
+    background: var(--color-surface);
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-lg);
   }
 
   .load-error p {

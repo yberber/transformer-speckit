@@ -674,7 +674,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - **Non-English note**: after a run, if the text contains a letter outside ASCII (`/\p{L}/u` and non-ASCII), explain that such text splits into many small tokens and gives weaker continuations.
   - **Status and errors**: a "Waking up the model…" status with elapsed seconds and Cancel. Error messages come from `error.<code>` with params, plus "Back to examples". `wake_timeout` adds a link to the Space page.
   - **Results**: on success, pass the live `RunData` to the same views and controls as example mode (FR-009).
-- [ ] T120 [US6] Create `frontend/src/components/ModeSwitch.svelte` and wire it in `frontend/src/App.svelte`:
+- [X] T120 [US6] Create `frontend/src/components/ModeSwitch.svelte` and wire it in `frontend/src/App.svelte`:
   - Rendered only when `VITE_API_BASE_URL` is non-empty.
   - Switching to live dynamically imports `LiveMode.svelte` inside `<svelte:boundary>`; any thrown error shows a translated message and keeps example mode usable (Principle V).
   - On entering live mode, call `waitForService`; `version_mismatch` disables live mode with a message.

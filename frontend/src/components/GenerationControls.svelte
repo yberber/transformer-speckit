@@ -104,7 +104,7 @@
 
   {#if run && atEnd}
     <div class="message end" data-end-message data-stop-reason={run.stopReason}>
-      <p>{t(endMessageKey(run.stopReason))}</p>
+      <p>{t(endMessageKey(run.stopReason, run.source))}</p>
       {#if run.stopReason === 'eos'}
         <p class="muted">{t('example.end.eos_marker')}</p>
       {/if}

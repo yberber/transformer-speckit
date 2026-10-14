@@ -57,6 +57,14 @@
   );
 
   const errorKey = (code: string) => `error.${code}` as MessageKey;
+  /** A service on another model version keeps live mode off, with its message, until reload. */
+  const shownError = $derived(
+    session.disabled
+      ? { code: 'version_mismatch' as const, params: {} }
+      : session.state === 'error'
+        ? session.error
+        : null,
+  );
   const statusKey = $derived(
     session.state === 'idle' || session.state === 'error'
       ? null
@@ -144,10 +152,10 @@
     <p class="note" data-non-english-note>{t('live.non_english')}</p>
   {/if}
 
-  {#if session.state === 'error' && session.error}
-    <div class="error" role="alert" data-live-error data-code={session.error.code}>
-      <p>{t(errorKey(session.error.code), session.error.params)}</p>
-      {#if session.error.code === 'wake_timeout'}
+  {#if shownError}
+    <div class="error" role="alert" data-live-error data-code={shownError.code}>
+      <p>{t(errorKey(shownError.code), shownError.params)}</p>
+      {#if shownError.code === 'wake_timeout'}
         <p>
           <a href={API_BASE_URL} target="_blank" rel="noopener noreferrer" data-space-link>
             {t('live.space_link')}

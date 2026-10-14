@@ -98,11 +98,11 @@ test('@live a run shows every view and steps like example mode', async ({ page }
   await openView(page, 'embeddings');
   await expect(page.locator('[data-embedding-row]')).toHaveCount(N);
   await openView(page, 'blocks');
-  await expect(page.locator('section[data-view="blocks"] [data-block]').first()).toBeVisible();
+  await expect(page.locator('section[data-view="blocks"] [data-block-schematic]')).toBeVisible();
   await openView(page, 'attention');
   await expect(page.locator('[data-heatmap-grid]')).toHaveAttribute('data-size', String(N));
   await openView(page, 'cost');
-  await expect(page.locator('section[data-view="cost"] [data-cost]').first()).toBeVisible();
+  await expect(page.locator('section[data-view="cost"] [data-cost-figure]').first()).toBeVisible();
   await openView(page, 'prediction');
   await expect(page.locator('section[data-view="prediction"] [data-candidates] > li')).toHaveCount(
     10,

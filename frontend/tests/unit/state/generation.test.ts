@@ -21,6 +21,9 @@ describe('endMessageKey', () => {
     expect(endMessageKey('step_limit')).toBe('example.end.step_limit');
     expect(endMessageKey('eos')).toBe('example.end.eos');
     expect(endMessageKey('context_limit')).toBe('example.end.context_limit');
+    expect(endMessageKey('step_limit', 'live')).toBe('live.end.step_limit');
+    expect(endMessageKey('eos', 'live')).toBe('live.end.eos');
+    expect(endMessageKey('context_limit', 'live')).toBe('live.end.context_limit');
   });
 });
 

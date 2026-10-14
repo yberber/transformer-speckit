@@ -374,5 +374,13 @@
   "live.status.ready": "Done. Step through the result with the buttons below.",
   "live.cancel": "Cancel",
   "live.back_to_examples": "Back to examples",
-  "live.space_link": "Open the model service page"
+  "live.space_link": "Open the model service page",
+  "mode.label": "Text",
+  "mode.example": "Examples",
+  "mode.live": "Your own text",
+  "live.empty": "Type a text above and press Run to see this view with your own text.",
+  "live.load_failed": "Live mode could not be loaded. The examples still work.",
+  "live.end.step_limit": "The text ends here: in live mode the model adds at most this many new tokens.",
+  "live.end.eos": "The model chose the end-of-text marker, so the text ends here.",
+  "live.end.context_limit": "The text has reached the longest length the model can read at once, so it ends here."
 }
