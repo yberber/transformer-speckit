@@ -56,7 +56,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
 - [X] T009 Implement `backend/app/core/model.py`. Constants `MODEL_ID = "openai-community/gpt2"` and `MODEL_REVISION`: resolve the current 40-hex commit SHA once with `huggingface_hub.HfApi().model_info(MODEL_ID).sha` and hard-code it here (never "main"; this is the only place it is defined). `load()` → `(tokenizer, model)` using `GPT2TokenizerFast` and `GPT2LMHeadModel.from_pretrained(..., revision=MODEL_REVISION, attn_implementation="eager", torch_dtype=torch.float32)`, `model.eval()`, `torch.set_num_threads(int(os.environ.get("TORCH_THREADS", "2")))`, cached as a module singleton. Also add `tokenize(text) -> list[int]` using `tokenizer(text, split_special_tokens=True)["input_ids"]`, `token_bytes(id) -> bytes` (via `convert_ids_to_tokens` + the byte-level BPE `byte_decoder`), `eos_token_id()`, `versions() -> {"torch": …, "transformers": …}`, and `python -m app.core.model --download` (snapshot download for the Docker build).
 - [X] T010 [P] Implement `backend/app/limits.py`. Load `limits.json` from env `LIMITS_PATH`, else `<repo>/contracts/limits.json`, else `/app/contracts/limits.json`. Expose a frozen dataclass `Limits(max_input_tokens, max_new_tokens, max_input_chars, wait_limit_s, example_steps, file_budget_bytes, initial_load_budget_bytes)`.
-- [ ] T011 [P] Implement `backend/app/core/encode.py`:
+- [X] T011 [P] Implement `backend/app/core/encode.py`:
   - `pack_causal(att: ndarray[H,T,T]) -> ndarray[H, T*(T+1)//2]` with "index of (i, j), j ≤ i = i(i+1)/2 + j"
   - `quantize_u16(w)` = `round(w × 65535)` clipped to [0, 65535], scale `1/65535`
   - `to_le_bytes(arr, dtype)` for float32/uint16 little-endian
