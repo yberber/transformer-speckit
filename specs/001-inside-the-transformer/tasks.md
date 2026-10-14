@@ -624,7 +624,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
 ### Tests for User Story 6 (frontend) ⚠️
 
-- [ ] T112 [P] [US6] Write `frontend/tests/contract/api-client.test.ts`. Ajv-validate every `contracts/fixtures/api/*.json` body against the OpenAPI component schemas, extracted from the YAML with the external `$ref` resolved. Then drive `client.ts` with a mocked `fetch` serving each fixture and check:
+- [X] T112 [P] [US6] Write `frontend/tests/contract/api-client.test.ts`. Ajv-validate every `contracts/fixtures/api/*.json` body against the OpenAPI component schemas, extracted from the YAML with the external `$ref` resolved. Then drive `client.ts` with a mocked `fetch` serving each fixture and check:
   - success responses parse into typed objects
   - each `error-<code>` maps to an `ApiError` with the same code and params
   - an abort after 60 s → `timeout`; a fetch rejection on a model request (`/runs`, `/attention`, `/token-embeddings`) → `network`
