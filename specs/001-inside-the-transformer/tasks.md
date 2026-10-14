@@ -343,7 +343,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - Two ChangeBars at the current step: attention part (`changeAt(...).attn`) and MLP part (`.mlp`).
   - A link "See this layer's attention heads" sets the view to `attention` and keeps the layer.
   - A data-flow animation through the block uses `duration()`.
-- [ ] T070 [US2] Create `frontend/src/components/Heatmap.svelte` (FR-017, FR-038, US2-4/5):
+- [X] T070 [US2] Create `frontend/src/components/Heatmap.svelte` (FR-017, FR-038, US2-4/5):
   - **Rendering**: `<canvas>` with rows = query tokens and columns = key tokens for the current prefix. Masked future cells (j > i) are drawn with a hatch pattern plus a lighter fill, so the mask is not shown by color alone. Valid cells use a sequential scale in both themes.
   - **Keyboard**: one focusable element (`tabindex="0"`, `role="grid"` semantics via `aria-roledescription` + `aria-activedescendant`, or a roving cell). Arrow keys, Home/End and PageUp/PageDown move within valid cells only (j ≤ i).
   - **Readout**: a polite `aria-live` readout "from ‘{query}’ to ‘{key}’: {weight}" (3 decimals; 7 significant digits in details).
