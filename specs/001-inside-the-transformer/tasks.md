@@ -410,7 +410,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T078 [P] [US4] Write `frontend/tests/unit/model/flops.test.ts` against the JSON block in `frontend/tests/reference/gpt2-small.md`. Check:
+- [X] T078 [P] [US4] Write `frontend/tests/unit/model/flops.test.ts` against the JSON block in `frontend/tests/reference/gpt2-small.md`. Check:
   - per-layer component values for decode (qkv, attn_out, mlp, scores and weighting at t = 10)
   - per-layer sum per token
   - LM head and position add
