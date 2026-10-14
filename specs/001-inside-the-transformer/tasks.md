@@ -396,7 +396,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - **"Show in action"**: wte/wpe → Embeddings; ln_*/mlp → Blocks at that layer; attn → Attention at that layer; lm_head → Prediction.
   - **Table**: `ShowDetails` with a table of all groups (the text equivalent of the diagram) and the total.
   - **Terms**: `<Term>` for layer, attention, MLP and embedding.
-- [ ] T077 [US3] Add all US3 strings (component names and descriptions, panel labels, tied-weights explanation, "Show in action", Conv1D-order note) to `frontend/src/lib/i18n/{en,tr,de}.json`
+- [X] T077 [US3] Add all US3 strings (component names and descriptions, panel labels, tied-weights explanation, "Show in action", Conv1D-order note) to `frontend/src/lib/i18n/{en,tr,de}.json`
 
 **Checkpoint**: The Architecture view works on its own; it needs only the config.
 
