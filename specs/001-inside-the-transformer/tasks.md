@@ -483,7 +483,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
 ### Implementation for User Story 8
 
-- [ ] T090 [US8] Implement `frontend/src/lib/model/formulas.ts`: the `FORMULAS` registry keyed by formula id. Each entry has `{ id, titleKey, expression (plain-text/MathML-free notation, e.g. "6 · d² · n"), inputs: ('n_embd'|'n_layer'|'n_head'|'n_inner'|'vocab_size'|'n_positions'|'n'|'t')[], worked(config, {n, t}) -> CostEstimate | number }`. `worked` calls `params.ts`/`flops.ts`/`kvcache.ts`, never duplicates the math.
+- [X] T090 [US8] Implement `frontend/src/lib/model/formulas.ts`: the `FORMULAS` registry keyed by formula id. Each entry has `{ id, titleKey, expression (plain-text/MathML-free notation, e.g. "6 · d² · n"), inputs: ('n_embd'|'n_layer'|'n_head'|'n_inner'|'vocab_size'|'n_positions'|'n'|'t')[], worked(config, {n, t}) -> CostEstimate | number }`. `worked` calls `params.ts`/`flops.ts`/`kvcache.ts`, never duplicates the math.
 - [ ] T091 [US8] Create `frontend/src/views/Method.svelte` (FR-028, US8-1/2):
   - ViewIntro.
   - An "Assumptions" section:
