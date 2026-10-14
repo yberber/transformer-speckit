@@ -355,7 +355,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - Lazy `run.getAttention(viewState.layer)` with loading and error states; pass the current head's data sliced by `attentionAt(heads, step)` to Heatmap.
   - A TokenSequence above with highlights from the heatmap.
   - A short explanation of causal masking.
-- [ ] T072 [US2] Add all US2 strings (view intros, strip labels, table headers, block schematic labels, `model.activation.gelu_new` = "GELU (tanh approximation)" in each locale's wording, readout template, focused-mode labels, masking explanation) to `frontend/src/lib/i18n/{en,tr,de}.json`
+- [X] T072 [US2] Add all US2 strings (view intros, strip labels, table headers, block schematic labels, `model.activation.gelu_new` = "GELU (tanh approximation)" in each locale's wording, readout template, focused-mode labels, masking explanation) to `frontend/src/lib/i18n/{en,tr,de}.json`
 
 **Checkpoint**: The visitor can follow text through embeddings, all blocks and every attention head.
 
