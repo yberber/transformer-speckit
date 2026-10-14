@@ -205,7 +205,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - **Views**: each view in `frontend/src/views/*.svelte` is lazy-loaded with a dynamic `import()` and wrapped in `<svelte:boundary>` with a translated error fallback, so one failing view never breaks the others (Principle V).
   - **Notices**: a polite `aria-live` notice region.
   - **Placeholders**: a placeholder view component for each view not yet built. Its root carries `data-placeholder`, and every view root (placeholder or real) carries `data-view="<id>"`. Every ViewNav entry carries `data-view="<id>"` too, so tests can navigate without depending on translated labels.
-- [ ] T047 [P] Implement `frontend/scripts/check-budgets.mjs` (Principle VII). It fails if any file under `frontend/dist/data/**` is ≥ `limits.file_budget_bytes`. It also computes the initial-load set and fails if its total is ≥ `limits.initial_load_budget_bytes`. The initial-load set is:
+- [X] T047 [P] Implement `frontend/scripts/check-budgets.mjs` (Principle VII). It fails if any file under `frontend/dist/data/**` is ≥ `limits.file_budget_bytes`. It also computes the initial-load set and fails if its total is ≥ `limits.initial_load_budget_bytes`. The initial-load set is:
   - `index.html`
   - the entry chunk plus its static imports, from `dist/.vite/manifest.json`
   - the CSS

@@ -62,8 +62,11 @@ Frontend (run from `frontend/`):
 - `npm run gen:api-types`: regenerate `src/generated/api-types.ts` from
   `contracts/inference-api.openapi.yaml`.
 - `npm run check:api-types`: fail if the committed API types differ from a fresh generation.
-- `npm run check:budgets`: check the built `dist/` against the performance budgets below
-  (`scripts/check-budgets.mjs`, not written yet).
+- `npm run check:budgets`: after `npm run build`, check `dist/` against the performance budgets
+  below (`scripts/check-budgets.mjs`). It fails if any file under `dist/data/` reaches 300,000
+  bytes, or if the initial load reaches 2,000,000 bytes, and prints a table of sizes. The initial
+  load counts `index.html`, the entry chunk and its static imports with their CSS, the latin font
+  files, `data/examples/index.json` and the default example's `core.json`.
 - `npm run lhci`: run Lighthouse CI against the preview build (its config,
   `lighthouserc.json`, is not written yet).
 
