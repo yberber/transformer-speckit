@@ -16,7 +16,7 @@
     "test:unit": "vitest run --project unit",
     "test:contract": "vitest run --project contract",
     "test:e2e": "playwright test",
-    "test:e2e:fullstack": "playwright test --project fullstack",
+    "test:e2e:fullstack": "E2E_FULLSTACK=1 playwright test",
     "gen:api-types": "openapi-typescript ../contracts/inference-api.openapi.yaml -o src/generated/api-types.ts",
     "check:api-types": "openapi-typescript ../contracts/inference-api.openapi.yaml -o node_modules/.cache/api-types.check.ts && diff -u src/generated/api-types.ts node_modules/.cache/api-types.check.ts",
     "check:budgets": "node scripts/check-budgets.mjs",
