@@ -389,7 +389,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - `count` = product of the shape; `share` = count / total; "shares of counted groups sum to 1". `lm_head.weight` has `tiedTo: 'wte.weight'` and is excluded from the total.
   - Buffers are not parameters.
   - `totalParams(config)` and `perBlockParams(config)`.
-- [ ] T076 [US3] Create `frontend/src/views/Architecture.svelte` (FR-019, US3-1..4):
+- [X] T076 [US3] Create `frontend/src/views/Architecture.svelte` (FR-019, US3-1..4):
   - **Diagram**: hand-written inline SVG, laid out vertically and responsive at 360 px: token embedding (wte) + position embedding (wpe) → add → a repeated block labelled "× {nLayer}" (ln_1, attention [c_attn, c_proj], ln_2, MLP [c_fc, c_proj]) → ln_f → LM head.
   - **Selection**: every weight and bias is a focusable `<button>`/`role="button"` element inside the SVG, with a visible focus ring. A LayerSelector picks which block's `h.{l}` groups are selected.
   - **Panel**: shows name, shape ("in × out"), count (`formatNumber`) and share (`formatPercent`, 3 decimals). For `lm_head`, the panel explains that it shares weights with the token embedding and is counted once.

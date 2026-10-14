@@ -31,7 +31,7 @@
     blocks: () => import('./views/Blocks.svelte'),
     attention: () => import('./views/Attention.svelte'),
     prediction: () => import('./views/Prediction.svelte'),
-    architecture: () => import('./views/Placeholder.svelte'),
+    architecture: () => import('./views/Architecture.svelte'),
     cost: () => import('./views/Placeholder.svelte'),
     method: () => import('./views/Placeholder.svelte'),
   };
