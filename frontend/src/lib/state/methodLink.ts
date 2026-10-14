@@ -1,23 +1,16 @@
 // Links to a formula on "How we calculate" (FR-027). The href is a real, shareable URL; a plain
 // click stays in the page, switches to the Method view and brings the formula into view.
 import { reducedMotion } from '../motion';
+import { serializeUrl } from './url';
 import { viewState } from './viewState.svelte';
 
 /**
- * The current state with `view=method` and the formula as fragment, keys in the order of
- * contracts/url-state.md (defaults left out except `ex` and `lang`). Text never goes in here.
- * Reactive when read in a template or `$derived`.
+ * The current state with `view=method` and the formula as fragment (contracts/url-state.md).
+ * Text never goes in here. Reactive when read in a template or `$derived`.
  */
 export function methodHref(formulaId: string): string {
-  const params = new URLSearchParams();
-  if (viewState.mode === 'live') params.set('mode', 'live');
-  else if (viewState.exampleId) params.set('ex', viewState.exampleId);
-  params.set('view', 'method');
-  if (viewState.layer !== 1) params.set('layer', String(viewState.layer));
-  if (viewState.head !== 1) params.set('head', String(viewState.head));
-  if (viewState.step !== 0) params.set('step', String(viewState.step));
-  params.set('lang', viewState.lang);
-  return `?${params}#${formulaId}`;
+  const { mode, exampleId, layer, head, step, lang } = viewState;
+  return serializeUrl({ mode, exampleId, view: 'method', layer, head, step, lang }, formulaId);
 }
 
 /** Waits for the lazily loaded Method view to render the anchor, then shows and focuses it. */
