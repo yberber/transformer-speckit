@@ -75,8 +75,26 @@ Backend (run from `backend/`):
 
 ## Regenerate example data
 
-The example-data generator and verifier do not exist yet. This section will list their commands
-and say where the model revision is pinned.
+The example data under `frontend/public/data/` is generated, never edited by hand. The model is
+pinned to one commit of `openai-community/gpt2` by `MODEL_REVISION` in
+`backend/app/core/model.py`, the only place it is defined. The generator records it in every data
+file. The six example texts and their length categories live in `backend/tools/examples.toml`.
+
+Run from `backend/` (the first run downloads the pinned GPT-2 weights, about 550 MB, into the
+Hugging Face cache):
+
+- `uv run python -m tools.generate_examples`: regenerate the example data
+  (`frontend/public/data/`), the bundled model config (`frontend/src/generated/gpt2-config.json`),
+  the reference parameter shapes (`frontend/tests/reference/param-shapes.json`) and the decoder
+  test fixture (`contracts/fixtures/data/tiny-example/`). It fails, and writes nothing, unless
+  every example meets the selection rules (token-count band, no trailing `?`, 20 steps or an
+  end-of-text stop, a top-1/top-2 probability margin of at least 1e-3 at every step), every file
+  is under 300,000 bytes, and every JSON file matches `contracts/example-data.schema.json`.
+- `uv run python -m tools.generate_examples --check`: regenerate in memory and fail if the
+  committed files are stale. Texts, tokens, IDs, shapes, the config and embedding rows must be
+  identical; values from matrix multiplications may differ in the last bits between CPUs, so
+  probabilities, change percentages and attention are compared with tolerances far below the
+  verification tolerances.
 
 ## Deploy
 

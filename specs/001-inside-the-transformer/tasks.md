@@ -97,7 +97,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - `medium-train` = "When the train finally pulled into the station, Maria grabbed her suitcase and stepped onto the platform. The first thing she noticed was"
   - `long-lighthouse` = "The old lighthouse keeper climbed the spiral stairs every evening at sunset. He checked the lamp, wiped the salt from the windows, and wrote a short note in his logbook. On the night of the great storm, the waves rose higher than he had ever seen, and"
   - `long-library` = "The city council met on Tuesday to discuss the new public library, which is expected to open next spring. Members agreed that the building should include a children's reading room, a small café and a quiet space for students. The final decision on the budget will be"
-- [ ] T016 Implement `backend/tools/generate_examples.py` (`python -m tools.generate_examples [--check]`). It uses `app.core.model` and `app.core.run`. For each example it computes the run with `max_new_tokens = limits.example_steps`.
+- [X] T016 Implement `backend/tools/generate_examples.py` (`python -m tools.generate_examples [--check]`). It uses `app.core.model` and `app.core.run`. For each example it computes the run with `max_new_tokens = limits.example_steps`.
   - **Rules (R20)**: fail unless:
     - input tokens fall within the band (short 5–15, medium 20–35, long 50–64, always ≤ `max_input_tokens`)
     - there is no trailing `?`

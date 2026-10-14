@@ -84,12 +84,11 @@
     },
     "Sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
     "BinaryFile": {
-      "description": "A raw little-endian typed array file. Value = stored * scale (scale omitted = 1).",
+      "description": "A raw little-endian typed array file. Value = stored * scale (scale omitted = 1). Open on purpose: each use closes it with unevaluatedProperties, so extended entries (unique_ids, first_position) can add fields. path is relative to the JSON file that contains it.",
       "type": "object",
       "required": ["path", "dtype", "shape", "bytes", "sha256"],
-      "additionalProperties": false,
       "properties": {
-        "path": { "type": "string", "pattern": "^[a-z0-9./-]+$" },
+        "path": { "type": "string", "pattern": "^[A-Za-z0-9./-]+$" },
         "dtype": { "enum": ["float32", "uint16"] },
         "shape": { "type": "array", "items": { "type": "integer", "minimum": 1 }, "minItems": 1 },
         "scale": { "type": "number", "exclusiveMinimum": 0 },
@@ -147,7 +146,7 @@
             "attention": {
               "description": "One file per layer, index 0 = layer 1. uint16 [n_head, T(T+1)/2], scale 1/65535.",
               "type": "array",
-              "items": { "$ref": "#/$defs/BinaryFile" },
+              "items": { "$ref": "#/$defs/BinaryFile", "unevaluatedProperties": false },
               "minItems": 1
             }
           }

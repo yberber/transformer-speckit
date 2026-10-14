@@ -23,6 +23,10 @@ data/
     └── wpe-0064-0127.f32             # rows 64..127 (covers live mode: 64 input + 64 steps)
 ```
 
+Every `path` in a JSON file (`core` in `index.json`, `BinaryFile.path`) is relative to the JSON
+file that contains it, resolved like a URL: `index.json` names `short-coffee/core.json` and
+`../model/wpe-0000-0063.f32`; `core.json` names `attention-L01.u16` next to itself.
+
 The model `config.json` is **not** a runtime fetch: it is copied to
 `frontend/src/generated/gpt2-config.json` and bundled (≈ 1 KB).
 
