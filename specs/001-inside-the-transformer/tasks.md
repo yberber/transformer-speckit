@@ -316,7 +316,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 ### Tests for User Story 2 ⚠️
 
 - [X] T060 [P] [US2] Write `frontend/tests/unit/data/embeddings.test.ts`: `buildEmbeddingVectors` on the tiny fixture gives token rows by `unique_ids` index and position rows from the shards. The sum equals `Math.fround(tok + pos)` element-wise, and each vector has length `modelConfig.nEmbd`.
-- [ ] T061 [P] [US2] Write `frontend/tests/e2e/inside-machine.spec.ts` (`@layers`):
+- [X] T061 [P] [US2] Write `frontend/tests/e2e/inside-machine.spec.ts` (`@layers`):
   - **Embeddings**: shows 3 strips per token, each with an accessible name; the details table for a chosen token has `n_embd` rows (read from the bundled config in the test).
   - **Blocks**: the layer indicator goes 1→12 with Next/Previous and with direct selection; the attention and MLP change % for token 0 equal the `core.json` values (formatted); the MLP part shows d → f → d sizes from the config.
   - **Attention**: select layer 5, head 3 with the keyboard only; arrow keys move the active cell and the `aria-live` readout reads "from … to …: 0.xxx"; masked cells are not selectable; "Show as table" row sums are 1 ± display rounding.
