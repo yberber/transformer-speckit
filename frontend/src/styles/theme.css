@@ -1,0 +1,114 @@
+/*
+ * Design tokens (FR-037, FR-040). Light is the default; dark applies when the system prefers it
+ * and the visitor has not chosen light, or when the visitor chose dark. The two dark blocks must
+ * stay identical (tests/unit/palette/theme-contrast.test.ts checks this and every text contrast).
+ *
+ * Visual language: "looking inside a machine". Pages sit on a faint grid like a blueprint;
+ * visualizations sit on dark machine panels in both themes; numbers use the mono font.
+ */
+
+:root {
+  color-scheme: light;
+
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --leading: 1.55;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+
+  --content-max: 72rem;
+  --gutter: var(--space-4);
+  --grid-size: 24px;
+  --focus-width: 3px;
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+
+  --color-bg: #eef1f6;
+  --color-surface: #ffffff;
+  --color-surface-raised: #f6f8fb;
+  --color-border: #d3d9e4;
+  --color-border-strong: #7d889c;
+  --color-text: #111827;
+  --color-text-muted: #485467;
+  --color-accent: #1f4fd1;
+  --color-accent-contrast: #ffffff;
+  --color-accent-soft: #e3ebff;
+  --color-danger: #b42318;
+  --color-danger-surface: #fdecea;
+  --color-panel: #18203a;
+  --color-panel-raised: #222c4c;
+  --color-panel-border: #39456b;
+  --color-panel-text: #e8ecf6;
+  --color-panel-muted: #aeb8d0;
+  --color-focus: #d4570a;
+  --color-grid: rgb(17 24 39 / 0.045);
+  --shadow-panel: 0 1px 2px rgb(17 24 39 / 0.06), 0 6px 20px rgb(17 24 39 / 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --color-bg: #0a0f1c;
+    --color-surface: #111a2d;
+    --color-surface-raised: #17223a;
+    --color-border: #26314d;
+    --color-border-strong: #6a7898;
+    --color-text: #e6ebf5;
+    --color-text-muted: #a6b1c8;
+    --color-accent: #82b1ff;
+    --color-accent-contrast: #0a0f1c;
+    --color-accent-soft: #1b2b52;
+    --color-danger: #ff8f85;
+    --color-danger-surface: #3a1519;
+    --color-panel: #0c1323;
+    --color-panel-raised: #141e36;
+    --color-panel-border: #2b3757;
+    --color-panel-text: #e6ebf5;
+    --color-panel-muted: #a6b1c8;
+    --color-focus: #fbbf24;
+    --color-grid: rgb(230 235 245 / 0.04);
+    --shadow-panel: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.35);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-bg: #0a0f1c;
+  --color-surface: #111a2d;
+  --color-surface-raised: #17223a;
+  --color-border: #26314d;
+  --color-border-strong: #6a7898;
+  --color-text: #e6ebf5;
+  --color-text-muted: #a6b1c8;
+  --color-accent: #82b1ff;
+  --color-accent-contrast: #0a0f1c;
+  --color-accent-soft: #1b2b52;
+  --color-danger: #ff8f85;
+  --color-danger-surface: #3a1519;
+  --color-panel: #0c1323;
+  --color-panel-raised: #141e36;
+  --color-panel-border: #2b3757;
+  --color-panel-text: #e6ebf5;
+  --color-panel-muted: #a6b1c8;
+  --color-focus: #fbbf24;
+  --color-grid: rgb(230 235 245 / 0.04);
+  --shadow-panel: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.35);
+}
