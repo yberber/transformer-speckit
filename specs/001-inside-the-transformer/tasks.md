@@ -383,7 +383,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
 ### Implementation for User Story 3
 
-- [ ] T075 [US3] Implement `frontend/src/lib/model/params.ts`:
+- [X] T075 [US3] Implement `frontend/src/lib/model/params.ts`:
   - `paramGroups(config): ParamGroup[]` with `{ name, component, layer, shape, count, share, tiedTo, formulaId: 'params-<component>' }`. Names are HF state-dict names (`wte.weight`, `wpe.weight`, `h.{l}.ln_1.weight|bias`, `h.{l}.attn.c_attn.weight|bias`, `h.{l}.attn.c_proj.weight|bias`, `h.{l}.ln_2.weight|bias`, `h.{l}.mlp.c_fc.weight|bias`, `h.{l}.mlp.c_proj.weight|bias`, `ln_f.weight|bias`, `lm_head.weight`).
   - Shapes from data-model.md: wte (V, d); wpe (P, d); ln_* (d); c_attn.weight (d, 3d), bias (3d); attn.c_proj.weight (d, d), bias (d); c_fc.weight (d, f), bias (f); mlp.c_proj.weight (f, d), bias (d). Label them as "HF Conv1D order (in × out)".
   - `count` = product of the shape; `share` = count / total; "shares of counted groups sum to 1". `lm_head.weight` has `tiedTo: 'wte.weight'` and is excluded from the total.
