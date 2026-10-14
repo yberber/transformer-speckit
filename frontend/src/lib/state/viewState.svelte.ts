@@ -4,22 +4,9 @@
 import { MediaQuery } from 'svelte/reactivity';
 import { isLocale, setLocale, type Locale } from '../i18n/index';
 import { modelConfig } from '../model/config';
+import { isView, type ViewId } from './views';
 
-export const VIEWS = [
-  'tokens',
-  'embeddings',
-  'blocks',
-  'attention',
-  'prediction',
-  'architecture',
-  'cost',
-  'method',
-] as const;
-export type ViewId = (typeof VIEWS)[number];
-
-/** The "inside the machine" views, in the order data flows through the model (FR-021). */
-export const FLOW_VIEWS = VIEWS.slice(0, 5) as readonly ViewId[];
-export const REFERENCE_VIEWS = VIEWS.slice(5) as readonly ViewId[];
+export { FLOW_VIEWS, REFERENCE_VIEWS, VIEWS, isView, type ViewId } from './views';
 
 export type Mode = 'example' | 'live';
 export type ThemePreference = 'light' | 'dark' | 'system';
@@ -28,10 +15,6 @@ export const THEMES: readonly ThemePreference[] = ['system', 'light', 'dark'];
 export const THEME_STORAGE_KEY = 'itt.theme';
 
 const prefersDark = new MediaQuery('(prefers-color-scheme: dark)', false);
-
-export function isView(v: unknown): v is ViewId {
-  return VIEWS.includes(v as ViewId);
-}
 
 function clampInt(value: number, lo: number, hi: number): number | null {
   if (!Number.isFinite(value)) return null;

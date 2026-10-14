@@ -231,7 +231,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - `uvicorn app.main:app` once `backend/app/main.py` exists
 
   Fix the README until the check passes. T134 later extends this check to the commands in `quickstart.md`.
-- [ ] T049b [P] Write `frontend/tests/e2e/a11y.spec.ts` (`@a11y`, FR-044, SC-007, Principle VI), after T046. For every id in `VIEWS` × color scheme {light, dark} (`page.emulateMedia({ colorScheme })`; theme defaults to `system`) × browser-context `locale` {en-US, tr-TR, de-DE}:
+- [X] T049b [P] Write `frontend/tests/e2e/a11y.spec.ts` (`@a11y`, FR-044, SC-007, Principle VI), after T046. For every id in `VIEWS` × color scheme {light, dark} (`page.emulateMedia({ colorScheme })`; theme defaults to `system`) × browser-context `locale` {en-US, tr-TR, de-DE}:
   - navigate through the ViewNav entry `[data-view="<id>"]`
   - run `new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa'])`, once with all `ShowDetails` closed and once with them all open
   - expect zero violations
