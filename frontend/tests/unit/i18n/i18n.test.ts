@@ -6,7 +6,8 @@ import {
   formatPercent,
   formatProb,
 } from '../../../src/lib/i18n/format';
-import { getLocale, setLocale, t, type MessageKey } from '../../../src/lib/i18n/index';
+import glossaryDe from '../../../src/lib/i18n/glossary.de.json';
+import { getLocale, glossary, setLocale, t, type MessageKey } from '../../../src/lib/i18n/index';
 import { i18nState } from '../../../src/lib/i18n/state.svelte';
 
 const key = (k: string) => k as MessageKey;
@@ -46,6 +47,13 @@ describe('t()', () => {
     expect(t('app.title')).toBe('Im Inneren des Transformers');
     await setLocale('en');
     expect(getLocale()).toBe('en');
+  });
+
+  it('switches glossary explanations with the locale, keeping the English term', async () => {
+    const english = glossary('attention');
+    await setLocale('de');
+    expect(glossary('attention')).toEqual(glossaryDe.attention);
+    expect(glossary('attention').term).toBe(english.term);
   });
 
   it('lets the last of two overlapping locale switches win', async () => {

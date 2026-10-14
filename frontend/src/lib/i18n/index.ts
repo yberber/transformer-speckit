@@ -2,9 +2,17 @@
 // through Intl.PluralRules (`key.one`, `key.other`, …). English is bundled; Turkish and German
 // load on demand. Technical terms stay English and live in the glossary catalogs.
 import en from './en.json';
-import { i18nState, type Catalog, type Locale } from './state.svelte';
+import glossaryEn from './glossary.en.json';
+import {
+  i18nState,
+  type Catalog,
+  type Glossary,
+  type GlossaryEntry,
+  type GlossaryId,
+  type Locale,
+} from './state.svelte';
 
-export type { Locale } from './state.svelte';
+export type { GlossaryEntry, GlossaryId, Locale } from './state.svelte';
 export const LOCALES: readonly Locale[] = ['en', 'tr', 'de'];
 
 type EnKey = keyof typeof en;
@@ -14,9 +22,10 @@ type PluralBase<K> = K extends `${infer B}.${PluralCategory}` ? B : never;
 export type MessageKey = EnKey | PluralBase<EnKey>;
 export type MessageParams = Record<string, string | number>;
 
-const loaders: Record<Exclude<Locale, 'en'>, () => Promise<{ default: Catalog }>> = {
-  tr: () => import('./tr.json'),
-  de: () => import('./de.json'),
+type Loaded = [{ default: Catalog }, { default: Glossary }];
+const loaders: Record<Exclude<Locale, 'en'>, () => Promise<Loaded>> = {
+  tr: () => Promise.all([import('./tr.json'), import('./glossary.tr.json')]),
+  de: () => Promise.all([import('./de.json'), import('./glossary.de.json')]),
 };
 
 export function isLocale(v: unknown): v is Locale {
@@ -32,9 +41,13 @@ let pending = 0;
 /** Switch the UI language. Resolves once the catalog is loaded; the last call wins. */
 export async function setLocale(locale: Locale): Promise<void> {
   const request = ++pending;
-  const messages = locale === 'en' ? (en as Catalog) : (await loaders[locale]()).default;
+  const [messages, glossary] =
+    locale === 'en'
+      ? [en as Catalog, glossaryEn]
+      : await loaders[locale]().then(([m, g]) => [m.default, g.default] as const);
   if (request !== pending) return;
   i18nState.messages = messages;
+  i18nState.glossary = glossary;
   i18nState.locale = locale;
   if (typeof document !== 'undefined') document.documentElement.lang = locale;
 }
@@ -70,4 +83,9 @@ export function t(key: MessageKey, params?: MessageParams): string {
     if (value === undefined) return match;
     return typeof value === 'number' ? numbers.format(value) : value;
   });
+}
+
+/** A glossary term (English) with its explanation in the current locale. Reactive. */
+export function glossary(id: GlossaryId): GlossaryEntry {
+  return i18nState.glossary[id];
 }
