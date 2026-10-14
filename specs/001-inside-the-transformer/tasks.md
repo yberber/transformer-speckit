@@ -565,7 +565,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - the client key is the first `X-Forwarded-For` hop, else the socket peer
   - concurrency gate: semaphore 1, at most 8 waiting, a 30 s queue wait, overflow → `busy` with `retry_after_s`
   - env overrides are honored
-- [ ] T103 [P] [US6] Write `backend/tests/privacy/test_canary.py` (FR-012, Q9):
+- [X] T103 [P] [US6] Write `backend/tests/privacy/test_canary.py` (FR-012, Q9):
   - Generate a unique canary (`f"canary-{uuid4()}"`). Send it as text through `/runs`, including the success, `empty_input` (canary with whitespace), `input_too_long_chars`, `input_too_long_tokens`, `invalid_request` (malformed JSON containing the canary) and `internal` (monkeypatched exception whose message contains the canary) paths.
   - Capture all log records (`caplog` at DEBUG on the root, `uvicorn`, `uvicorn.access`, `fastapi` and `app`) and stdout/stderr (`capfd`).
   - Assert the canary appears in no log record, no captured output and no response body or header.
