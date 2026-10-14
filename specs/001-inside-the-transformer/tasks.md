@@ -454,7 +454,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
 ### Implementation for User Story 4 (P2: context-length chart)
 
-- [ ] T085 [US4] Create `frontend/src/components/CostChart.svelte` and mount it in `frontend/src/views/Cost.svelte` (FR-025):
+- [X] T085 [US4] Create `frontend/src/components/CostChart.svelte` and mount it in `frontend/src/views/Cost.svelte` (FR-025):
   - An inline SVG line chart of `decodeFlops(config, t).total` for t = 1..`nPositions`, with axis labels and translated, locale-formatted tick values.
   - A marker and label at the current context length `nInput + k`.
   - Focusable, with a text summary ("cost grows linearly from … to …").

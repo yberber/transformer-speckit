@@ -6,6 +6,7 @@
   link to its formula on "How we calculate" (FR-027).
 -->
 <script lang="ts">
+  import CostChart from '../components/CostChart.svelte';
   import EstimateLabel from '../components/EstimateLabel.svelte';
   import ShowDetails from '../components/ShowDetails.svelte';
   import Term from '../components/Term.svelte';
@@ -242,6 +243,8 @@
         <p class="no-token" data-no-token>{t('cost.decode.none')}</p>
       {/if}
     </section>
+
+    <CostChart current={run.nInput + step} />
   {/if}
 </section>
 
