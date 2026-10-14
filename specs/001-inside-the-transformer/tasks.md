@@ -140,7 +140,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 - [X] T021 [P] Write `frontend/tests/unit/model/config.test.ts`: the bundled config loads; `validateConfig` rejects a missing field, non-integer, 0, negative and indivisible `n_embd % n_head`; `nInner` falls back to 4·n_embd when `n_inner` is null
 - [X] T022 [P] Create `frontend/src/lib/limits.ts`: import `$contracts/limits.json` and export a typed `limits` object
 - [X] T023 [P] Add API type generation. `gen:api-types` = `openapi-typescript ../contracts/inference-api.openapi.yaml -o src/generated/api-types.ts`. `check:api-types` regenerates to a temp file and fails if it differs from the committed file. Commit `frontend/src/generated/api-types.ts`.
-- [ ] T024 [P] Implement `frontend/src/lib/data/binary.ts`:
+- [X] T024 [P] Implement `frontend/src/lib/data/binary.ts`:
   - `decodeBinary(buf: ArrayBuffer, {dtype, shape, scale?}) -> Float32Array`: assert `byteLength === product(shape) × sizeof(dtype)`, else throw `DataFormatError` (fail closed). The value is stored × scale.
   - `decodeEncodedArray(e)` (base64 → same path).
   - `packedIndex(i, j) = i*(i+1)/2 + j`.
