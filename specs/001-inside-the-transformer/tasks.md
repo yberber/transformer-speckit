@@ -262,7 +262,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T050 [P] [US1] Write `frontend/tests/unit/state/generation.test.ts`:
+- [X] T050 [P] [US1] Write `frontend/tests/unit/state/generation.test.ts`:
   - `canAdvance` is true iff k < steps.
   - `endMessageKey`: `example.end.step_limit`, `example.end.eos`, `example.end.context_limit`.
   - `detectRepetition`: true iff, within `tokens[0, nInput+k)`, some sequence of 3 token ids occurs at least twice and the later occurrence includes a generated token.
