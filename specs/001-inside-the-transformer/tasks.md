@@ -290,7 +290,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - ViewIntro, `<Term id="token">`, a `TokenSequence` at the current step, and the token count.
   - A `ShowDetails` table with columns position, token ID, exact text (with `␣`/`⏎` markers), byte values for partial characters, and origin (input/generated).
   - A translated explanation when any token is `partial`.
-- [ ] T057 [US1] Create `frontend/src/views/Prediction.svelte` (FR-018):
+- [X] T057 [US1] Create `frontend/src/views/Prediction.svelte` (FR-018):
   - ViewIntro, `<Term id="logit">`, `<Term id="probability-distribution">`.
   - The ten candidates from `predictionAt(run, step)` as a ranked list, each with a horizontal bar (width ∝ prob), a `TokenChip`-style label and a percentage. The top one is marked "greedy choice" with a text badge, not color alone.
   - An EOS candidate renders as a labelled "end-of-text" marker.
