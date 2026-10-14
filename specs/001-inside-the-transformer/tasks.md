@@ -63,7 +63,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - `encoded_array(arr, dtype, scale=None) -> {"dtype","shape","scale"?, "data": base64}`
   - `sha256_hex(bytes)`
   - `sig7(x: float) -> float` (7 significant digits, for probabilities and change percentages in JSON)
-- [ ] T012 [P] Write `backend/tests/unit/test_encode.py`:
+- [X] T012 [P] Write `backend/tests/unit/test_encode.py`:
   - Packing indices for T=1..5.
   - Prefix property: the first t(t+1)/2 entries of each head equal `pack_causal` of the t-prefix.
   - Quantization max error ≤ 7.6e-6.
