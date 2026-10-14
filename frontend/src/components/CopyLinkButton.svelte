@@ -12,12 +12,7 @@
 
   let { mode }: { mode: Mode } = $props();
 
-  const MESSAGES = {
-    copied: 'share.copied',
-    manual: 'share.copy_manual',
-    live: 'share.live_not_included',
-  } as const;
-  type Status = keyof typeof MESSAGES;
+  type Status = 'copied' | 'manual' | 'live';
 
   let status = $state<Status | null>(null);
   /** The link to copy by hand, after the clipboard refused it. */
@@ -77,7 +72,14 @@
     />
   {/if}
   <p class="status" role="status" aria-live="polite" data-copy-status>
-    {#if status}{t(MESSAGES[status])}{/if}
+    {#if status === 'copied'}
+      {t('share.copied')}
+    {:else if status === 'manual'}
+      {t('share.copy_manual')}
+    {:else if status === 'live'}
+      <!-- Names the mode switch option exactly as the switch shows it. -->
+      {t('share.live_not_included', { examples: t('mode.example') })}
+    {/if}
   </p>
 </div>
 

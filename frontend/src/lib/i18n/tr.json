@@ -95,7 +95,7 @@
   "share.copied": "Bağlantı kopyalandı. Açan herkes tam olarak bu görünümü görür.",
   "share.copy_manual": "Bu tarayıcı kopyalamaya izin vermedi. Bağlantı alanda seçili, kopyalamaya hazır.",
   "share.link_label": "Bu görünümün bağlantısı",
-  "share.live_not_included": "Gizliliğinizi korumak için bağlantılar kendi metninizi hiçbir zaman içermez; bu yüzden bu görünüm paylaşılamaz. Bağlantı kopyalamak için Örnekler'e geçin.",
+  "share.live_not_included": "Gizliliğinizi korumak için bağlantılar kendi metninizi hiçbir zaman içermez; bu yüzden bu görünüm paylaşılamaz. Bağlantı kopyalamak için “{examples}” seçeneğine geçin.",
   "details.show": "Ayrıntıları göster",
   "details.hide": "Ayrıntıları gizle",
   "table.show": "Tablo olarak göster",

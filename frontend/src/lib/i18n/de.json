@@ -95,7 +95,7 @@
   "share.copied": "Link kopiert. Wer ihn öffnet, sieht genau diese Ansicht.",
   "share.copy_manual": "Dieser Browser hat das Kopieren nicht erlaubt. Der Link ist im Feld markiert und kann kopiert werden.",
   "share.link_label": "Link zu dieser Ansicht",
-  "share.live_not_included": "Links enthalten nie Ihren eigenen Text, um Ihre Privatsphäre zu schützen. Diese Ansicht lässt sich daher nicht teilen. Wechseln Sie zu „Beispiele“, um einen Link zu kopieren.",
+  "share.live_not_included": "Links enthalten nie Ihren eigenen Text, um Ihre Privatsphäre zu schützen. Diese Ansicht lässt sich daher nicht teilen. Wechseln Sie zu „{examples}“, um einen Link zu kopieren.",
   "details.show": "Details anzeigen",
   "details.hide": "Details ausblenden",
   "table.show": "Als Tabelle anzeigen",

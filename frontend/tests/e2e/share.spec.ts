@@ -6,7 +6,7 @@
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import { VIEWS } from '../../src/lib/state/views';
-import { mockApi } from './live-api';
+import { fill, mockApi } from './live-api';
 
 type Catalog = Record<string, string>;
 const I18N = new URL('../../src/lib/i18n/', import.meta.url);
@@ -321,7 +321,9 @@ test.describe('@share @live live mode', () => {
 
     await page.evaluate(() => navigator.clipboard.writeText('untouched'));
     await copyButton(page).click();
-    await expect(copyStatus(page)).toHaveText(en['share.live_not_included']!);
+    await expect(copyStatus(page)).toHaveText(
+      fill(en['share.live_not_included']!, { examples: en['mode.example']! }),
+    );
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('untouched');
     expect(page.url()).not.toContain(encodeURIComponent(text).slice(0, 20));
     expect(decodeURIComponent(page.url())).not.toContain(text);
