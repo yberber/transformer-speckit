@@ -606,7 +606,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
     Then, inside `model_gate()`, `await run_in_threadpool(compute_run, ids, min(max_new_tokens, n_positions − n_input))` → `{model, run: run.to_core()}`.
   - **`POST /attention`**: validate `len(token_ids) ≤ max_input_tokens + max_new_tokens` and `≤ n_positions`, each id < `vocab_size`, `layer ≤ n_layer`. Return `{layer, n_tokens, weights: encoded_array(pack_causal(quantize_u16(...)), 'uint16', 1/65535)}`.
   - **`POST /token-embeddings`**: the same id validation; return `{unique_ids, embeddings: encoded_array(rows, 'float32')}`.
-- [ ] T109 [US6] Implement `backend/app/main.py`:
+- [X] T109 [US6] Implement `backend/app/main.py`:
   - FastAPI app with `docs_url=None`, `redoc_url=None` and a lifespan that loads the model once and flips a `ready` flag.
   - `CORSMiddleware` with `allow_origins` from env `ALLOWED_ORIGINS` (comma-separated; empty ⇒ none), methods GET/POST, header `content-type`.
   - `GZipMiddleware(minimum_size=1000)`, the logging middleware and the error handlers.

@@ -39,8 +39,26 @@ Frontend (run from `frontend/`):
   `VITE_API_BASE_URL` is set at build time.
 - `npm run preview`: serve the built `frontend/dist/` locally.
 
-Backend: the inference service entry point does not exist yet. Its `uvicorn` command is added
-here when the service is built.
+Backend inference service (run from `backend/`):
+
+- `ALLOWED_ORIGINS=http://localhost:5173 uv run uvicorn app.main:app --port 7860 --no-access-log`:
+  start the live-mode service on port 7860. It answers at once and loads the pinned GPT-2
+  weights in the background (the first start downloads them, about 550 MB); until they are
+  loaded, `GET /api/v1/health` answers 503 `model_loading`. Always pass `--no-access-log`:
+  uvicorn's access log records paths and client addresses, and the service writes its own
+  request log with only the method, route template, status and duration.
+- `ALLOWED_ORIGINS`: comma-separated origins allowed to call the service from a browser (CORS),
+  e.g. `http://localhost:5173` for `npm run dev` or `http://localhost:4173` for
+  `npm run preview`. Empty or unset allows no cross-origin caller.
+- Optional limits, all read at start-up: `RL_RUNS_PER_MIN` (default 6) and `RL_RUNS_BURST` (3)
+  for `/runs` per client, `RL_DETAIL_PER_MIN` (60) and `RL_DETAIL_BURST` (20) for
+  `/attention` and `/token-embeddings`, `GATE_MAX_WAITING` (8) requests waiting for the model
+  and `GATE_QUEUE_WAIT_S` (30) seconds each may wait; `TORCH_THREADS` (2) CPU threads for the
+  model; `LIMITS_PATH` to read `limits.json` from somewhere other than `contracts/`.
+
+To use the local service from the frontend, set `VITE_API_BASE_URL` when starting or building
+it, e.g. `VITE_API_BASE_URL=http://localhost:7860 npm run dev` from `frontend/`. Live mode
+appears only in builds where this variable is set.
 
 ## Test
 
