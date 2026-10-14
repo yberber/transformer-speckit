@@ -172,7 +172,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - `setLocale(l)` lazy-loads `tr.json`/`de.json` via dynamic import. `en` is bundled.
   - Add `frontend/src/lib/i18n/format.ts` with `formatNumber`, `formatPercent`, `formatProb(p, digits)`, `formatCompact` and `formatBytes` (1 MB = 1,000,000 B) via `Intl.NumberFormat(locale)`.
 - [X] T033 [P] Create the catalogs `frontend/src/lib/i18n/{en,tr,de}.json`: flat keys for the app shell (app title, view names in flow order, nav, theme switch, loading, generic errors, "Show details"/"Hide details", "Show as table"). Create `frontend/src/lib/i18n/glossary.{en,tr,de}.json` with the minimum term set `token`, `attention`, `embedding`, `layer`, `head`, `mlp`, `logit`, `probability-distribution`, `prefill`, `decode`, `flops`, `kv-cache`, each `{ "term": <English>, "explanation": <one or two plain sentences in that locale> }`.
-- [ ] T034 [P] Write `frontend/tests/unit/i18n/completeness.test.ts` (SC-008):
+- [X] T034 [P] Write `frontend/tests/unit/i18n/completeness.test.ts` (SC-008):
   - "key set of `tr` and `de` must equal `en` exactly; no empty values"
   - the `{name}` placeholder sets are identical per key
   - the glossary ids are equal across locales, and `term` is identical (English) in all locales
