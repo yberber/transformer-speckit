@@ -1,0 +1,50 @@
+{
+  "token": {
+    "term": "token",
+    "explanation": "Bir kelime, kelime parçası ya da noktalama işareti gibi küçük bir metin parçası. Model metni bir token dizisi olarak okur ve yazar."
+  },
+  "attention": {
+    "term": "attention",
+    "explanation": "Her token'ın önceki token'lardan bilgi topladığı adım; bazılarına diğerlerinden daha fazla ağırlık verir."
+  },
+  "embedding": {
+    "term": "embedding",
+    "explanation": "Bir token'ı temsil eden uzun bir sayı listesi. Birbirine benzeyen token'ların listeleri de benzer olur."
+  },
+  "layer": {
+    "term": "layer",
+    "explanation": "Sayıların sırayla içinden geçtiği, art arda tekrarlanan transformer bloklarından biri."
+  },
+  "head": {
+    "term": "head",
+    "explanation": "Bir layer içindeki birkaç attention biriminden biri. Yan yana çalışırlar ve her biri token'lar arasındaki farklı ilişkilere odaklanabilir."
+  },
+  "mlp": {
+    "term": "MLP",
+    "explanation": "Her bloğun ileri beslemeli kısmı. Her token'ın sayılarını diğer token'lara bakmadan, tek başına yeniden şekillendirir."
+  },
+  "logit": {
+    "term": "logit",
+    "explanation": "Modelin olası her sonraki token'a, puanlar olasılığa çevrilmeden önce verdiği ham puan."
+  },
+  "probability-distribution": {
+    "term": "probability distribution",
+    "explanation": "Olası her sonraki token için bir olasılık içeren ve toplamı %100 olan liste."
+  },
+  "prefill": {
+    "term": "prefill",
+    "explanation": "İlk yeni token üretilmeden önce giriş metnindeki tüm token'ların tek seferde işlenmesi."
+  },
+  "decode": {
+    "term": "decode",
+    "explanation": "Önceki token'lar için hesaplanmış sonuçları yeniden kullanarak tek bir yeni token üretmek."
+  },
+  "flops": {
+    "term": "FLOPs",
+    "explanation": "Kayan noktalı işlemler: bir hesaplamanın gerektirdiği toplama ve çarpma sayısı."
+  },
+  "kv-cache": {
+    "term": "KV cache",
+    "explanation": "Önceki token'ların key ve value değerlerini saklayan bellek; böylece her yeni token için yeniden hesaplanmaları gerekmez."
+  }
+}

@@ -43,7 +43,7 @@ describe('t()', () => {
   it('switches locale and loads its catalog', async () => {
     await setLocale('de');
     expect(getLocale()).toBe('de');
-    expect(t('app.title')).toBe('Inside the Transformer');
+    expect(t('app.title')).toBe('Im Inneren des Transformers');
     await setLocale('en');
     expect(getLocale()).toBe('en');
   });

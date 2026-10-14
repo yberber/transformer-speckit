@@ -1,0 +1,50 @@
+{
+  "token": {
+    "term": "token",
+    "explanation": "A small piece of text, such as a word, part of a word or a punctuation mark. The model reads and writes text as a sequence of tokens."
+  },
+  "attention": {
+    "term": "attention",
+    "explanation": "The step where each token gathers information from earlier tokens, weighing some of them more than others."
+  },
+  "embedding": {
+    "term": "embedding",
+    "explanation": "A long list of numbers that stands for a token. Similar tokens get similar lists."
+  },
+  "layer": {
+    "term": "layer",
+    "explanation": "One of the repeated transformer blocks that the numbers pass through, one after another."
+  },
+  "head": {
+    "term": "head",
+    "explanation": "One of several attention units inside a layer. They work side by side, and each can focus on different relationships between tokens."
+  },
+  "mlp": {
+    "term": "MLP",
+    "explanation": "The feed-forward part of each block. It reshapes each token's numbers on its own, without looking at other tokens."
+  },
+  "logit": {
+    "term": "logit",
+    "explanation": "The raw score the model gives each possible next token, before the scores are turned into probabilities."
+  },
+  "probability-distribution": {
+    "term": "probability distribution",
+    "explanation": "A list of chances, one for every possible next token, that add up to 100%."
+  },
+  "prefill": {
+    "term": "prefill",
+    "explanation": "Processing all the tokens of the input text in one pass, before the first new token is generated."
+  },
+  "decode": {
+    "term": "decode",
+    "explanation": "Generating one new token, reusing what was already computed for the earlier tokens."
+  },
+  "flops": {
+    "term": "FLOPs",
+    "explanation": "Floating-point operations: a count of the additions and multiplications a computation needs."
+  },
+  "kv-cache": {
+    "term": "KV cache",
+    "explanation": "Memory that keeps the keys and values of earlier tokens, so they do not have to be computed again for each new token."
+  }
+}

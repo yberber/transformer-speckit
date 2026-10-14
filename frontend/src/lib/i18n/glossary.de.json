@@ -1,0 +1,50 @@
+{
+  "token": {
+    "term": "token",
+    "explanation": "Ein kleines Stück Text, etwa ein Wort, ein Wortteil oder ein Satzzeichen. Das Modell liest und schreibt Text als Folge von Tokens."
+  },
+  "attention": {
+    "term": "attention",
+    "explanation": "Der Schritt, in dem jedes Token Informationen von früheren Tokens sammelt und manche davon stärker gewichtet als andere."
+  },
+  "embedding": {
+    "term": "embedding",
+    "explanation": "Eine lange Liste von Zahlen, die für ein Token steht. Ähnliche Tokens bekommen ähnliche Listen."
+  },
+  "layer": {
+    "term": "layer",
+    "explanation": "Einer der sich wiederholenden Transformer-Blöcke, durch die die Zahlen nacheinander laufen."
+  },
+  "head": {
+    "term": "head",
+    "explanation": "Eine von mehreren Attention-Einheiten in einem Layer. Sie arbeiten nebeneinander, und jede kann sich auf andere Beziehungen zwischen Tokens konzentrieren."
+  },
+  "mlp": {
+    "term": "MLP",
+    "explanation": "Der Feed-forward-Teil jedes Blocks. Er formt die Zahlen jedes Tokens für sich allein um, ohne andere Tokens anzusehen."
+  },
+  "logit": {
+    "term": "logit",
+    "explanation": "Die Rohbewertung, die das Modell jedem möglichen nächsten Token gibt, bevor daraus Wahrscheinlichkeiten werden."
+  },
+  "probability-distribution": {
+    "term": "probability distribution",
+    "explanation": "Eine Liste von Wahrscheinlichkeiten, eine für jedes mögliche nächste Token, die zusammen 100 % ergeben."
+  },
+  "prefill": {
+    "term": "prefill",
+    "explanation": "Die Verarbeitung aller Tokens des Eingabetexts in einem Durchgang, bevor das erste neue Token erzeugt wird."
+  },
+  "decode": {
+    "term": "decode",
+    "explanation": "Die Erzeugung eines neuen Tokens, wobei bereits Berechnetes für die früheren Tokens wiederverwendet wird."
+  },
+  "flops": {
+    "term": "FLOPs",
+    "explanation": "Gleitkommaoperationen: die Anzahl der Additionen und Multiplikationen, die eine Berechnung braucht."
+  },
+  "kv-cache": {
+    "term": "KV cache",
+    "explanation": "Speicher, der die Keys und Values früherer Tokens aufbewahrt, damit sie nicht für jedes neue Token neu berechnet werden müssen."
+  }
+}
