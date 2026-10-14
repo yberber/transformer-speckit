@@ -166,7 +166,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - `id === modelConfig.eosTokenId` → `eos`
   - Add tests in `frontend/tests/unit/tokens/display.test.ts`: " the", "\n", a split emoji, an accented letter split across tokens, EOS.
 - [X] T031 [P] Implement `frontend/src/lib/tokens/palette.ts`: 12 token background colors per theme (light, dark) and `tokenColor(position, theme) = palette[position mod palette.length]`, so a token's color never changes between views or steps, plus `tokenTextColor`. Write `frontend/tests/unit/palette/palette.test.ts`, which computes the WCAG 2.1 contrast ratio for text on every palette color in both themes and asserts ≥ 4.5:1. Also assert that neighboring palette entries differ (ΔE or luminance difference > a documented threshold).
-- [ ] T032 Implement i18n in `frontend/src/lib/i18n/index.ts`:
+- [X] T032 Implement i18n in `frontend/src/lib/i18n/index.ts`:
   - Svelte 5 `$state` locale (`'en'|'tr'|'de'`).
   - `t(key: MessageKey, params?)`. `MessageKey` is derived from `en.json`. Placeholders use the `{name}` syntax. Plurals use `Intl.PluralRules` with `key.one`/`key.other` keys. A missing key renders `⟦key⟧` and `console.error`s in dev and test.
   - `setLocale(l)` lazy-loads `tr.json`/`de.json` via dynamic import. `en` is bundled.
