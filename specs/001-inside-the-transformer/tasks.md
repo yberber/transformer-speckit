@@ -146,7 +146,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - `packedIndex(i, j) = i*(i+1)/2 + j`.
   - `attentionRow(headData, i) -> Float32Array(i+1)`.
   - `prefixPackedLength(t) = t*(t+1)/2`.
-- [ ] T025 [P] Write `frontend/tests/unit/data/binary.test.ts` against `contracts/fixtures/data/tiny-example/`: decode every file, a wrong byteLength throws, `attentionRow` sums to 1 ± (i+1)·2⁻¹⁶, and the prefix of the packed data equals the rows for a shorter t
+- [X] T025 [P] Write `frontend/tests/unit/data/binary.test.ts` against `contracts/fixtures/data/tiny-example/`: decode every file, a wrong byteLength throws, `attentionRow` sums to 1 ± (i+1)·2⁻¹⁶, and the prefix of the packed data equals the rows for a shorter t
 - [ ] T026 Define the shared data interface in `frontend/src/lib/data/runData.ts`, with TS types mirroring `RunCore`, `Token`, `Prediction` and `LayerChange` from the schema.
   - `interface RunData { source: 'example'|'live'; nInput; steps; stopReason; tokens; predictions; layers; getAttention(layer1: number): Promise<Float32Array[]>; getTokenEmbeddings(): Promise<{uniqueIds: number[]; rows: Float32Array}> }`
   - Step helpers: `tokensAt(run, k)` returns the prefix `[0, nInput+k)`, `predictionAt(run, k)`, `changeAt(run, layer1, k)` returns prefix-sliced `attn`/`mlp` arrays, and `attentionAt(heads, k)` slices the first `prefixPackedLength(nInput+k)` entries.

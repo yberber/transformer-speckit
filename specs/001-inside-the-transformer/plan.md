@@ -106,6 +106,7 @@ the VII budget was confirmed by the project owner on 2026-10-14.
 | openapi-typescript | FE dev | Principle IX: TS types generated from the OpenAPI contract | Hand-written types would drift silently |
 | Ajv | FE dev (tests only) | Principle IX: validate fixtures and committed example data against the JSON Schema (Draft 2020-12) | Never shipped to the browser (runtime uses hand-written guards). `ajv-formats` is not added: the contract schemas use no `format` keywords |
 | svelte-check | FE dev | Type checking `.svelte` files | `tsc` does not understand `.svelte` files |
+| @types/node (^22, matching the Node 22 toolchain) | FE dev | Type checking the tests and scripts that read committed files with Node APIs (`node:fs`, `node:crypto`): fixture decoding, contract/budget/README/architecture-literal checks | Already installed by `@lhci/cli`, but at an unrelated major version; declared explicitly because our tests import Node APIs directly, so the version is locked rather than inherited by accident |
 | ESLint, typescript-eslint, eslint-plugin-svelte | FE dev | Architecture-literal lint rule over `.ts` and `.svelte` (Principle I) | ESLint cannot parse TS or Svelte without these two plugins |
 | Prettier, prettier-plugin-svelte | FE dev | Consistent formatting, including `.svelte` files | Prettier cannot format Svelte without the plugin |
 | Self-hosted fonts (1 sans, 1 mono, latin + latin-ext woff2) | FE asset | FR-040 polished design; Turkish/German glyphs | System fonts vary widely; third-party font CDN would leak visitor IPs |
