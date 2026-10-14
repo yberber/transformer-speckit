@@ -69,7 +69,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - Quantization max error ≤ 7.6e-6.
   - base64/little-endian round trip.
   - `sig7` keeps 7 significant digits.
-- [ ] T013 Implement `backend/app/core/run.py` (shared by the service and the generator). Define `compute_run(token_ids: list[int], max_new_tokens: int) -> Run`:
+- [X] T013 Implement `backend/app/core/run.py` (shared by the service and the generator). Define `compute_run(token_ids: list[int], max_new_tokens: int) -> Run`:
   - **Greedy loop** with `past_key_values`. At each step, softmax the float32 logits of the last position (no temperature).
   - **Top-10 candidates**, "sorted by prob desc, ties by id asc": use a stable sort on `(-prob, id)`, not bare `topk`. `candidates[0]` is the appended token.
   - **Stop rules**:
