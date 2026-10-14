@@ -277,7 +277,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
 ### Implementation for User Story 1
 
-- [ ] T052 [US1] Implement `frontend/src/lib/state/generation.ts` (`canAdvance`, `endMessageKey(stopReason)`, `detectRepetition(tokens, nInput, k)`) per T050
+- [X] T052 [US1] Implement `frontend/src/lib/state/generation.ts` (`canAdvance`, `endMessageKey(stopReason)`, `detectRepetition(tokens, nInput, k)`) per T050
 - [ ] T053 [P] [US1] Create `frontend/src/components/IntroNote.svelte`: one or two translated sentences explaining that GPT-2 continues text and does not answer questions like a chat assistant (FR-002), shown on the landing view and dismissible for the session (in memory only)
 - [ ] T054 [P] [US1] Create `frontend/src/components/ExamplePicker.svelte`: an accessible radio group or `<select>` grouped by length ("Short", "Medium", "Long"), using translated titles `example.<id>.title` and showing the input token count. Selecting an example calls `viewState.setExample(id)`, which resets the step to 0.
 - [ ] T055 [US1] Create `frontend/src/components/GenerationControls.svelte`:
