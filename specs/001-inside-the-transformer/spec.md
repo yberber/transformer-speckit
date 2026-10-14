@@ -197,7 +197,7 @@ A developer wants to check the numbers. The "How we calculate" page documents ev
 - **FR-008**: Live mode MUST be opt-in. Users MUST be able to type their own text and have it processed by the inference service without downloading the model.
 - **FR-009**: Live-mode results MUST be shown with the same views, controls and visual behavior as example mode.
 - **FR-010**: For the same input, live mode MUST produce identical tokens to example mode, and probabilities within an absolute difference of 0.0001.
-- **FR-011**: If the inference service is waking up, the site MUST show a translated progress status with a cancel option. If the service is unavailable, slow beyond the wait limit, busy or returns an error, the site MUST show a clear translated message and keep example mode fully usable.
+- **FR-011**: If the inference service is waking up, the site MUST show a translated progress status with a cancel option. If the service is unavailable, slow beyond the wait limit, busy or returns an error, the site MUST show a clear translated message and keep example mode fully usable. The site MUST tell "waking up" apart from "unavailable" as follows: if the service's host answers at all (even with a page that is not the service's API, such as a hosting provider's start-up page), the service is treated as waking up until the wait limit runs out; if the host cannot be reached on two checks in a row, the service is treated as unavailable straight away.
 - **FR-012**: User-entered text MUST NOT be stored or logged anywhere: not on the service, in logs, analytics, error reports, shared links, or persistent browser storage. It MAY be held only in memory while it is being processed and displayed.
 - **FR-013**: Live mode MUST enforce a maximum input length of 64 tokens and a maximum of 64 generation steps, and MUST state both limits in the UI. The inference service is the only place where tokens are counted: it MUST check the exact token count before running the model and return the count when rejecting input. The browser MUST NOT tokenize text itself; it only applies a 1,000-character cap before sending.
 
@@ -271,14 +271,14 @@ A developer wants to check the numbers. The "How we calculate" page documents ev
 - **SC-001**: For all six examples and all of their precomputed steps, 100% of tokens are identical to the reference GPT-2 run, 100% of shown probabilities are within 0.0001 of it, 100% of attention weights are within 0.001 of it, and 100% of embedding and other vector values are within 0.1% (relative) of it.
 - **SC-002**: For the text of each of the six examples run in live mode, tokens are 100% identical to example mode, and all probabilities are within 0.0001.
 - **SC-003**: Every parameter, FLOP and memory value shown matches its hand-computed reference value. For example, the total parameter count of GPT-2 small, with tied embeddings counted once, equals 124,439,808.
-- **SC-004**: With the inference service switched off, 100% of example-mode features work, and a live-mode attempt shows a clear message within 10 seconds of the failure being detected.
+- **SC-004**: With the inference service switched off, 100% of example-mode features work. If the service's host cannot be reached, a live-mode attempt shows a clear "unavailable" message within 10 seconds of starting. If the host answers but the service never becomes ready, the message appears as soon as the 60-second wait limit runs out.
 - **SC-005**: In a usability session with at least five participants who have no ML background, at least 4 of 5 complete these tasks unaided within 10 minutes: pick an example, find which earlier token a chosen token attends to most in a given layer and head, generate two tokens, and say in their own words that the model predicts one token at a time.
 - **SC-006**: Every main view is reachable and every feature can be operated using only the keyboard; this is verified for all eight end-to-end scenarios.
 - **SC-007**: Automated accessibility checks report zero violations on every main view, in both themes and all three languages.
 - **SC-008**: 100% of user-facing strings exist in Turkish, English and German. No untranslated string appears in any language.
 - **SC-009**: 100% of displayed estimates carry a "theoretical estimate" label and link to a documented formula.
 - **SC-010**: Opening a shared link restores the identical view state in 100% of tested combinations of example, view, layer, head, step and language.
-- **SC-011**: Example mode reaches a performance score of at least 90 in a standard automated web performance audit (Lighthouse), with the first usable view visible within 3 seconds on a mid-range mobile device over a typical 4G connection.
+- **SC-011**: Example mode reaches a performance score of at least 90 in a standard automated web performance audit (Lighthouse, mobile preset, which simulates a mid-range phone on a 4G connection). In the same audit, the first usable view is visible within 3 seconds (Largest Contentful Paint ≤ 3,000 ms) and responds without long delays (Total Blocking Time ≤ 200 ms).
 - **SC-012**: All end-to-end scenarios listed in FR-043 pass in automated runs.
 
 ## Assumptions
@@ -296,5 +296,6 @@ A developer wants to check the numbers. The "How we calculate" page documents ev
 - **Sharing in live mode**: Links never include user text (privacy first). Sharing a live view is not supported in this version; the visitor is told why.
 - **Privacy scope**: Operational monitoring of the service (request counts, error rates, response times) is allowed as long as it never records input text or model output.
 - **Hosting**: The inference service may sleep when idle (hence the "waking up" state). No uptime target is required, because example mode always works.
+- **Waking up vs. unavailable**: While a sleeping service starts, its hosting provider may answer with its own start-up page instead of the service's API, and the browser may not be allowed to read that page. Any answer from the host therefore counts as "waking up", and only a host that cannot be reached at all counts as "unavailable" before the wait limit runs out (FR-011).
 - **Reference implementation**: The verification reference is GPT-2 small as published with its official weights and run through the Hugging Face transformers library, as named in the user's acceptance criteria.
 - **Out of scope**: Training or fine-tuning, any decoding strategy other than greedy, models other than GPT-2 small (including closed models), user accounts, saving or exporting user texts.

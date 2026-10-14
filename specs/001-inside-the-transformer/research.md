@@ -245,10 +245,26 @@ Context could have marked "NEEDS CLARIFICATION" is resolved here; none remain op
 
 ## R13. Wake-up, timeouts and failure containment
 
-- **Decision**: Entering live mode calls `GET /health` (timeout 5 s per attempt); a non-200,
-  non-JSON (HF "starting" page) or slow reply switches the UI to a translated "waking up" status
-  and polls every 3 s, cancellable (AbortController), until `limits.wait_limit_s` (60 s) elapses →
-  "unavailable" message with "back to examples". Every model request has the same 60 s ceiling.
+- **Decision**: Entering live mode calls `GET /health` (timeout 5 s per attempt) and polls every
+  3 s, cancellable (AbortController). Each attempt is classified as follows:
+
+  | Health attempt result | Reachability probe | Classification |
+  |---|---|---|
+  | 200 with valid `Health` JSON | — | **ready** |
+  | Non-200, non-JSON body (HF "starting" page with CORS headers) or 5 s timeout | — | **waking** |
+  | CORS `fetch` rejects (`TypeError`) | `fetch(sameUrl, {mode: 'no-cors', cache: 'no-store'})` resolves (opaque response) | **waking**: the host answered, the browser just may not read it (HF start-up page without CORS headers) |
+  | CORS `fetch` rejects | probe also rejects | **unreachable** |
+
+  The UI shows the translated "waking up" status from the first waking attempt. Two
+  **consecutive** unreachable attempts (≈ 3–6 s apart in total) end the wait at once with the
+  `network` error ("unavailable" + "back to examples"), which meets SC-004's 10 s bound. Any
+  waking or ready attempt resets the counter. Otherwise polling continues until
+  `limits.wait_limit_s` (60 s) elapses → `wake_timeout` ("unavailable" + link to the Space
+  page). Every model request has the same 60 s ceiling.
+  The probe is a plain GET of the health URL: it carries no user text or credentials, and its
+  opaque body is never read (Principle IV). A deleted or stopped Space still answers through the
+  HF proxy, so it shows "waking" and then `wake_timeout`; only a host that cannot be reached at
+  all (DNS failure, refused connection, offline client) fails fast.
   Partial bodies are never rendered: responses are parsed only after full receipt and validated
   (shape check) before entering app state. Live-mode code is a lazily-loaded chunk; its errors are
   caught at the mode boundary so example mode keeps working.
@@ -256,9 +272,14 @@ Context could have marked "NEEDS CLARIFICATION" is resolved here; none remain op
   live mode with a message (prevents silent divergence from example data).
 - **Rationale**: FR-011, Principle V, SC-004 (message within 10 s of detected failure).
 - **Open item to validate during implementation** (not blocking): whether an HTTP request to the
-  Space's `*.hf.space` URL wakes a sleeping free Space, or only a visit to the Space page does.
-  The UI behaves correctly in both cases (worst case: "unavailable" after 60 s plus a link to the
+  Space's `*.hf.space` URL wakes a sleeping free Space, or only a visit to the Space page does,
+  and whether the start-up page carries CORS headers (i.e. which "waking" row above is hit).
+  The UI behaves correctly in all cases (worst case: "unavailable" after 60 s plus a link to the
   Space page); quickstart step Q8 checks it.
+- **Alternatives considered**: Treat every rejected `fetch` as waking (a host that is truly down
+  would show "waking" for 60 s, breaking SC-004); treat every rejected `fetch` as unavailable
+  (a sleeping Space whose start-up page has no CORS headers would never show "waking" and might
+  never be woken). The `no-cors` probe is the only browser-side signal that separates the two.
 
 ## R14. Rate limiting and concurrency (≤ 5 concurrent users)
 
@@ -325,8 +346,12 @@ Context could have marked "NEEDS CLARIFICATION" is resolved here; none remain op
 
 - **Decision**:
   - Frontend: **Vitest** (unit, contract, i18n completeness, palette contrast, budgets helpers),
-    **Playwright** (e2e, keyboard, axe), **Lighthouse CI** (`@lhci/cli`, performance ≥ 0.90,
-    total byte weight < 2,000,000), `svelte-check` + ESLint for static checks.
+    **Playwright** (e2e, keyboard, axe), **Lighthouse CI** (`@lhci/cli`, mobile preset with
+    simulated throttling: performance ≥ 0.90, `largest-contentful-paint` ≤ 3,000 ms and
+    `total-blocking-time` ≤ 200 ms as the measurable form of SC-011's "first usable view within
+    3 s", total byte weight < 2,000,000), `svelte-check` + ESLint for static checks. No DOM
+    emulator (jsdom): rune-based state is tested in Vitest's `node` environment and components
+    only in a real browser.
   - Backend: **pytest** + FastAPI `TestClient` (contract, limits, rate limit, privacy canary,
     live-vs-example equality SC-002 using the real model), **ruff**.
   - Data: `backend/tools/verify_examples.py` — reruns the HF reference **step by step** (prefix of
@@ -338,7 +363,14 @@ Context could have marked "NEEDS CLARIFICATION" is resolved here; none remain op
   - E2E live mode: default runs use Playwright route mocks fed by contract fixtures (fast,
     deterministic); one `@fullstack` project runs the live scenarios against a locally started
     backend in a separate CI job with a cached model.
-- **Rationale**: FR-041–FR-044, SC-001–SC-012, Principles II, VI, VII, IX.
+  - **When the gates start**: CI (both workflows), the budget check, Lighthouse CI, the axe suite
+    and the README doc check are set up at the end of the foundational phase, before any user
+    story. The axe suite iterates over every view that is no longer a placeholder, so each view
+    is covered from the moment it is built. `main` is protected by these checks, and the Pages
+    deploy job runs only after they pass, so no deploy (including the MVP) skips them.
+- **Rationale**: FR-041–FR-044, SC-001–SC-012, Principles II, VI, VII, IX. Principles VI and VII
+  require automated checks and forbid merging a budget break; adding CI only at the end would
+  let the MVP deploy without them.
 
 ## R19. Python tooling and repository layout
 
@@ -364,7 +396,8 @@ Context could have marked "NEEDS CLARIFICATION" is resolved here; none remain op
 ## R21. Deployment
 
 - **Decision**:
-  - Frontend: GitHub Actions builds, runs budgets, deploys `frontend/dist` to GitHub Pages.
+  - Frontend: GitHub Actions builds, runs budgets, axe and Lighthouse checks, and deploys
+    `frontend/dist` to GitHub Pages only after every check passes.
     `VITE_API_BASE_URL` set at build time (empty ⇒ live mode hidden, site fully works).
   - Backend: `backend/` contains the Space's `Dockerfile` and Space `README.md` front matter
     (`sdk: docker`, `app_port: 7860`). Deploy by `huggingface_hub` `upload_folder` (CI job or

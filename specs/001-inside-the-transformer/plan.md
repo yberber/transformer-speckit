@@ -58,7 +58,8 @@ HF Spaces free CPU tier (2 vCPU, 16 GB RAM, sleeps when idle).
 **Project Type**: Web application — static frontend + one inference web service.
 
 **Performance Goals**: Lighthouse performance ≥ 90 (mobile preset) in example mode; first usable
-view ≤ 3 s on mid-range phone over 4G; view switches and step changes < 100 ms (all data local
+view ≤ 3 s on mid-range phone over 4G, measured in the same Lighthouse mobile run as Largest
+Contentful Paint ≤ 3,000 ms and Total Blocking Time ≤ 200 ms (SC-011); view switches and step changes < 100 ms (all data local
 after first load of a view); live `/runs` for 64 input + 64 steps ≈ 1–3 s on 2 vCPU; ≤ 5
 concurrent users.
 
@@ -84,10 +85,10 @@ No "NEEDS CLARIFICATION" items remain; all were resolved in [research.md](./rese
 | III | Built for Non-Experts | ✅ PASS | One-sentence explanation per view; "Show details" disclosure for exact numbers; `<Term>` component keeps 12+ glossary terms in English with localized explanation at first appearance per view; en/tr/de catalogs with a completeness test that fails CI (R16). |
 | IV | Privacy by Default | ✅ PASS | Text only in POST bodies; no access log; route-template-only request log; no input echo in errors; no analytics or error reporting; live text never in URL/storage; canary tests on both sides (R15). |
 | V | Always Usable | ✅ PASS | Example mode = static files, no server, no model download; site builds and works with `VITE_API_BASE_URL` unset. Live mode is a lazy chunk behind an error boundary; wake-up, timeout, busy and error states are translated and offer "back to examples"; e2e runs with service down (R13). |
-| VI | Accessible | ✅ PASS | Keyboard grid widget for heatmap, roving focus, live-region readouts, table equivalents for heatmap/vectors/chart; visible focus; reduced-motion support; axe on every main view × 2 themes × 3 locales in CI (R17). |
-| VII | Performance Budgets | ✅ PASS | `check-budgets.mjs` + Lighthouse CI in CI. An example's data is split into several files, *each* < 300,000 B, loaded lazily per view; only `index.json` + default `core.json` are in the initial load (R6). **Confirmed by the project owner (2026-10-14)**: the budget applies per file, and one example may span several files. |
+| VI | Accessible | ✅ PASS | Keyboard grid widget for heatmap, roving focus, live-region readouts, table equivalents for heatmap/vectors/chart; visible focus; reduced-motion support; axe on every main view × 2 themes × 3 locales in CI (R17). The axe suite and CI exist from the end of the foundational phase and cover each view as soon as it is built, so no view ships, including the MVP deploy, without passing them (R18). |
+| VII | Performance Budgets | ✅ PASS | `check-budgets.mjs` + Lighthouse CI (score ≥ 90, LCP ≤ 3,000 ms, TBT ≤ 200 ms, byte weight) run in CI from the end of the foundational phase; `main` is protected by these checks and the Pages deploy runs only after they pass. An example's data is split into several files, *each* < 300,000 B, loaded lazily per view; only `index.json` + default `core.json` are in the initial load (R6). **Confirmed by the project owner (2026-10-14)**: the budget applies per file, and one example may span several files. |
 | VIII | Simplicity | ✅ PASS | Exactly two runtime components (static site + one CPU service). No DB, queue, cache, auth or accounts. Rate limiter and concurrency gate in-process (~40 lines). Every dependency justified below. |
-| IX | Documented Contracts | ✅ PASS | Single authoritative contract set at repo-root `contracts/` (moved from this spec folder in the first task): OpenAPI 3.1, JSON Schema for data files, `limits.json`, URL-state contract, shared fixtures. Backend validates real responses; frontend uses generated types and fixture-driven client tests (R11). README covers run/test/deploy/regenerate; CI fails if README misses any `npm run`/`uv run` target listed in `quickstart.md` (doc check). |
+| IX | Documented Contracts | ✅ PASS | Single authoritative contract set at repo-root `contracts/` (moved from this spec folder in the first task): OpenAPI 3.1, JSON Schema for data files, `limits.json`, URL-state contract, shared fixtures. Backend validates real responses; frontend uses generated types and fixture-driven client tests (R11). README covers run/test/deploy/regenerate. It is created in the setup phase and every task that adds or changes a run, test, deploy or regeneration command updates it in the same task. From the foundational phase, a CI doc check fails if the README misses any `frontend/package.json` script or `backend/tools` / `app` entry point; before release the check also covers every command in `quickstart.md`. |
 
 **Gate result**: PASS — no violations; Complexity Tracking is empty. The per-file reading of
 the VII budget was confirmed by the project owner on 2026-10-14.
@@ -97,20 +98,30 @@ the VII budget was confirmed by the project owner on 2026-10-14.
 | Dependency | Side | Concrete requirement it serves | Why existing tools are not enough |
 |---|---|---|---|
 | Svelte 5 | FE runtime | 8 interactive views sharing reactive state; compile-time a11y warnings (FR-038) | Hand-written DOM updates for heatmaps, steppers, i18n re-render = more code and bugs; Svelte's runtime is small (budget) |
-| Vite 6 | FE build | TS + Svelte compilation, code splitting (lazy views, lazy live mode), static output | No build = no TS/Svelte; Vite is the standard Svelte toolchain |
-| Vitest | FE test | FR-042 calculation tests, i18n/contract/palette tests | Shares Vite config; no other runner needed |
+| Vite 6, @sveltejs/vite-plugin-svelte | FE build | TS + Svelte compilation, code splitting (lazy views, lazy live mode), static output | No build = no TS/Svelte; Vite is the standard Svelte toolchain and the plugin is how Vite compiles `.svelte` and `.svelte.ts` files |
+| TypeScript 5 | FE dev | Typed config, contract types and calculation code (Principles I, II, IX) | Plain JS cannot type-check generated API types or the data layer |
+| Vitest | FE test | FR-042 calculation tests, i18n/contract/palette tests, rune-based state tests (`.svelte.ts` compiled by the Svelte plugin in the `node` environment) | Shares Vite config; no other runner needed. No DOM emulator (e.g. jsdom) is added: there are no component unit tests, and components are tested in a real browser by Playwright |
 | Playwright + @axe-core/playwright | FE test | FR-043 e2e, FR-044/SC-007 a11y checks, keyboard scenarios | Only practical way to automate browser + axe |
-| @lhci/cli | FE CI | Principle VII Lighthouse ≥ 90 and byte budget checked automatically | Constitution requires automated check |
-| openapi-typescript, Ajv | FE dev | Principle IX: types from the contract, fixture validation | Hand-written types would drift silently |
-| svelte-check, ESLint, Prettier | FE dev | Type checking `.svelte` files; architecture-literal lint rule (Principle I) | — |
+| @lhci/cli | FE CI | Principle VII Lighthouse ≥ 90, SC-011 LCP/TBT and byte budget checked automatically | Constitution requires automated check |
+| openapi-typescript | FE dev | Principle IX: TS types generated from the OpenAPI contract | Hand-written types would drift silently |
+| Ajv | FE dev (tests only) | Principle IX: validate fixtures and committed example data against the JSON Schema (Draft 2020-12) | Never shipped to the browser (runtime uses hand-written guards). `ajv-formats` is not added: the contract schemas use no `format` keywords |
+| svelte-check | FE dev | Type checking `.svelte` files | `tsc` does not understand `.svelte` files |
+| ESLint, typescript-eslint, eslint-plugin-svelte | FE dev | Architecture-literal lint rule over `.ts` and `.svelte` (Principle I) | ESLint cannot parse TS or Svelte without these two plugins |
+| Prettier, prettier-plugin-svelte | FE dev | Consistent formatting, including `.svelte` files | Prettier cannot format Svelte without the plugin |
 | Self-hosted fonts (1 sans, 1 mono, latin + latin-ext woff2) | FE asset | FR-040 polished design; Turkish/German glyphs | System fonts vary widely; third-party font CDN would leak visitor IPs |
 | FastAPI, Uvicorn, Pydantic v2 | BE runtime | Typed HTTP API with validation (Principle IX) | Standard library HTTP server lacks validation, async, CORS |
 | PyTorch (CPU), transformers | BE runtime + tools | Reference model (FR-041 names HF transformers); attention/hooks access | Any other runtime breaks parity with the reference |
-| jsonschema, pytest, httpx (TestClient), ruff | BE dev | Contract validation, tests, lint | — |
+| NumPy | BE runtime + tools | Attention packing and uint16 quantization (`encode.py`), little-endian binary writing, and the verifier's independent decoding of shipped files (FR-041) | Already installed by PyTorch and transformers; declared explicitly because our code imports it directly, so the version is locked rather than inherited by accident |
+| huggingface_hub | BE runtime + tools | Downloading the pinned model snapshot for the Docker image (`app.core.model --download`), reading the pinned `config.json` for the generator, and uploading the Space (`deploy_space.py`) | Already installed by transformers; declared explicitly because our code imports it directly. A hand-written HTTP client for the Hub API would duplicate it |
+| jsonschema, referencing | BE dev | Contract validation (Principle IX); `referencing` resolves the OpenAPI file's external `$ref` to `example-data.schema.json` | `referencing` is the registry library `jsonschema` itself uses; declared explicitly because the tests import it directly |
+| PyYAML | BE dev | Loading `inference-api.openapi.yaml` in the contract tests | The standard library has no YAML parser; the contract is authored in YAML |
+| pytest, httpx (TestClient), ruff | BE dev | Tests, FastAPI TestClient transport, lint | — |
 | uv | BE tooling | Locked, reproducible env so example data regenerates identically | pip lacks a lockfile |
 
 Explicitly **not** added: i18n library, charting library (D3), state library, rate-limit
-library, Redis/DB, analytics, error-reporting SaaS, SvelteKit.
+library, Redis/DB, analytics, error-reporting SaaS, SvelteKit, jsdom/happy-dom, ajv-formats.
+
+Any task that adds a dependency not in this table MUST first add a row here (Principle VIII).
 
 ## Project Structure
 
@@ -203,8 +214,8 @@ backend/
     └── privacy/                   # canary never logged or echoed
 
 .github/workflows/
-├── frontend.yml                   # lint, typecheck, unit, contract, build, budgets, e2e+axe, lighthouse, deploy Pages
-├── backend.yml                    # ruff, pytest (model cached), verify_examples, fullstack e2e
+├── frontend.yml                   # created in the foundational phase: lint, typecheck, unit, contract, doc check, build, budgets, axe, lighthouse, deploy Pages (after all checks); later phases add the remaining e2e projects
+├── backend.yml                    # created in the foundational phase: ruff, pytest (model cached), generate --check, verify_examples; fullstack e2e added with live mode
 └── space-deploy.yml               # manual: deploy backend/ to HF Space
 
 README.md                          # run, test, deploy, regenerate example data (Principle IX)
@@ -234,7 +245,9 @@ Agent context file: none configured for this project (no `update-agent-context` 
 ## Risks & follow-ups for `/speckit-tasks`
 
 1. **Wake-up semantics** of sleeping free Spaces via API requests — validated in quickstart Q8;
-   UI is correct either way (R13).
+   UI is correct either way (R13). The HF start-up page is cross-origin and may lack CORS headers,
+   which makes a CORS `fetch` fail exactly like an unreachable host; R13 resolves this with a
+   second, `no-cors` reachability probe (an opaque response proves the host answered).
 2. **CPU-to-CPU numeric drift** could flip greedy near-ties between the generator machine and the
    Space — mitigated by the ≥ 1e-3 top-1/top-2 margin rule for examples (R20); live parity test
    SC-002 runs in CI.

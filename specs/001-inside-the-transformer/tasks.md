@@ -18,10 +18,15 @@ description: "Task list for implementing Inside the Transformer"
 - **[P]**: Can run in parallel (different files, no dependency on an unfinished task)
 - **[Story]**: The user story the task belongs to (US1–US8)
 - Every task names exact file paths
+- Tasks with a letter suffix (T008a, T049a–T049d) were inserted after the list was numbered (analysis remediation). They run in the position where they appear, and the existing IDs and cross-references are unchanged.
 
 ## Path Conventions
 
 Web application (plan.md → Project Structure): `frontend/`, `backend/`, the authoritative `contracts/` at the repo root, and `.github/workflows/`. "Config" always means `frontend/src/generated/gpt2-config.json` (frontend) or the pinned HF config (backend). **Never write architecture numbers (768, 3072, 50257, 1024, 12 layers/heads, 124439808) as literals in application code** (Principle I). These numbers may appear only in `frontend/tests/reference/` and generated files.
+
+**README rule (Principle IX)**: any task that adds or changes a run, test, deploy or regeneration command (an `npm run` script, a `uv run` / `python -m` entry point, an env var needed to run or deploy) MUST update the root `README.md` in the same task. From T049a on, the doc check fails CI when it does not.
+
+**Dependency rule (Principle VIII)**: any task that adds a dependency not listed in plan.md → "Dependency justification" MUST add a row there first.
 
 ---
 
@@ -31,12 +36,13 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
 - [ ] T001 Move the contract set to the repo root: `git mv specs/001-inside-the-transformer/contracts/{inference-api.openapi.yaml,example-data.schema.json,example-data.md,url-state.md,limits.json} contracts/`. Create `specs/001-inside-the-transformer/contracts/README.md`, a one-paragraph pointer saying the authoritative copy is `../../../contracts/`. Update the `contracts/` links in `specs/001-inside-the-transformer/{plan,research,data-model,quickstart}.md` to `../../contracts/…`. Keep the relative `$ref: "./example-data.schema.json"` inside the OpenAPI file unchanged, because both files move together.
 - [ ] T002 Create the directory skeleton from plan.md: `contracts/fixtures/api/`, `contracts/fixtures/data/tiny-example/`, `frontend/{public/fonts,public/data/examples,public/data/model,scripts,src/generated,src/lib/{model,data,api,state,i18n,tokens},src/components,src/views,src/styles,tests/{unit,contract,reference,e2e}}`, `backend/{app/core,tools,tests/{contract,unit,integration,privacy}}` (add `__init__.py` in `backend/app`, `backend/app/core`, `backend/tools`, `backend/tests`), and `.github/workflows/`
-- [ ] T003 Initialize the Python project in `backend/pyproject.toml` with uv. Use Python `==3.12.*`. Runtime deps: `fastapi`, `uvicorn[standard]`, `pydantic>=2`, `torch` (CPU wheel via `[tool.uv.sources]` + index `https://download.pytorch.org/whl/cpu`), `transformers`. Dev group: `pytest`, `httpx`, `jsonschema`, `referencing`, `pyyaml`, `ruff`, `huggingface_hub`. Configure `[tool.ruff]` (line length 100, rules E,F,I,UP,B) and `[tool.pytest.ini_options]` (testpaths `tests`, marker `model` = "needs GPT-2 weights"). Run `uv lock` and commit `backend/uv.lock`.
-- [ ] T004 Initialize the frontend in `frontend/package.json` (Node 22, `"type": "module"`). Runtime dep: `svelte@^5`. Dev deps: `vite@^6`, `@sveltejs/vite-plugin-svelte`, `typescript@^5`, `svelte-check`, `vitest`, `@playwright/test`, `@axe-core/playwright`, `@lhci/cli`, `openapi-typescript`, `ajv`, `ajv-formats`, `eslint`, `typescript-eslint`, `eslint-plugin-svelte`, `prettier`, `prettier-plugin-svelte`. Add the scripts `dev`, `build`, `preview`, `typecheck` (svelte-check), `lint`, `format`, `test:unit`, `test:contract`, `test:e2e`, `test:e2e:fullstack`, `gen:api-types`, `check:api-types`, `check:budgets`, `lhci`. Create `frontend/vite.config.ts`: Svelte plugin, `base` from `process.env.VITE_BASE ?? '/'`, alias `$contracts` → `../contracts`, `server.fs.allow: ['..']`, `build.manifest: true`. Create `frontend/tsconfig.json` with `strict` and `resolveJsonModule`, and `frontend/index.html` with `<html lang="en">`. Commit `package-lock.json`.
+- [ ] T003 Initialize the Python project in `backend/pyproject.toml` with uv. Use Python `==3.12.*`. Runtime deps: `fastapi`, `uvicorn[standard]`, `pydantic>=2`, `torch` (CPU wheel via `[tool.uv.sources]` + index `https://download.pytorch.org/whl/cpu`), `transformers`, `numpy` and `huggingface_hub` (both imported directly by our code; see plan.md dependency table). Dev group: `pytest`, `httpx`, `jsonschema`, `referencing`, `pyyaml`, `ruff`. Every package here has a row in plan.md → "Dependency justification". Configure `[tool.ruff]` (line length 100, rules E,F,I,UP,B) and `[tool.pytest.ini_options]` (testpaths `tests`, marker `model` = "needs GPT-2 weights"). Run `uv lock` and commit `backend/uv.lock`.
+- [ ] T004 Initialize the frontend in `frontend/package.json` (Node 22, `"type": "module"`). Runtime dep: `svelte@^5`. Dev deps: `vite@^6`, `@sveltejs/vite-plugin-svelte`, `typescript@^5`, `svelte-check`, `vitest`, `@playwright/test`, `@axe-core/playwright`, `@lhci/cli`, `openapi-typescript`, `ajv`, `eslint`, `typescript-eslint`, `eslint-plugin-svelte`, `prettier`, `prettier-plugin-svelte`. Add the scripts `dev`, `build`, `preview`, `typecheck` (svelte-check), `lint`, `format`, `test:unit`, `test:contract`, `test:e2e`, `test:e2e:fullstack`, `gen:api-types`, `check:api-types`, `check:budgets`, `lhci`. Create `frontend/vite.config.ts`: Svelte plugin, `base` from `process.env.VITE_BASE ?? '/'`, alias `$contracts` → `../contracts`, `server.fs.allow: ['..']`, `build.manifest: true`. Create `frontend/tsconfig.json` with `strict` and `resolveJsonModule`, and `frontend/index.html` with `<html lang="en">`. Commit `package-lock.json`.
 - [ ] T005 [P] Configure linting in `frontend/eslint.config.js` (typescript-eslint + eslint-plugin-svelte) and `frontend/.prettierrc`. Add a `no-restricted-syntax` rule that rejects the numeric literals `768`, `3072`, `50257`, `1024` and `124439808` in `src/**` except `src/generated/**`, with the message "Architecture numbers must come from the model config (Principle I)".
-- [ ] T006 [P] Configure test runners. `frontend/vitest.config.ts` has projects `unit` (`tests/unit/**`) and `contract` (`tests/contract/**`), environment `node`, and `jsdom` for `*.svelte.test.ts`; add `jsdom` as a dev dep. `frontend/playwright.config.ts` has projects `chromium` (desktop 1280×800), `mobile` (360×780, `isMobile`) and `fullstack` (grep `@fullstack`, with a second `webServer` running `uv run uvicorn app.main:app --port 7860 --no-access-log` in `../backend`). The default `webServer` is `npm run build && npm run preview -- --port 4173`, and `fullstack` is excluded from the default projects.
+- [ ] T006 [P] Configure test runners. `frontend/vitest.config.ts` has projects `unit` (`tests/unit/**`) and `contract` (`tests/contract/**`), environment `node` for both, with the Svelte plugin loaded so rune-based `.svelte.ts` modules compile. Do not add jsdom or another DOM emulator: components are tested only in Playwright (plan.md dependency table). `frontend/playwright.config.ts` has projects `chromium` (desktop 1280×800), `mobile` (360×780, `isMobile`) and `fullstack` (grep `@fullstack`, with a second `webServer` running `uv run uvicorn app.main:app --port 7860 --no-access-log` in `../backend`). The default `webServer` is `npm run build && npm run preview -- --port 4173`, and `fullstack` is excluded from the default projects.
 - [ ] T007 [P] Create the root `.gitignore` (node_modules, dist, .venv, __pycache__, playwright-report, test-results, .lighthouseci, `.cache/huggingface`) and `.editorconfig`
 - [ ] T008 [P] Add self-hosted fonts: one sans and one monospace font (e.g. Inter + JetBrains Mono, both OFL), as woff2 subset to latin + latin-ext (Turkish/German glyphs), in `frontend/public/fonts/`, with the license files beside them. Declare them with `@font-face` and `font-display: swap` in `frontend/src/styles/fonts.css`. No third-party font CDN.
+- [ ] T008a Create the root `README.md` skeleton (Principle IX, after T003 and T004). Sections: overview and the two components; prerequisites (Node 22, Python 3.12, uv, optional Docker); run locally; test; regenerate example data; deploy; privacy guarantees, budgets and the `contracts/` location. Fill in every command that exists now: `uv sync`, `npm ci` and each script defined in `frontend/package.json` by T004 with one line saying what it does. Sections whose commands do not exist yet say so in one line. From here on the README rule (Path Conventions) applies.
 
 ---
 
@@ -108,6 +114,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
     - `frontend/tests/reference/param-shapes.json`: `{name: shape}` from `model.state_dict()` with the `transformer.` prefix stripped, buffers (`attn.bias`, `attn.masked_bias`) excluded, and `lm_head.weight` included
     - `contracts/fixtures/data/tiny-example/`: text "Hello world", `max_new_tokens=2`, band rules skipped, same file layout
   - **Validation**: validate every JSON against `contracts/example-data.schema.json` (jsonschema Draft 2020-12). Output is deterministic (stable key order, trailing newline). `--check` regenerates into a temp dir and exits non-zero if anything differs from the committed files.
+  - **README**: fill the "Regenerate example data" section with `uv run python -m tools.generate_examples` and `--check`, and say where the model revision is pinned.
 - [ ] T017 Run `cd backend && uv run python -m tools.generate_examples`. Iterate on `backend/tools/examples.toml` until every rule passes, then commit the generated files under `frontend/public/data/`, `frontend/src/generated/gpt2-config.json`, `frontend/tests/reference/param-shapes.json` and `contracts/fixtures/data/tiny-example/`
 - [ ] T018 Implement `backend/tools/verify_examples.py` (`python -m tools.verify_examples [--self-test]`, FR-041). It must use an independent code path: no imports from `app.core.run` or `app.core.encode`; it loads the model directly with transformers at `MODEL_REVISION`.
   - **Reference runs**: for every example and every step k, run the reference on the prefix of length `n_input + k`.
@@ -119,6 +126,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
     - token/position embeddings and change % ≤ 0.1 % relative; compute change % with its own hooks
   - **Output**: one line per example/step, then `PASS`, or a non-zero exit with the first breaches.
   - **`--self-test`**: corrupt an in-memory copy (one prob +2e-4, one attention cell +2e-3, one embedding ×1.002) and assert that each corruption is detected.
+  - **README**: add `uv run python -m tools.verify_examples` and `--self-test` to the "Regenerate example data" section (regenerate → verify → `--check`).
 - [ ] T019 Run `cd backend && uv run python -m tools.verify_examples` and `--self-test`. Both must pass (SC-001).
 
 ### Frontend core libraries
@@ -146,7 +154,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - Implement `assertRunCore(obj)`: a hand-written runtime guard that checks the shape plus the consistency rules from `contracts/example-data.md` rule 3, with no runtime Ajv.
 - [ ] T027 Implement `frontend/src/lib/data/exampleSource.ts`. `loadIndex()` fetches `${import.meta.env.BASE_URL}data/examples/index.json`. `loadExample(id) -> Promise<RunData>` fetches `core.json`, runs `assertRunCore`, and lazy-loads and memoizes attention files per layer and `embeddings-token.f32` on first use. Failures raise a typed `ExampleLoadError(exampleId, kind)` that affects only that example. Add `loadPositionEmbeddings(count)` → `Float32Array[count × n_embd]` from the shared `wpe-*` shards listed in `index.json` (lazy, memoized; used by both modes).
 - [ ] T028 [P] Write `frontend/tests/unit/data/exampleSource.test.ts`. Mock `fetch` to serve the tiny-example fixture. Check that the lazy files are fetched only on demand and only once, and that a corrupt or missing attention file rejects only that call while `core.json` data stays usable.
-- [ ] T029 [P] Write `frontend/tests/contract/example-data.test.ts`. Use Ajv 2020 + ajv-formats to validate the committed `frontend/public/data/examples/index.json`, every `core.json` and the tiny fixture against `contracts/example-data.schema.json`. Also assert that:
+- [ ] T029 [P] Write `frontend/tests/contract/example-data.test.ts`. Use Ajv 2020 to validate the committed `frontend/public/data/examples/index.json`, every `core.json` and the tiny fixture against `contracts/example-data.schema.json`. Also assert that:
   - each file's `bytes` equals its size on disk, every `sha256` matches (node:crypto), and every file is < `limits.file_budget_bytes`
   - there are exactly 2 short, 2 medium and 2 long examples, each with `n_input` within its band and ≤ `limits.max_input_tokens`
   - no example text ends with `?`
@@ -196,7 +204,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - **Layout**: header (title, slots for the language switch, mode switch and theme switch), an intro area, an example-picker slot, FlowIndicator + ViewNav, and a view outlet.
   - **Views**: each view in `frontend/src/views/*.svelte` is lazy-loaded with a dynamic `import()` and wrapped in `<svelte:boundary>` with a translated error fallback, so one failing view never breaks the others (Principle V).
   - **Notices**: a polite `aria-live` notice region.
-  - **Placeholders**: a placeholder view component for each view not yet built.
+  - **Placeholders**: a placeholder view component for each view not yet built. Its root carries `data-placeholder`, and every view root (placeholder or real) carries `data-view="<id>"`. Every ViewNav entry carries `data-view="<id>"` too, so tests can navigate without depending on translated labels.
 - [ ] T047 [P] Implement `frontend/scripts/check-budgets.mjs` (Principle VII). It fails if any file under `frontend/dist/data/**` is ≥ `limits.file_budget_bytes`. It also computes the initial-load set and fails if its total is ≥ `limits.initial_load_budget_bytes`. The initial-load set is:
   - `index.html`
   - the entry chunk plus its static imports, from `dist/.vite/manifest.json`
@@ -215,7 +223,34 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
   Each value gets a written derivation line and a machine-readable JSON block for the tests to import.
 
-**Checkpoint**: Generated example data is verified (T019). Frontend libraries, i18n, state and shell are in place, so user stories can start.
+### Automated quality gates (Principles VI, VII, IX; in place before any user story)
+
+- [ ] T049a [P] Write `frontend/tests/unit/readme-doc-check.test.ts` (Principle IX). It reads the root `README.md` and fails, naming each missing item, unless the README contains:
+  - `npm run <name>` for every key in `frontend/package.json` `scripts`
+  - `python -m tools.<name>` for every module in `backend/tools/*.py` (excluding `__init__.py`)
+  - `uvicorn app.main:app` once `backend/app/main.py` exists
+
+  Fix the README until the check passes. T134 later extends this check to the commands in `quickstart.md`.
+- [ ] T049b [P] Write `frontend/tests/e2e/a11y.spec.ts` (`@a11y`, FR-044, SC-007, Principle VI), after T046. For every id in `VIEWS` × color scheme {light, dark} (`page.emulateMedia({ colorScheme })`; theme defaults to `system`) × browser-context `locale` {en-US, tr-TR, de-DE}:
+  - navigate through the ViewNav entry `[data-view="<id>"]`
+  - run `new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa'])`, once with all `ShowDetails` closed and once with them all open
+  - expect zero violations
+
+  Placeholder views are checked too, so each real view is covered as soon as it replaces its placeholder. Locales take effect once US5's `resolveLocale` lands (T096); until then the tr/de runs render English and still have to pass.
+- [ ] T049c [P] Create `frontend/lighthouserc.json` (Principle VII, SC-011). Collect from `npm run preview` at `/` with the mobile preset (`formFactor: mobile`, simulated throttling, 3 runs, median). Assert:
+  - `categories:performance` ≥ 0.9
+  - `largest-contentful-paint` `maxNumericValue` 3000 (SC-011 "first usable view within 3 s")
+  - `total-blocking-time` `maxNumericValue` 200
+  - `resource-summary:total:size` < `2000000`
+
+  Add the `lhci` script (`lhci autorun`) and document it in the README.
+- [ ] T049d Create `.github/workflows/frontend.yml` and `.github/workflows/backend.yml` (after T047, T049a–T049c). Later tasks (T135, T136) extend these files; they do not recreate them.
+  - **frontend.yml** (push, pull_request; Node 22): `npm ci`, `lint`, `typecheck`, `check:api-types`, `test:unit` (includes T048 and T049a), `test:contract`, `build`, `check:budgets`, Playwright install, `test:e2e` (default projects chromium + mobile, which run every spec present, including `@a11y`), and `lhci`. A `deploy` job on `main` publishes `frontend/dist` to GitHub Pages (`actions/upload-pages-artifact` + `actions/deploy-pages`) and `needs:` every check job, so nothing deploys unless all gates pass.
+  - **backend.yml** (push, pull_request): `uv sync`, `ruff check`, a cache for `~/.cache/huggingface` keyed on `MODEL_REVISION`, `pytest` (all markers), `python -m tools.generate_examples --check`, `python -m tools.verify_examples` and `--self-test`.
+  - **README**: add a short "CI" section listing what each workflow checks. Note that `main` must be protected with both workflows' check jobs as required status checks: the project owner configures this in the repository settings, and the README says so.
+  - From here on a story's changes merge only with both workflows green. Within a story, tests are still written first and seen failing locally before the implementation lands.
+
+**Checkpoint**: Generated example data is verified (T019). Frontend libraries, i18n, state and shell are in place. CI runs the budget, accessibility, Lighthouse, README and data checks on every push (T049d), so user stories can start.
 
 ---
 
@@ -576,6 +611,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - `CORSMiddleware` with `allow_origins` from env `ALLOWED_ORIGINS` (comma-separated; empty ⇒ none), methods GET/POST, header `content-type`.
   - `GZipMiddleware(minimum_size=1000)`, the logging middleware and the error handlers.
   - Uvicorn access log disabled: document `--no-access-log` and set `logging.getLogger("uvicorn.access").disabled = True`.
+  - **README**: add the local backend run command (`uv run uvicorn app.main:app --port 7860 --no-access-log`) and `ALLOWED_ORIGINS` to "Run locally", plus how to point the frontend at it with `VITE_API_BASE_URL`.
 - [ ] T110 [P] [US6] Create `backend/Dockerfile`:
   - `python:3.12-slim`; install uv; `uv sync --frozen --no-dev`.
   - `ENV HF_HOME=/app/.cache/huggingface`; `RUN uv run python -m app.core.model --download` (bakes the pinned weights).
@@ -584,15 +620,21 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - Non-root user; `EXPOSE 7860`; `CMD uv run uvicorn app.main:app --host 0.0.0.0 --port 7860 --no-access-log`.
 
   Also create `backend/README.md` with the HF Space front matter (`title`, `sdk: docker`, `app_port: 7860`) and a short description with a privacy statement.
-- [ ] T111 [US6] Implement `backend/tools/record_api_fixtures.py`: use TestClient against the real app to write `contracts/fixtures/api/health.json`, `run.json` (text "The quick brown fox", `max_new_tokens` 3), `attention.json` (layer 1 of that run), `token-embeddings.json` and one `error-<code>.json` per error code (`{status, headers?, body}`). Run it and commit the fixtures. T099 validates them.
+- [ ] T111 [US6] Implement `backend/tools/record_api_fixtures.py`: use TestClient against the real app to write `contracts/fixtures/api/health.json`, `run.json` (text "The quick brown fox", `max_new_tokens` 3), `attention.json` (layer 1 of that run), `token-embeddings.json` and one `error-<code>.json` per error code (`{status, headers?, body}`). Run it and commit the fixtures. T099 validates them. Add `uv run python -m tools.record_api_fixtures` to the README.
 
 ### Tests for User Story 6 (frontend) ⚠️
 
 - [ ] T112 [P] [US6] Write `frontend/tests/contract/api-client.test.ts`. Ajv-validate every `contracts/fixtures/api/*.json` body against the OpenAPI component schemas, extracted from the YAML with the external `$ref` resolved. Then drive `client.ts` with a mocked `fetch` serving each fixture and check:
   - success responses parse into typed objects
   - each `error-<code>` maps to an `ApiError` with the same code and params
-  - an abort after 60 s → `timeout`; a fetch rejection → `network`
-  - a non-JSON health reply (HF "starting" HTML) → the waking state, then `wake_timeout` after `limits.wait_limit_s`
+  - an abort after 60 s → `timeout`; a fetch rejection on a model request (`/runs`, `/attention`, `/token-embeddings`) → `network`
+  - health polling follows the R13 classification table (use fake timers and a mocked `fetch` that distinguishes `mode: 'no-cors'` calls):
+    - a non-JSON health reply (HF "starting" HTML) → waking, then `wake_timeout` after `limits.wait_limit_s`
+    - CORS fetch rejects but the `no-cors` probe resolves (opaque) → waking, not `network`; still waking after 30 s of this
+    - CORS fetch and probe both reject twice in a row → `network` within 10 s of the start
+    - one unreachable attempt, then a waking attempt, then an unreachable one → still waking (the counter resets)
+    - the probe request carries no body and no credentials
+  - `onWaking` fires on the first waking attempt
   - a revision ≠ `index.json` revision → `version_mismatch`
   - a truncated/invalid body → `invalid_response`, and nothing partial is returned
 - [ ] T113 [P] [US6] Write `frontend/tests/e2e/live.spec.ts` (`@live`), using `page.route` mocks fed by `contracts/fixtures/api/` and building with `VITE_API_BASE_URL=http://api.test`. Check:
@@ -600,8 +642,9 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - run → every explore view and the Cost view render, and stepping works
   - a text ending in `?` shows the tip without blocking
   - the health reply is HTML for 2 polls, then OK → the "waking up" status with Cancel, then the result
+  - the health reply is HTML **without** `access-control-allow-origin` (so the browser's CORS fetch fails but the `no-cors` probe gets an opaque response) for 2 polls, then OK → the "waking up" status, not "unavailable", then the result
   - Cancel returns to idle
-  - all routes abort → a translated unavailable message within 10 s, "Back to examples" works, and example views still render
+  - all routes abort with `connectionrefused` → a translated unavailable message within 10 s of pressing Run, "Back to examples" works, and example views still render
   - a 429 and a 503 busy each show a translated message with retry seconds
   - a 422 `input_too_long_tokens` shows the limit and the actual count
   - switching language during a pending request → the result and messages appear in the new language
@@ -612,7 +655,12 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 ### Implementation for User Story 6 (frontend)
 
 - [ ] T116 [US6] Implement `frontend/src/lib/api/client.ts`, using the types from `src/generated/api-types.ts`:
-  - `getHealth(signal)` has a 5 s timeout per attempt. `waitForService({signal, onWaking})` polls every 3 s until OK or `limits.wait_limit_s` elapses (→ `wake_timeout`). It treats non-200, non-JSON and slow replies as waking. It compares `health.model.revision` with the `index.json` revision (→ `version_mismatch`).
+  - `getHealth(signal)` has a 5 s timeout per attempt. `waitForService({signal, onWaking})` polls every 3 s and classifies each attempt per the R13 table:
+    - 200 with a valid `Health` body → ready
+    - non-200, non-JSON or a 5 s timeout → waking
+    - a rejected CORS fetch → call `probeReachable(url, signal)`, which is `fetch(url, { mode: 'no-cors', cache: 'no-store', credentials: 'omit' })`; if it resolves, waking, else unreachable
+
+    `onWaking` fires on the first waking attempt. Two consecutive unreachable attempts end the wait with `network`; any other result resets the count. If `limits.wait_limit_s` elapses first → `wake_timeout`. When ready, it compares `health.model.revision` with the `index.json` revision (→ `version_mismatch`).
   - `createRun(text, signal)` always sends `max_new_tokens = limits.max_new_tokens`. Add `getAttention(ids, layer, signal)` and `getTokenEmbeddings(ids, signal)`.
   - Every request has a 60 s ceiling via `AbortController`. The body is read fully (`await res.text()`) and then parsed and validated with hand-written guards (`assertRunCore` etc.) before return.
   - Errors are typed `ApiError { code, params }`, with client codes `timeout|network|wake_timeout|version_mismatch|invalid_response`.
@@ -683,31 +731,38 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
 ## Phase 11: Polish & Cross-Cutting Concerns
 
-**Purpose**: Accessibility matrix, budgets, CI, documentation, deployment and release validation
+**Purpose**: Release completeness of the gates that have run in CI since Phase 2 (T049a–T049d), remaining e2e matrices, deployment, documentation and release validation
 
-- [ ] T130 [P] Write `frontend/tests/e2e/a11y.spec.ts` (`@a11y`, FR-044, SC-007): for every main view (tokens, embeddings, blocks, attention, prediction, architecture, cost, method) × theme {light, dark} × lang {en, tr, de}, run `new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa'])`. Run it once with all `ShowDetails` closed and once with them open, and expect zero violations.
+- [ ] T130 [P] Extend `frontend/tests/e2e/a11y.spec.ts` (from T049b; FR-044, SC-007) for release:
+  - assert that no view root carries `data-placeholder`, so all 8 main views are real
+  - add the live-mode states (mocked API, as in T113) to the matrix: input form, waking status and an error message, × theme × lang
+  - the zero-violations expectation is unchanged
 - [ ] T131 [P] Write `frontend/tests/e2e/keyboard.spec.ts` (`@keyboard`, SC-006). Using the keyboard only (no `click`, no `mouse`), cover the FR-043 scenarios: open an example, step through layers, change the attention head, generate the next token, switch language, open a shared link, use live mode (mocked), and use live mode with the service unavailable. On each focus stop, assert the focused element has a visible focus indicator (computed `outline-style` ≠ `none` or a box-shadow ring).
 - [ ] T132 [P] Write `frontend/tests/e2e/responsive-motion.spec.ts` (`@responsive`). On the `mobile` project (360 px), check that every main view has `document.documentElement.scrollWidth ≤ clientWidth` (FR-039). With `page.emulateMedia({ reducedMotion: 'reduce' })`, generate a token and switch views, then assert `document.getAnimations().length === 0` and that the same final DOM state is reached (FR-036).
-- [ ] T133 [P] Create `frontend/lighthouserc.json` (SC-011): collect from `npm run preview` at `/` with the mobile preset (`formFactor: mobile`, simulated throttling); assert `categories:performance ≥ 0.9` and `resource-summary:total byte weight` < `2000000`. Add the `lhci` script `lhci autorun`.
-- [ ] T134 [P] Write `frontend/tests/unit/readme-doc-check.test.ts` (Principle IX): extract every `npm run …`, `npx …` and `uv run …` command from `specs/001-inside-the-transformer/quickstart.md` and assert each appears in the root `README.md`
-- [ ] T135 [P] Create `.github/workflows/frontend.yml`:
-  - Trigger: push and pull_request.
-  - Steps on Node 22: `npm ci`, `lint`, `typecheck`, `check:api-types`, `test:unit`, `test:contract`, `build` (with `VITE_BASE` and `VITE_API_BASE_URL` from repo variables), `check:budgets`, Playwright install, `test:e2e` (chromium + mobile, including @a11y, @keyboard, @i18n, @share, @privacy, @live, @responsive), and `lhci`.
-  - On `main`: deploy `frontend/dist` to GitHub Pages (`actions/upload-pages-artifact` + `actions/deploy-pages`).
-- [ ] T136 [P] Create `.github/workflows/backend.yml`: `uv sync`, `ruff check`, and a cache for `~/.cache/huggingface` keyed on `MODEL_REVISION`. Then `pytest` (all markers), `python -m tools.generate_examples --check`, `python -m tools.verify_examples` and `--self-test`. A `fullstack` job starts the backend and runs `npm run test:e2e:fullstack`.
-- [ ] T137 [P] Implement `backend/tools/deploy_space.py` (`--space <user>/<space>`, requires `HF_TOKEN`): stage `backend/` (excluding `.venv`, `tests`, `tools`, caches) plus `contracts/` into a temp dir, then `huggingface_hub.HfApi().upload_folder(repo_id=space, repo_type="space", folder_path=staging)`. Create `.github/workflows/space-deploy.yml` (manual `workflow_dispatch`, uses the `HF_TOKEN` secret).
-- [ ] T138 Write the root `README.md` (Principle IX). Sections:
+- [ ] T133 [P] With every view built and the live chunk in place, confirm that `lhci` (config from T049c) still passes all four assertions (performance ≥ 0.9, LCP ≤ 3,000 ms, TBT ≤ 200 ms, total size < 2,000,000 B) and that `check:budgets` passes. If anything fails, fix the build. A budget may only be raised after a constitution amendment (Principle VII).
+- [ ] T134 [P] Extend `frontend/tests/unit/readme-doc-check.test.ts` (from T049a; Principle IX): also extract every `npm run …`, `npx …` and `uv run …` command from `specs/001-inside-the-transformer/quickstart.md` and assert each appears in the root `README.md`
+- [ ] T135 [P] Extend `.github/workflows/frontend.yml` (from T049d):
+  - pass `VITE_BASE` and `VITE_API_BASE_URL` from repo variables to `build`
+  - make sure `test:e2e` runs the full default matrix (chromium + mobile, including @a11y, @keyboard, @i18n, @share, @privacy, @live, @responsive)
+  - keep the Pages `deploy` job dependent on every check job
+- [ ] T136 [P] Extend `.github/workflows/backend.yml` (from T049d) with a `fullstack` job that starts the backend and runs `npm run test:e2e:fullstack`
+- [ ] T137 [P] Implement `backend/tools/deploy_space.py` (`--space <user>/<space>`, requires `HF_TOKEN`): stage `backend/` (excluding `.venv`, `tests`, `tools`, caches) plus `contracts/` into a temp dir, then `huggingface_hub.HfApi().upload_folder(repo_id=space, repo_type="space", folder_path=staging)`. Create `.github/workflows/space-deploy.yml` (manual `workflow_dispatch`, uses the `HF_TOKEN` secret). Add the deploy command, `HF_TOKEN` and `ALLOWED_ORIGINS` to the README "Deploy" section.
+- [ ] T138 Do the final README review (Principle IX). The README has been kept current since T008a. Check that every section is complete and correct:
   - project overview and the two components
   - prerequisites (Node 22, Python 3.12, uv, optional Docker)
   - run locally, in example mode and with the backend (`VITE_API_BASE_URL`)
   - test: every `npm run`/`uv run` command from quickstart Q1–Q11
   - regenerate example data (generate → verify → `--check`; model revision pin)
   - deploy: GitHub Pages variables, `deploy_space.py`, `ALLOWED_ORIGINS`
+  - CI and required status checks
   - privacy guarantees, budgets, and the contracts location
 
   T134 must pass.
 - [ ] T139 Run quickstart Q1–Q7 and Q9–Q11 locally from a clean checkout (`npm ci`, `uv sync`) and fix any failure. Every command must pass as written in `specs/001-inside-the-transformer/quickstart.md`.
-- [ ] T140 Deploy the frontend (Pages) and backend (Space) and run quickstart Q8 (wake-up behavior). Record whether an API request alone wakes the sleeping Space under the R13 open item in `specs/001-inside-the-transformer/research.md`. If it does not, confirm the `wake_timeout` message links to the Space page.
+- [ ] T140 Deploy the frontend (Pages) and backend (Space) and run quickstart Q8 (wake-up behavior). Record under the R13 open item in `specs/001-inside-the-transformer/research.md`:
+  - whether an API request alone wakes the sleeping Space; if it does not, confirm the `wake_timeout` message links to the Space page
+  - whether the Space's start-up reply carries CORS headers for the Pages origin, and which R13 "waking" row the browser actually hit (check in DevTools: a readable HTML reply, or a CORS failure followed by an opaque `no-cors` probe)
+  - that the deployed site shows "waking up", not "unavailable", while the Space starts
 - [ ] T141 (Manual, SC-005) Run a usability session with ≥ 5 participants who have no ML background. The tasks are: pick an example; find which earlier token a chosen token attends to most in a given layer and head; generate two tokens; explain in their own words that the model predicts one token at a time. Record the protocol, results (≥ 4 of 5 within 10 minutes) and follow-ups in `specs/001-inside-the-transformer/usability-study.md`.
 - [ ] T142 Do a final constitution Quality Gates review: check all 9 gates from `.specify/memory/constitution.md` against the implementation and CI results, and record pass/fail with evidence links in `specs/001-inside-the-transformer/checklists/quality-gates.md`
 
@@ -717,7 +772,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
 ### Phase Dependencies
 
-- **Setup (Phase 1)**: none. T001 runs first, since everything references `contracts/` at the repo root.
+- **Setup (Phase 1)**: none. T001 runs first, since everything references `contracts/` at the repo root. T003 + T004 → T008a (the README documents their commands).
 - **Foundational (Phase 2)**: depends on Setup and BLOCKS all stories. Inside the phase:
   - T009 → T013 → T014
   - T011 → T013
@@ -727,8 +782,12 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - T032 → T033 → T034
   - T036 → T046
   - T039–T045 → T046
-- **User stories (Phase 3+)**: all depend on Foundational.
-- **Polish (Phase 11)**: depends on all the stories you want to ship. T130–T132 need every main view to exist.
+  - T008a → T049a
+  - T006 + T046 → T049b
+  - T046 → T049c
+  - T047 + T049a + T049b + T049c (+ T017–T019 for the backend workflow) → T049d, the last task of the phase
+- **User stories (Phase 3+)**: all depend on Foundational, including T049d. Every story merges only with CI green.
+- **Polish (Phase 11)**: depends on all the stories you want to ship. T130–T133 need every main view to exist. T134–T136 extend files created in T049a and T049d.
 
 ### User Story Dependencies
 
@@ -748,14 +807,16 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 - Write the tests first and confirm they fail (unit before e2e)
 - Libraries and models before components, components before views, views before wiring, wiring before strings
 - Each story's i18n task must leave T034 (completeness) green
+- Each story leaves CI green: its views pass the `@a11y` suite (T049b) as soon as they replace their placeholders, budgets and Lighthouse hold, and the README doc check (T049a) passes
 
 ### Parallel Opportunities
 
-- **Phase 1**: T005–T008 in parallel after T004.
+- **Phase 1**: T005–T008 in parallel after T004; T008a after T003 and T004.
 - **Phase 2**:
   - Backend T010, T011, T012 and T015 run in parallel with T009.
   - Frontend T020–T025, T030, T031, T033, T035 and T047–T049 run in parallel once T017 has produced the config and data.
   - Components T039–T042 and T045 run in parallel.
+  - Gates T049a, T049b and T049c run in parallel; T049d comes after them.
 - **After Phase 2**:
   - US3 and the US6 backend work (T099–T111) can run alongside US1.
   - US4's `flops.ts`/`kvcache.ts` (T081, T082) and US8's registry work can run alongside US2.
@@ -799,14 +860,14 @@ Task: "T103 privacy canary in backend/tests/privacy/test_canary.py"
 ### MVP First (User Story 1 Only)
 
 1. Phase 1: Setup
-2. Phase 2: Foundational. The critical path is the backend core → generated and **verified** example data (T019) → frontend libraries and shell.
+2. Phase 2: Foundational. The critical path is the backend core → generated and **verified** example data (T019) → frontend libraries and shell → CI with all automated gates (T049d).
 3. Phase 3: US1
-4. **STOP and VALIDATE**: quickstart Q1 + Q2; `@example-mode` passes with the network blocked
-5. Deploy to GitHub Pages with `VITE_API_BASE_URL` unset. The site is already useful without a server (Principle V).
+4. **STOP and VALIDATE**: quickstart Q1 + Q2; `@example-mode` passes with the network blocked; both CI workflows are green (budgets, Lighthouse incl. LCP/TBT, `@a11y` on the built views, README doc check)
+5. Deploy to GitHub Pages with `VITE_API_BASE_URL` unset, through the T049d `deploy` job, which runs only after every check passes. The README already describes how to run, test, regenerate and deploy. The site is already useful without a server (Principle V).
 
 ### Incremental Delivery
 
-1. Setup + Foundational → verified data and app shell
+1. Setup + Foundational → verified data, app shell, README and CI gates
 2. US1 → MVP (tokens + prediction, stepping)
 3. US2 → embeddings, blocks, attention ("open the machine")
 4. US3 → architecture with exact parameter counts
@@ -814,7 +875,7 @@ Task: "T103 privacy canary in backend/tests/privacy/test_canary.py"
 6. US5 → translation pass and language switch
 7. US6 → live mode (backend + frontend); deploy the Space
 8. US7 → shareable links
-9. Polish → the full a11y/keyboard/responsive matrix, Lighthouse, CI, README, release validation (T139–T142)
+9. Polish → release completeness of the a11y suite, the keyboard/responsive matrices, final Lighthouse and README review, CI extensions, release validation (T139–T142)
 
 ### Parallel Team Strategy
 
@@ -834,5 +895,7 @@ After Phase 2:
 - [P] means a different file and no dependency on an unfinished task. [USn] maps a task to its spec story.
 - Never hand-edit generated files (`frontend/public/data/**`, `frontend/src/generated/**`, `frontend/tests/reference/param-shapes.json`, `contracts/fixtures/**`). Regenerate them with T016/T023/T111.
 - Every new user-facing string goes into en, tr and de in the same task (Principle III).
+- Every new or changed run/test/deploy/regenerate command goes into the README in the same task (Principle IX); T049a enforces it.
+- Every new dependency gets a justification row in plan.md first (Principle VIII).
 - No code path may persist or log live text (Principle IV). The T103/T114 canaries guard this.
 - Stop at any checkpoint to validate the story on its own.
