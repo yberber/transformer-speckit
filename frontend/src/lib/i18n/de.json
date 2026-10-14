@@ -2,6 +2,8 @@
   "app.title": "Im Inneren des Transformers",
   "app.tagline": "Sehen Sie zu, wie GPT-2 small Text Token für Token in neuen Text verwandelt – mit echten Zahlen.",
   "app.skip_to_content": "Zum Inhalt springen",
+  "intro.note": "GPT-2 setzt Text fort: Sie geben ihm den Anfang eines Textes, und es hängt ein kleines Stück nach dem anderen an. Fragen beantwortet es nicht so wie ein Chat-Assistent.",
+  "intro.dismiss": "Diesen Hinweis ausblenden",
   "header.language": "Sprache",
   "lang.en": "English",
   "lang.tr": "Türkçe",

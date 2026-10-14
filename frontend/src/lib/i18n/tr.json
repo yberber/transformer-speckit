@@ -2,6 +2,8 @@
   "app.title": "Transformer'ın İçinde",
   "app.tagline": "GPT-2 small'un metni gerçek sayılarla, her seferinde bir token ekleyerek nasıl yeni metne dönüştürdüğünü izleyin.",
   "app.skip_to_content": "İçeriğe geç",
+  "intro.note": "GPT-2 metni devam ettirir: ona bir metnin başlangıcını verirsiniz, o da arka arkaya küçük parçalar ekler. Soruları bir sohbet asistanı gibi yanıtlamaz.",
+  "intro.dismiss": "Bu notu gizle",
   "header.language": "Dil",
   "lang.en": "English",
   "lang.tr": "Türkçe",

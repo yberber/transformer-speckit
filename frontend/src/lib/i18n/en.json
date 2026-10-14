@@ -2,6 +2,8 @@
   "app.title": "Inside the Transformer",
   "app.tagline": "Watch GPT-2 small turn text into new text, one token at a time, with real numbers.",
   "app.skip_to_content": "Skip to content",
+  "intro.note": "GPT-2 continues text: give it the start of a text and it adds one small piece after another. It does not answer questions the way a chat assistant does.",
+  "intro.dismiss": "Hide this note",
   "header.language": "Language",
   "lang.en": "English",
   "lang.tr": "Türkçe",
