@@ -444,7 +444,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - **Non-layer**: pos_add d·n (prefill) or d (decode); lm_head 2dV in both phases.
   - **Exports**: `prefillFlops(config, n)` and `decodeFlops(config, t)` return the `{ breakdown: CostEstimate[], total }` breakdown. `costAtStep(config, nInput, k)` returns `{ prefill, decode: k ≥ 1 ? decodeFlops(nInput + k) : null, runningTotal }`.
   - **Formula ids**: `flops-qkv`, `flops-attn-scores`, `flops-attn-weighting`, `flops-attn-out`, `flops-mlp`, `flops-pos-add`, `flops-lm-head`, `flops-prefill-total`, `flops-decode-total`, `flops-running-total`.
-- [ ] T082 [P] [US4] Implement `frontend/src/lib/model/kvcache.ts`: `kvCacheBytes(config, t, bytesPerValue = 4)` = `2·L·t·d·bytesPerValue` as a CostEstimate with `phase 'kv_cache'` and `formulaId 'kv-cache-bytes'`
+- [X] T082 [P] [US4] Implement `frontend/src/lib/model/kvcache.ts`: `kvCacheBytes(config, t, bytesPerValue = 4)` = `2·L·t·d·bytesPerValue` as a CostEstimate with `phase 'kv_cache'` and `formulaId 'kv-cache-bytes'`
 - [ ] T083 [P] [US4] Create `frontend/src/components/EstimateLabel.svelte`: a visible "theoretical estimate" badge (text, not icon-only) plus a link "How we calculate". The link's `href` is the serialized current state with `view=method` and `#<formulaId>`; clicking it sets `viewState.view = 'method'` and scrolls to and focuses the anchor (FR-027).
 - [ ] T084 [US4] Create `frontend/src/views/Cost.svelte` (FR-022–FR-024, US4-1..3):
   - ViewIntro, `<Term id="flops">`, `<Term id="prefill">`, `<Term id="decode">`.
