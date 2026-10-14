@@ -235,35 +235,36 @@ function phased(
   };
 }
 
+// The component formulas carry the labels of the Cost view's table, whose links lead here.
 const FLOPS: Formula[] = [
-  phased('qkv', 'method.formula.flops_qkv', ['n_embd', 'n', 't'], '6 · d² · n', '6 · d²'),
+  phased('qkv', 'cost.component.qkv', ['n_embd', 'n', 't'], '6 · d² · n', '6 · d²'),
   phased(
     'attn_scores',
-    'method.formula.flops_attn_scores',
+    'cost.component.attn_scores',
     ['n_embd', 'n', 't'],
     'd · n · (n + 1)',
     '2 · d · t',
   ),
   phased(
     'attn_weighting',
-    'method.formula.flops_attn_weighting',
+    'cost.component.attn_weighting',
     ['n_embd', 'n', 't'],
     'd · n · (n + 1)',
     '2 · d · t',
   ),
-  phased('attn_out', 'method.formula.flops_attn_out', ['n_embd', 'n', 't'], '2 · d² · n', '2 · d²'),
+  phased('attn_out', 'cost.component.attn_out', ['n_embd', 'n', 't'], '2 · d² · n', '2 · d²'),
   phased(
     'mlp',
-    'method.formula.flops_mlp',
+    'cost.component.mlp',
     ['n_embd', 'n_inner', 'n', 't'],
     '4 · d · f · n',
     '4 · d · f',
   ),
-  phased('pos_add', 'method.formula.flops_pos_add', ['n_embd', 'n', 't'], 'd · n', 'd'),
+  phased('pos_add', 'cost.component.pos_add', ['n_embd', 'n', 't'], 'd · n', 'd'),
   {
     id: FORMULA_IDS.lm_head,
     group: 'flops',
-    titleKey: 'method.formula.flops_lm_head',
+    titleKey: 'cost.component.lm_head',
     inputs: ['n_embd', 'vocab_size'],
     variants: [
       {

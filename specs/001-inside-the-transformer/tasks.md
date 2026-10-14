@@ -499,7 +499,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - One `<section id="{formulaId}" tabindex="-1">` per formula: expression, named inputs with their config source, and a worked GPT-2 small example with values from `worked()` and the config values shown.
   - On load or hash change, focus the targeted section.
 - [X] T092 [US8] (P3) Add an interactive panel to `frontend/src/views/Method.svelte` (FR-028 Could, US8-3): labelled number inputs for input tokens n (1..`limits.max_input_tokens`) and context length t (1..`nPositions`). Values are clamped with an inline translated validation message. Every worked example re-renders immediately from the same functions, and an `aria-live` summary announces the changed totals.
-- [ ] T093 [US8] Add all US8 strings (assumption texts, formula titles, input labels, worked-example captions) to `frontend/src/lib/i18n/{en,tr,de}.json`
+- [X] T093 [US8] Add all US8 strings (assumption texts, formula titles, input labels, worked-example captions) to `frontend/src/lib/i18n/{en,tr,de}.json`
 
 **Checkpoint**: Every estimate on the site is traceable to a documented, tested formula.
 
