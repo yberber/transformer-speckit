@@ -694,7 +694,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
 ### Tests for User Story 7 ⚠️
 
-- [ ] T123 [P] [US7] Write `frontend/tests/unit/state/url.test.ts` (contract `contracts/url-state.md`):
+- [X] T123 [P] [US7] Write `frontend/tests/unit/state/url.test.ts` (contract `contracts/url-state.md`):
   - **Round trip**: `parse(serialize(s)) == s` over a matrix of every example × views {tokens, attention, cost, method} × layer {1, nLayer} × head {1, nHead} × step {0, last} × lang {en, tr, de}.
   - **Key order** is `mode, ex, view, layer, head, step, lang`, and `ex` and `lang` are always written.
   - **Normalization**:
