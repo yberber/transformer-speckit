@@ -186,7 +186,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - `setExample` resets step to 0 and keeps view, layer and head.
   - Theme is persisted in `localStorage` key `itt.theme` inside try/catch and applied as `document.documentElement.dataset.theme`.
   - **Live text is NOT part of this class.**
-- [ ] T037 [P] Write `frontend/tests/unit/state/viewState.test.ts`: clamping of layer/head/step/view/lang, the `setExample` reset rule, and that theme persistence survives a throwing `localStorage`
+- [X] T037 [P] Write `frontend/tests/unit/state/viewState.test.ts`: clamping of layer/head/step/view/lang, the `setExample` reset rule, and that theme persistence survives a throwing `localStorage`
 - [ ] T038 Create the design system in `frontend/src/styles/theme.css` and `frontend/src/styles/global.css` (FR-037, FR-039, FR-040):
   - Color tokens on `:root` and dark overrides under `@media (prefers-color-scheme: dark)` for `:root:not([data-theme="light"])` and `:root[data-theme="dark"]`. Every text/background pair is ≥ 4.5:1.
   - A visible `:focus-visible` ring (≥ 3:1 against adjacent colors).
