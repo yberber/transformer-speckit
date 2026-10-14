@@ -650,7 +650,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - switching language during a pending request → the result and messages appear in the new language
   - at the last step of an example, "Continue in live mode" re-runs the example text in live mode
 - [X] T114 [P] [US6] Write `frontend/tests/e2e/privacy.spec.ts` (`@privacy`). Type a unique canary in live mode (mocked API) and run it. Assert the canary is absent from `page.url()`, every request URL, `localStorage`, `sessionStorage`, `indexedDB.databases()` names and `document.cookie`, and is present only in the POST body to `/api/v1/runs`.
-- [ ] T115 [P] [US6] Write `frontend/tests/e2e/fullstack.spec.ts` (`@fullstack`, project `fullstack`, real backend on :7860, `ALLOWED_ORIGINS=http://localhost:4173`). For two examples (one short, one long), entering the example text in live mode gives tokens identical to example mode. The Prediction details probabilities are within 1e-4 of the example's, and stepping, Attention and Embeddings load via the API.
+- [X] T115 [P] [US6] Write `frontend/tests/e2e/fullstack.spec.ts` (`@fullstack`, project `fullstack`, real backend on :7860, `ALLOWED_ORIGINS=http://localhost:4173`). For two examples (one short, one long), entering the example text in live mode gives tokens identical to example mode. The Prediction details probabilities are within 1e-4 of the example's, and stepping, Attention and Embeddings load via the API.
 
 ### Implementation for User Story 6 (frontend)
 
