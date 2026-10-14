@@ -544,7 +544,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
 ### Tests for User Story 6 (backend) ⚠️
 
-- [ ] T099 [P] [US6] Write `backend/tests/contract/test_api_contract.py`:
+- [X] T099 [P] [US6] Write `backend/tests/contract/test_api_contract.py`:
   - Load `contracts/inference-api.openapi.yaml` (PyYAML) and `contracts/example-data.schema.json` into a `referencing.Registry` so `./example-data.schema.json#/$defs/...` resolves. Validate with `Draft202012Validator`.
   - Validate the real TestClient responses for `GET /api/v1/health`, `POST /api/v1/runs`, `POST /api/v1/attention` and `POST /api/v1/token-embeddings`.
   - Validate each error code: `empty_input`, `input_too_long_chars`, `input_too_long_tokens`, `invalid_request`, `rate_limited`, `busy`, `model_loading` (model not yet loaded), and `internal` (monkeypatch `compute_run` to raise).
