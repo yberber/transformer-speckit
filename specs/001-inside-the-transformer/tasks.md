@@ -127,7 +127,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - **Output**: one line per example/step, then `PASS`, or a non-zero exit with the first breaches.
   - **`--self-test`**: corrupt an in-memory copy (one prob +2e-4, one attention cell +2e-3, one embedding ×1.002) and assert that each corruption is detected.
   - **README**: add `uv run python -m tools.verify_examples` and `--self-test` to the "Regenerate example data" section (regenerate → verify → `--check`).
-- [ ] T019 Run `cd backend && uv run python -m tools.verify_examples` and `--self-test`. Both must pass (SC-001).
+- [X] T019 Run `cd backend && uv run python -m tools.verify_examples` and `--self-test`. Both must pass (SC-001).
 
 ### Frontend core libraries
 
