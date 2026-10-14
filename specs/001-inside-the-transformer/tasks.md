@@ -200,7 +200,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 - [X] T043 Create `frontend/src/components/TokenSequence.svelte`: renders `tokensAt(run, step)` as wrapping `TokenChip`s, with an optional `highlight: number[]` and an `onfocustoken`/`onhovertoken` callback. Used by Tokens, Embeddings, Blocks, Attention and Prediction.
 - [X] T044 Create `frontend/src/components/FlowIndicator.svelte` and `frontend/src/components/ViewNav.svelte`. The nav lists VIEWS, with the flow views grouped as "Inside the machine" (text → tokens → embeddings → blocks → attention → prediction) and architecture/cost/method as "Reference". It uses `aria-current="page"`, is keyboard reachable, and wraps on mobile. FlowIndicator persistently shows where the visitor is in the flow (FR-021).
 - [X] T045 [P] Create `frontend/src/components/ThemeSwitch.svelte` (system / light / dark, a radio group with translated labels) bound to `viewState.theme`
-- [ ] T046 Create `frontend/src/App.svelte` and `frontend/src/main.ts`:
+- [X] T046 Create `frontend/src/App.svelte` and `frontend/src/main.ts`:
   - **Layout**: header (title, slots for the language switch, mode switch and theme switch), an intro area, an example-picker slot, FlowIndicator + ViewNav, and a view outlet.
   - **Views**: each view in `frontend/src/views/*.svelte` is lazy-loaded with a dynamic `import()` and wrapped in `<svelte:boundary>` with a translated error fallback, so one failing view never breaks the others (Principle V).
   - **Notices**: a polite `aria-live` notice region.

@@ -33,6 +33,12 @@ export default tseslint.config(
     },
   },
   {
+    rules: {
+      // Positional parameters that must exist but are unused (e.g. a Svelte snippet's error).
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    },
+  },
+  {
     files: ['src/**/*.{ts,js,svelte}'],
     ignores: ['src/generated/**'],
     rules: {
