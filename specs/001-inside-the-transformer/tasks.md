@@ -593,7 +593,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
     - Starlette `HTTPException` → `invalid_request`
     - generic `Exception` → 500 `internal`, logging only `type(exc).__name__` and the raising module:lineno from the traceback's last frame, never `str(exc)` or locals
 - [X] T106 [P] [US6] Implement `backend/app/ratelimit.py` (~40 lines, no dependency) per T102. Settings come from env vars `RL_RUNS_PER_MIN`, `RL_RUNS_BURST`, `RL_DETAIL_PER_MIN`, `RL_DETAIL_BURST`, `GATE_MAX_WAITING`, `GATE_QUEUE_WAIT_S`. Expose `check_rate(request, bucket)` raising `ApiError('rate_limited')` and `async with model_gate():` raising `ApiError('busy')`. The keys stay in memory only and are never logged.
-- [ ] T107 [P] [US6] Implement `backend/app/logging.py`: middleware that logs one line `method route_template status duration_ms` using `request.scope["route"].path` (falling back to `"unmatched"`). It records no query, IP, headers or body.
+- [X] T107 [P] [US6] Implement `backend/app/logging.py`: middleware that logs one line `method route_template status duration_ms` using `request.scope["route"].path` (falling back to `"unmatched"`). It records no query, IP, headers or body.
 - [ ] T108 [US6] Implement `backend/app/api.py` (APIRouter prefix `/api/v1`):
   - **`GET /health`**: `{status:"ok", api_version: <openapi info.version>, model:{id, revision, versions}, limits}`. Returns 503 `model_loading` until the model is loaded.
   - **`POST /runs`**, checked in this order:
