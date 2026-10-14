@@ -27,7 +27,7 @@
   // Each story replaces its placeholder with the real view module here.
   const views: Record<ViewId, () => Promise<ViewModule>> = {
     tokens: () => import('./views/Tokens.svelte'),
-    embeddings: () => import('./views/Placeholder.svelte'),
+    embeddings: () => import('./views/Embeddings.svelte'),
     blocks: () => import('./views/Placeholder.svelte'),
     attention: () => import('./views/Placeholder.svelte'),
     prediction: () => import('./views/Prediction.svelte'),
