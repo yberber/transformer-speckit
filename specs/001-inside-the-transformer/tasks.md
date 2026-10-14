@@ -131,7 +131,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
 ### Frontend core libraries
 
-- [ ] T020 [P] Implement `frontend/src/lib/model/config.ts`. Import `../../generated/gpt2-config.json` and validate it: "loader rejects the config if any required field is missing, non-integer, ≤ 0, or if `n_embd % n_head ≠ 0`".
+- [X] T020 [P] Implement `frontend/src/lib/model/config.ts`. Import `../../generated/gpt2-config.json` and validate it: "loader rejects the config if any required field is missing, non-integer, ≤ 0, or if `n_embd % n_head ≠ 0`".
   - Export a typed `modelConfig`: `{ nLayer, nHead, nEmbd, nInner, dHead, vocabSize, nPositions, activationFunction, layerNormEpsilon, tieWordEmbeddings, eosTokenId }`.
   - `nInner` = `n_inner ?? 4 * n_embd`. Add a comment citing the HF GPT-2 semantics; the factor 4 is architecture semantics, not a size.
   - `tieWordEmbeddings` defaults to `true`.
