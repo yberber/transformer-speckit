@@ -40,6 +40,8 @@ export class LiveSession {
   wakingSince: number | null = $state(null);
   /** The service runs another model than the examples: live mode stays off. */
   disabled = $state(false);
+  /** What is in progress: the service check on entering, a run, or nothing. */
+  pending: 'check' | 'run' | null = $state(null);
 
   private controller: AbortController | null = null;
 
@@ -48,7 +50,7 @@ export class LiveSession {
   /** Entering live mode: check (and wake) the service before any text is sent. */
   async enter(): Promise<void> {
     if (this.disabled || this.controller) return;
-    await this.operation(async (signal, current) => {
+    await this.operation('check', async (signal, current) => {
       await this.waitForService(signal, current);
       if (current()) this.state = 'idle';
     });
@@ -79,7 +81,7 @@ export class LiveSession {
         params: { limit: limits.max_input_chars, actual: chars },
       });
     }
-    await this.operation(async (signal, current) => {
+    await this.operation('run', async (signal, current) => {
       await this.waitForService(signal, current);
       if (!current()) return;
       this.state = 'running';
@@ -109,6 +111,7 @@ export class LiveSession {
   private abort(): void {
     this.controller?.abort();
     this.controller = null;
+    this.pending = null;
   }
 
   private fail(error: LiveError): void {
@@ -132,10 +135,12 @@ export class LiveSession {
 
   /** Runs one cancellable step; a newer operation or cancel() makes its results stale. */
   private async operation(
+    kind: 'check' | 'run',
     body: (signal: AbortSignal, current: () => boolean) => Promise<void>,
   ): Promise<void> {
     const controller = new AbortController();
     this.controller = controller;
+    this.pending = kind;
     const current = () => this.controller === controller;
     this.state = 'validating';
     try {
@@ -148,7 +153,10 @@ export class LiveSession {
           : { code: 'invalid_response', params: {} },
       );
     } finally {
-      if (current()) this.controller = null;
+      if (current()) {
+        this.controller = null;
+        this.pending = null;
+      }
     }
   }
 }

@@ -357,5 +357,22 @@
   "error.network": "Der Modelldienst ist gerade nicht erreichbar.",
   "error.wake_timeout": "Der Modelldienst ist nicht rechtzeitig gestartet. Er ist möglicherweise nicht verfügbar.",
   "error.version_mismatch": "Der Modelldienst verwendet eine andere Modellversion als die Beispiele, daher ist der Live-Modus ausgeschaltet.",
-  "error.invalid_response": "Der Modelldienst hat eine Antwort gesendet, die nicht gelesen werden konnte."
+  "error.invalid_response": "Der Modelldienst hat eine Antwort gesendet, die nicht gelesen werden konnte.",
+  "live.title": "Eigenen Text ausprobieren",
+  "live.input_label": "Text, den GPT-2 fortsetzen soll",
+  "live.hint": "GPT-2 setzt den Text, den Sie eingeben, Token für Token fort. Es hat vor allem von englischen Webseiten gelernt und funktioniert deshalb am besten mit englischem Text.",
+  "live.privacy": "Ihr Text wird nur an das Modell gesendet, um dieses Ergebnis zu berechnen. Er wird nie gespeichert oder protokolliert und wird nie Teil der Seitenadresse.",
+  "live.limits": "Grenzen: höchstens {tokens} Tokens Text; danach fügt das Modell höchstens {steps} neue Tokens hinzu.",
+  "live.char_count": "{count} von {limit} Zeichen",
+  "live.run": "Ausführen",
+  "live.chat_tip": "Tipp: GPT-2 ist kein Chatbot. Es beantwortet keine Fragen und folgt keinen Anweisungen; es schreibt, was als Nächstes kommen könnte. Ein besseres Ergebnis erhalten Sie, wenn Sie den Anfang des gewünschten Textes schreiben, zum Beispiel „The capital of France is“.",
+  "live.non_english": "Ihr Text enthält Buchstaben außerhalb des englischen Alphabets. GPT-2 zerlegt solchen Text in viele kleine Tokens, deshalb sind die Fortsetzungen meist schwächer.",
+  "live.status.validating": "Verbindung zum Modell wird hergestellt…",
+  "live.status.waking": "Das Modell wird geweckt… Das kann bis zu einer Minute dauern.",
+  "live.status.elapsed": "{seconds} s",
+  "live.status.running": "Das Modell berechnet die nächsten Tokens…",
+  "live.status.ready": "Fertig. Gehen Sie das Ergebnis mit den Schaltflächen unten Schritt für Schritt durch.",
+  "live.cancel": "Abbrechen",
+  "live.back_to_examples": "Zurück zu den Beispielen",
+  "live.space_link": "Seite des Modelldienstes öffnen"
 }

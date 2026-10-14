@@ -667,7 +667,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - Text is sent only in POST bodies, and nothing is logged.
 - [X] T117 [US6] Implement `frontend/src/lib/data/liveSource.ts`: `createLiveRun(response, client) -> RunData` with `source: 'live'`. `getAttention(layer)` calls the API with `tokens.map(t => t.id)` and caches per layer in memory. `getTokenEmbeddings()` is cached the same way. Position embeddings use the shared static shards. Results are decoded with `decodeEncodedArray`.
 - [X] T118 [US6] Implement `frontend/src/lib/state/liveSession.svelte.ts`. The state machine is "`idle → validating (char cap) → waking? → running → ready | error(code)`; `ready → idle` on new text; any state `→ idle` on cancel; `error → example mode` on 'back to examples'". The live text lives only in this module's `$state` (memory) and is never written to storage or the URL; the module has no import of `url.ts` or storage helpers. Add `cancel()` (AbortController) and `runText(text)`.
-- [ ] T119 [US6] Create `frontend/src/components/live/LiveMode.svelte` (lazy chunk, FR-008/011/013, US6-1..6):
+- [X] T119 [US6] Create `frontend/src/components/live/LiveMode.svelte` (lazy chunk, FR-008/011/013, US6-1..6):
   - **Input**: a labelled `<textarea>` with a hint that GPT-2 continues text and works best in English, a privacy note that the text is never stored, and the limits from `limits.ts` (64 tokens, 64 steps).
   - **Character cap**: a code-point counter `[...text].length` / 1000; Run is disabled for empty or whitespace-only text or > `max_input_chars`.
   - **Chat tip**: shown when the trimmed text ends with `?` or matches `/^(what|who|why|how|when|where|can you|could you|please|tell me|write)\b/i`; it does not block the run.

@@ -160,7 +160,9 @@ test('@live the character limit counts code points and disables Run', async ({ p
   await enterLive(page);
   const input = page.locator('[data-live-input]');
   await input.fill('😀'.repeat(limits.max_input_chars));
-  await expect(page.locator('[data-char-count]')).toContainText(String(limits.max_input_chars));
+  await expect(page.locator('[data-char-count]')).toContainText(
+    new Intl.NumberFormat('en-US').format(limits.max_input_chars),
+  );
   await expect(runButton(page)).toBeEnabled();
   await input.fill('😀'.repeat(limits.max_input_chars + 1));
   await expect(runButton(page)).toBeDisabled();

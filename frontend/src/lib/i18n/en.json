@@ -357,5 +357,22 @@
   "error.network": "The model service cannot be reached right now.",
   "error.wake_timeout": "The model service did not start in time. It may be unavailable.",
   "error.version_mismatch": "The model service runs a different model version than the examples, so live mode is turned off.",
-  "error.invalid_response": "The model service sent an answer that could not be read."
+  "error.invalid_response": "The model service sent an answer that could not be read.",
+  "live.title": "Try your own text",
+  "live.input_label": "Text for GPT-2 to continue",
+  "live.hint": "GPT-2 continues the text you type, one token at a time. It learned mostly from English web pages, so it works best with English text.",
+  "live.privacy": "Your text is sent to the model only to compute this result. It is never stored or logged, and it never becomes part of the page address.",
+  "live.limits": "Limits: up to {tokens} tokens of text; the model then adds up to {steps} new tokens.",
+  "live.char_count": "{count} of {limit} characters",
+  "live.run": "Run",
+  "live.chat_tip": "Tip: GPT-2 is not a chatbot. It does not answer questions or follow instructions; it writes what could come next. For a better result, write the beginning of the text you want, for example “The capital of France is”.",
+  "live.non_english": "Your text contains letters outside the English alphabet. GPT-2 splits such text into many small tokens, so its continuations are usually weaker.",
+  "live.status.validating": "Connecting to the model…",
+  "live.status.waking": "Waking up the model… This can take up to a minute.",
+  "live.status.elapsed": "{seconds} s",
+  "live.status.running": "The model is computing the next tokens…",
+  "live.status.ready": "Done. Step through the result with the buttons below.",
+  "live.cancel": "Cancel",
+  "live.back_to_examples": "Back to examples",
+  "live.space_link": "Open the model service page"
 }
