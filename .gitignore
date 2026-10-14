@@ -16,6 +16,8 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 .ruff_cache/
+# contracts/ staged into the Docker build context (see README, Deploy)
+backend/contracts/
 
 # Model weights cache (CI caches it separately; never committed)
 .cache/huggingface/

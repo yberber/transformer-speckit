@@ -139,8 +139,21 @@ Actions". The build uses `VITE_BASE=/<repository name>/`. Live mode stays hidden
 works fully in example mode, until the repository variable `VITE_API_BASE_URL` (Settings →
 Secrets and variables → Actions → Variables) is set to the inference service URL.
 
-**Inference service (Hugging Face Space).** Not set up yet. This section will cover deploying
-`backend/` to a Docker Space.
+**Inference service (Hugging Face Space).** `backend/` is a Docker Space: `backend/Dockerfile`
+builds the image (Python 3.12, CPU-only PyTorch, the pinned GPT-2 weights baked in, offline at
+run time, non-root, port 7860) and `backend/README.md` holds the Space card (`sdk: docker`,
+`app_port: 7860`). The image also needs the repo-root `contracts/` in its build context. To
+build and run it locally, from the repository root:
+
+```sh
+cp -R contracts backend/contracts      # stage the contracts into the build context
+docker build -t inside-the-transformer backend
+rm -rf backend/contracts
+docker run --rm -p 7860:7860 -e ALLOWED_ORIGINS=http://localhost:4173 inside-the-transformer
+```
+
+In the Space settings, set the variable `ALLOWED_ORIGINS` to the GitHub Pages origin (e.g.
+`https://<user>.github.io`). The upload script for the Space is not set up yet.
 
 ## CI
 

@@ -1,0 +1,15 @@
+# Only pyproject.toml, uv.lock, app/ and the staged contracts/ go into the image.
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.cache/
+tests/
+tools/
+.env
+.env.*
+*.log
+Dockerfile
+.dockerignore

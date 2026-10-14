@@ -612,7 +612,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - `GZipMiddleware(minimum_size=1000)`, the logging middleware and the error handlers.
   - Uvicorn access log disabled: document `--no-access-log` and set `logging.getLogger("uvicorn.access").disabled = True`.
   - **README**: add the local backend run command (`uv run uvicorn app.main:app --port 7860 --no-access-log`) and `ALLOWED_ORIGINS` to "Run locally", plus how to point the frontend at it with `VITE_API_BASE_URL`.
-- [ ] T110 [P] [US6] Create `backend/Dockerfile`:
+- [X] T110 [P] [US6] Create `backend/Dockerfile`:
   - `python:3.12-slim`; install uv; `uv sync --frozen --no-dev`.
   - `ENV HF_HOME=/app/.cache/huggingface`; `RUN uv run python -m app.core.model --download` (bakes the pinned weights).
   - At runtime: `ENV HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 LIMITS_PATH=/app/contracts/limits.json`.
