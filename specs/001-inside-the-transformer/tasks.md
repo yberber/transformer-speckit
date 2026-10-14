@@ -335,7 +335,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - Data loads lazily when the view opens, with translated loading and error states.
   - A token-flow animation (chip → strip) uses `duration()`.
 - [X] T066 [P] [US2] Create `frontend/src/components/LayerSelector.svelte`: Previous/Next buttons plus a direct `<select>` of layers `1..modelConfig.nLayer`, a label "Layer {n} of {total}" and `aria-live` on change. Bound to `viewState.layer`.
-- [ ] T067 [P] [US2] Create `frontend/src/components/HeadSelector.svelte`: Previous/Next plus a direct `<select>` of heads `1..modelConfig.nHead`, bound to `viewState.head`
+- [X] T067 [P] [US2] Create `frontend/src/components/HeadSelector.svelte`: Previous/Next plus a direct `<select>` of heads `1..modelConfig.nHead`, bound to `viewState.head`
 - [ ] T068 [P] [US2] Create `frontend/src/components/ChangeBars.svelte`: one row per token (TokenChip + horizontal bar + `formatPercent` value) for an array of change percentages, with a caption explaining "length of the update ÷ length of the token's vector before this part" (FR-016). Under `ShowDetails`, a table of the exact values.
 - [ ] T069 [US2] Create `frontend/src/views/Blocks.svelte` (FR-016, US2-2/3):
   - ViewIntro, `<Term id="layer">`, `<Term id="attention">`, `<Term id="mlp">`, LayerSelector.
