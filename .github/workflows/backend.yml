@@ -1,0 +1,44 @@
+# Backend checks: lint, tests (including those that need the GPT-2 weights), and the example
+# data checks: the committed data matches a fresh generation and passes the reference
+# verification (FR-041).
+name: backend
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  checks:
+    name: lint, tests, example data
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - id: model
+        name: read the pinned model revision
+        run: |
+          revision=$(sed -n 's/^MODEL_REVISION = "\([0-9a-f]\{40\}\)"$/\1/p' app/core/model.py)
+          test -n "$revision"
+          echo "revision=$revision" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v6
+        with:
+          path: ~/.cache/huggingface
+          key: hf-gpt2-${{ steps.model.outputs.revision }}
+      - run: uv run python -m app.core.model --download
+      - run: uv run pytest
+      - run: uv run python -m tools.generate_examples --check
+      - run: uv run python -m tools.verify_examples
+      - run: uv run python -m tools.verify_examples --self-test

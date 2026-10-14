@@ -244,7 +244,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - `resource-summary:total:size` < `2000000`
 
   Add the `lhci` script (`lhci autorun`) and document it in the README.
-- [ ] T049d Create `.github/workflows/frontend.yml` and `.github/workflows/backend.yml` (after T047, T049a–T049c). Later tasks (T135, T136) extend these files; they do not recreate them.
+- [X] T049d Create `.github/workflows/frontend.yml` and `.github/workflows/backend.yml` (after T047, T049a–T049c). Later tasks (T135, T136) extend these files; they do not recreate them.
   - **frontend.yml** (push, pull_request; Node 22): `npm ci`, `lint`, `typecheck`, `check:api-types`, `test:unit` (includes T048 and T049a), `test:contract`, `build`, `check:budgets`, Playwright install, `test:e2e` (default projects chromium + mobile, which run every spec present, including `@a11y`), and `lhci`. A `deploy` job on `main` publishes `frontend/dist` to GitHub Pages (`actions/upload-pages-artifact` + `actions/deploy-pages`) and `needs:` every check job, so nothing deploys unless all gates pass.
   - **backend.yml** (push, pull_request): `uv sync`, `ruff check`, a cache for `~/.cache/huggingface` keyed on `MODEL_REVISION`, `pytest` (all markers), `python -m tools.generate_examples --check`, `python -m tools.verify_examples` and `--self-test`.
   - **README**: add a short "CI" section listing what each workflow checks. Note that `main` must be protected with both workflows' check jobs as required status checks: the project owner configures this in the repository settings, and the README says so.

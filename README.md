@@ -114,8 +114,34 @@ the pinned GPT-2 weights, about 550 MB, into the Hugging Face cache):
 
 ## Deploy
 
-Deployment is not set up yet. This section will cover publishing the static site to GitHub
-Pages and the inference service to a Hugging Face Space.
+**Static site (GitHub Pages).** Every push to `main` runs the `frontend` workflow; its `deploy`
+job publishes `frontend/dist` to GitHub Pages only after all frontend check jobs have passed.
+One-time setup by the repository owner: in Settings → Pages, set the source to "GitHub
+Actions". The build uses `VITE_BASE=/<repository name>/`. Live mode stays hidden, and the site
+works fully in example mode, until the repository variable `VITE_API_BASE_URL` (Settings →
+Secrets and variables → Actions → Variables) is set to the inference service URL.
+
+**Inference service (Hugging Face Space).** Not set up yet. This section will cover deploying
+`backend/` to a Docker Space.
+
+## CI
+
+Two GitHub Actions workflows run on every push and pull request:
+
+- `.github/workflows/frontend.yml`: `static` (ESLint, `svelte-check`, API types up to date),
+  `test` (unit tests, including the architecture-literal scan and the README doc check, and
+  contract tests), `build` (production build and `check:budgets`), `e2e` (Playwright on the
+  `chromium` and `mobile` projects, including the `@a11y` axe suite) and `lighthouse`
+  (`npm run lhci`). On `main`, `deploy` publishes to GitHub Pages after all of them pass.
+- `.github/workflows/backend.yml`: `checks` runs `ruff check`, `pytest` with all markers (the
+  GPT-2 weights are cached under `~/.cache/huggingface`, keyed on `MODEL_REVISION`),
+  `tools.generate_examples --check`, `tools.verify_examples` and `tools.verify_examples
+  --self-test`.
+
+Changes merge only with both workflows green. The repository owner must protect `main` in
+Settings → Branches (or Rules) and mark the check jobs of both workflows as required status
+checks: `static`, `test`, `build`, `e2e`, `lighthouse` and `checks`. The workflows cannot set
+this up themselves.
 
 ## Privacy, budgets and contracts
 
