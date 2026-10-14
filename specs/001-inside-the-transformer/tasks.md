@@ -559,7 +559,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - the step cap is `min(max_new_tokens, n_positions − n_input)`
   - all limit values come from `contracts/limits.json`
 - [X] T101 [P] [US6] Write `backend/tests/integration/test_live_matches_examples.py` (SC-002, marker `model`): for each example in `frontend/public/data/examples/`, POST `/api/v1/runs` with its text and `max_new_tokens = core.run.steps`. Assert the tokens are identical and every candidate probability is within 1e-4 of `core.json`. Also check that `/attention` for layer 1 dequantizes to within 1e-3 of the example's `attention-L01.u16`.
-- [ ] T102 [P] [US6] Write `backend/tests/unit/test_ratelimit.py`:
+- [X] T102 [P] [US6] Write `backend/tests/unit/test_ratelimit.py`:
   - token-bucket refill and burst (`/runs` 6/min burst 3; detail 60/min burst 20)
   - entries expire after 10 min (injectable clock)
   - the client key is the first `X-Forwarded-For` hop, else the socket peer
