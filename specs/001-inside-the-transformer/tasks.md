@@ -573,7 +573,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 ### Implementation for User Story 6 (backend)
 
 - [X] T104 [US6] Implement `backend/app/schemas.py`: Pydantic v2 models with `extra="forbid"` mirroring the contract: `RunRequest {text: str (max_length 4000), max_new_tokens: int ≥ 0}`, `TokenIdsRequest {token_ids: list[int ≥ 0], 1..128 items}`, `AttentionRequest {token_ids, layer: int ≥ 1}`, `EncodedArray`, `Health`, `Limits`, `RunResponse {model, run}`, `AttentionResponse`, `TokenEmbeddingsResponse`, `ErrorBody`
-- [ ] T105 [US6] Implement `backend/app/errors.py`:
+- [X] T105 [US6] Implement `backend/app/errors.py`:
   - `ApiError(code, http_status, params)` with this mapping:
 
     | Code | HTTP |
