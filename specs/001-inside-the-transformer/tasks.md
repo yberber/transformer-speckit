@@ -375,7 +375,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - The per-block, wte, wpe and ln_f counts equal the references.
   - `lm_head.weight` has `tied_to: 'wte.weight'` and is excluded from the total.
   - The shares of counted groups sum to 1 within 1e-12.
-- [ ] T074 [P] [US3] Write `frontend/tests/e2e/architecture.spec.ts` (`@architecture`):
+- [X] T074 [P] [US3] Write `frontend/tests/e2e/architecture.spec.ts` (`@architecture`):
   - the diagram shows every component type and the "×{n_layer}" label
   - Tab/Enter on each component opens a panel with name, shape, count and share
   - selecting the LM head shows the tied-weights explanation
