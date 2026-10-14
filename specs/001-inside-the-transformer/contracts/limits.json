@@ -1,0 +1,10 @@
+{
+  "$comment": "Product limits shared by frontend and inference service (contract v1.0.0). Not architecture numbers; those come from the model config.",
+  "max_input_tokens": 64,
+  "max_new_tokens": 64,
+  "max_input_chars": 1000,
+  "wait_limit_s": 60,
+  "example_steps": 20,
+  "file_budget_bytes": 300000,
+  "initial_load_budget_bytes": 2000000
+}

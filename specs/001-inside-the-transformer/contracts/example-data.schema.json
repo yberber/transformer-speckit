@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://inside-the-transformer/contracts/example-data.schema.json",
+  "title": "Inside the Transformer — run and example data",
+  "description": "Version 1.0.0. Single definition of RunCore, used by static example files (core.json, index.json) and by the inference API (openapi.yaml $refs into $defs). Binary layouts: example-data.md.",
+  "$defs": {
+    "TokenBytes": {
+      "description": "Raw byte-level BPE bytes of one token (may be part of a UTF-8 character).",
+      "type": "array",
+      "items": { "type": "integer", "minimum": 0, "maximum": 255 },
+      "minItems": 1
+    },
+    "Token": {
+      "type": "object",
+      "required": ["id", "bytes"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "integer", "minimum": 0 },
+        "bytes": { "$ref": "#/$defs/TokenBytes" }
+      }
+    },
+    "Candidate": {
+      "type": "object",
+      "required": ["id", "bytes", "prob"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "integer", "minimum": 0 },
+        "bytes": { "$ref": "#/$defs/TokenBytes" },
+        "prob": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+      }
+    },
+    "Prediction": {
+      "description": "Top-10 next-token candidates at one step, sorted by prob desc then id asc. candidates[0] is the greedy choice.",
+      "type": "object",
+      "required": ["candidates"],
+      "additionalProperties": false,
+      "properties": {
+        "candidates": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Candidate" },
+          "minItems": 10,
+          "maxItems": 10
+        }
+      }
+    },
+    "LayerChange": {
+      "description": "Per-token change percentages for one block. Arrays have length n_input + steps.",
+      "type": "object",
+      "required": ["attn_change_pct", "mlp_change_pct"],
+      "additionalProperties": false,
+      "properties": {
+        "attn_change_pct": { "type": "array", "items": { "type": "number", "minimum": 0 } },
+        "mlp_change_pct": { "type": "array", "items": { "type": "number", "minimum": 0 } }
+      }
+    },
+    "RunCore": {
+      "description": "Everything needed for Tokenization, Prediction, Blocks and Cost views for every step. Step k is the prefix of length n_input + k (causality).",
+      "type": "object",
+      "required": ["n_input", "steps", "stop_reason", "tokens", "predictions", "layers"],
+      "additionalProperties": false,
+      "properties": {
+        "n_input": { "type": "integer", "minimum": 1 },
+        "steps": { "type": "integer", "minimum": 0 },
+        "stop_reason": { "enum": ["step_limit", "eos", "context_limit"] },
+        "tokens": {
+          "description": "Input tokens followed by generated tokens; length n_input + steps.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/Token" },
+          "minItems": 1
+        },
+        "predictions": {
+          "description": "Index k = prediction shown at step k; length steps + 1.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/Prediction" },
+          "minItems": 1
+        },
+        "layers": {
+          "description": "One entry per block (length n_layer from config), 0-based.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/LayerChange" },
+          "minItems": 1
+        }
+      }
+    },
+    "Sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "BinaryFile": {
+      "description": "A raw little-endian typed array file. Value = stored * scale (scale omitted = 1).",
+      "type": "object",
+      "required": ["path", "dtype", "shape", "bytes", "sha256"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "type": "string", "pattern": "^[a-z0-9./-]+$" },
+        "dtype": { "enum": ["float32", "uint16"] },
+        "shape": { "type": "array", "items": { "type": "integer", "minimum": 1 }, "minItems": 1 },
+        "scale": { "type": "number", "exclusiveMinimum": 0 },
+        "bytes": { "type": "integer", "minimum": 1, "exclusiveMaximum": 300000 },
+        "sha256": { "$ref": "#/$defs/Sha256" }
+      }
+    },
+    "ModelRef": {
+      "type": "object",
+      "required": ["id", "revision"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "revision": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "versions": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "ExampleCore": {
+      "description": "Content of data/examples/<id>/core.json.",
+      "type": "object",
+      "required": ["format_version", "example", "model", "run", "files"],
+      "additionalProperties": false,
+      "properties": {
+        "format_version": { "const": "1.0.0" },
+        "example": {
+          "type": "object",
+          "required": ["id", "length", "text"],
+          "additionalProperties": false,
+          "properties": {
+            "id": { "type": "string", "pattern": "^[a-z0-9-]{1,40}$" },
+            "length": { "enum": ["short", "medium", "long"] },
+            "text": { "type": "string", "minLength": 1 }
+          }
+        },
+        "model": { "$ref": "#/$defs/ModelRef" },
+        "run": { "$ref": "#/$defs/RunCore" },
+        "files": {
+          "type": "object",
+          "required": ["embeddings_token", "attention"],
+          "additionalProperties": false,
+          "properties": {
+            "embeddings_token": {
+              "allOf": [{ "$ref": "#/$defs/BinaryFile" }],
+              "description": "float32 [unique_ids.length, n_embd]; row r is wte[unique_ids[r]].",
+              "unevaluatedProperties": false,
+              "properties": {
+                "path": true, "dtype": true, "shape": true, "scale": true, "bytes": true, "sha256": true,
+                "unique_ids": { "type": "array", "items": { "type": "integer", "minimum": 0 }, "uniqueItems": true }
+              },
+              "required": ["unique_ids"]
+            },
+            "attention": {
+              "description": "One file per layer, index 0 = layer 1. uint16 [n_head, T(T+1)/2], scale 1/65535.",
+              "type": "array",
+              "items": { "$ref": "#/$defs/BinaryFile" },
+              "minItems": 1
+            }
+          }
+        }
+      }
+    },
+    "ExampleIndex": {
+      "description": "Content of data/examples/index.json. First entry is the default example.",
+      "type": "object",
+      "required": ["format_version", "model", "examples", "position_embeddings"],
+      "additionalProperties": false,
+      "properties": {
+        "format_version": { "const": "1.0.0" },
+        "model": { "$ref": "#/$defs/ModelRef" },
+        "examples": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "required": ["id", "length", "core"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z0-9-]{1,40}$" },
+              "length": { "enum": ["short", "medium", "long"] },
+              "core": { "type": "string", "pattern": "^[a-z0-9./-]+$" }
+            }
+          }
+        },
+        "position_embeddings": {
+          "description": "Shared wpe shards (float32 [rows, n_embd]) covering positions 0..(max_input_tokens + max_new_tokens - 1).",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "allOf": [{ "$ref": "#/$defs/BinaryFile" }],
+            "unevaluatedProperties": false,
+            "properties": {
+              "path": true, "dtype": true, "shape": true, "scale": true, "bytes": true, "sha256": true,
+              "first_position": { "type": "integer", "minimum": 0 }
+            },
+            "required": ["first_position"]
+          }
+        }
+      }
+    }
+  }
+}

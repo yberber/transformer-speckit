@@ -1,0 +1,248 @@
+openapi: 3.1.0
+info:
+  title: Inside the Transformer — inference API
+  version: 1.0.0
+  description: |
+    Stateless CPU inference service for live mode (GPT-2 small, greedy decoding only).
+
+    Authoritative contract between the static frontend and the inference service (Principle IX).
+    Location after implementation starts: `contracts/inference-api.openapi.yaml` at repo root.
+    Versioning: semver in `info.version`; breaking changes bump MAJOR and the `/api/vN` prefix.
+
+    Rules that schemas cannot express:
+    - Privacy: request bodies are never stored or logged; error responses never echo input.
+    - Tokenization happens only here (GPT2TokenizerFast, `split_special_tokens=True`).
+    - Limits come from `limits.json`; the service enforces them exactly.
+    - Large arrays use `EncodedArray` (base64 of little-endian typed array; see example-data.md).
+    - Responses are gzip-compressed when the client sends `Accept-Encoding: gzip`.
+    - CORS: only origins in the `ALLOWED_ORIGINS` environment variable.
+servers:
+  - url: https://{space}.hf.space
+    variables:
+      space:
+        default: inside-the-transformer
+  - url: http://localhost:7860
+paths:
+  /api/v1/health:
+    get:
+      operationId: getHealth
+      summary: Readiness, model identity and limits. Not rate limited.
+      responses:
+        "200":
+          description: Service is ready.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Health" }
+        "503":
+          $ref: "#/components/responses/Unavailable"
+  /api/v1/runs:
+    post:
+      operationId: createRun
+      summary: Tokenize text, generate greedily, return the RunCore for all steps.
+      description: |
+        Counts tokens exactly before running the model. Rejects with `input_too_long_tokens`
+        (params `limit`, `actual`) without running the model when the input exceeds
+        `max_input_tokens`. Generates up to `min(max_new_tokens, n_positions - n_input)` tokens,
+        stopping early at end-of-text (`stop_reason: eos`). Top-10 predictions come from the same
+        logits that chose each token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RunRequest" }
+      responses:
+        "200":
+          description: Completed run. Never partial.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RunResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "422": { $ref: "#/components/responses/InputRejected" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+        "500": { $ref: "#/components/responses/Internal" }
+  /api/v1/attention:
+    post:
+      operationId: getAttention
+      summary: Attention weights of one layer, all heads, for a token sequence.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AttentionRequest" }
+      responses:
+        "200":
+          description: Packed causal lower triangle per head.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AttentionResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+        "500": { $ref: "#/components/responses/Internal" }
+  /api/v1/token-embeddings:
+    post:
+      operationId: getTokenEmbeddings
+      summary: Token-embedding rows (wte) for the unique IDs of a sequence.
+      description: Position-embedding rows are not returned; clients use the shared static wpe shards.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TokenIdsRequest" }
+      responses:
+        "200":
+          description: Rows in order of first appearance.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TokenEmbeddingsResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "503": { $ref: "#/components/responses/Unavailable" }
+        "500": { $ref: "#/components/responses/Internal" }
+components:
+  schemas:
+    Limits:
+      type: object
+      description: Mirrors limits.json.
+      required: [max_input_tokens, max_new_tokens, max_input_chars, wait_limit_s]
+      properties:
+        max_input_tokens: { type: integer, minimum: 1 }
+        max_new_tokens: { type: integer, minimum: 1 }
+        max_input_chars: { type: integer, minimum: 1 }
+        wait_limit_s: { type: integer, minimum: 1 }
+    Health:
+      type: object
+      required: [status, api_version, model, limits]
+      additionalProperties: false
+      properties:
+        status: { const: ok }
+        api_version: { type: string, pattern: '^\d+\.\d+\.\d+$' }
+        model: { $ref: "./example-data.schema.json#/$defs/ModelRef" }
+        limits: { $ref: "#/components/schemas/Limits" }
+    RunRequest:
+      type: object
+      required: [text, max_new_tokens]
+      additionalProperties: false
+      properties:
+        text:
+          type: string
+          description: Text to continue. Non-empty after trimming; ≤ max_input_chars Unicode code points (checked by the service; schema maxLength is a transport guard).
+          maxLength: 4000
+        max_new_tokens:
+          type: integer
+          minimum: 0
+          description: ≤ limits.max_new_tokens, else 400 invalid_request.
+    RunResponse:
+      type: object
+      required: [model, run]
+      additionalProperties: false
+      properties:
+        model: { $ref: "./example-data.schema.json#/$defs/ModelRef" }
+        run: { $ref: "./example-data.schema.json#/$defs/RunCore" }
+    TokenIdsRequest:
+      type: object
+      required: [token_ids]
+      additionalProperties: false
+      properties:
+        token_ids:
+          type: array
+          description: Full sequence from a RunResponse. Length ≤ max_input_tokens + max_new_tokens and ≤ n_positions; each id < vocab_size.
+          minItems: 1
+          maxItems: 128
+          items: { type: integer, minimum: 0 }
+    AttentionRequest:
+      type: object
+      required: [token_ids, layer]
+      additionalProperties: false
+      properties:
+        token_ids: { $ref: "#/components/schemas/TokenIdsRequest/properties/token_ids" }
+        layer: { type: integer, minimum: 1, description: "1-based; ≤ n_layer." }
+    EncodedArray:
+      type: object
+      description: Base64 of a little-endian typed array, row-major. Value = stored * scale.
+      required: [dtype, shape, data]
+      additionalProperties: false
+      properties:
+        dtype: { enum: [float32, uint16] }
+        shape: { type: array, items: { type: integer, minimum: 1 }, minItems: 1 }
+        scale: { type: number, exclusiveMinimum: 0 }
+        data: { type: string, contentEncoding: base64 }
+    AttentionResponse:
+      type: object
+      required: [layer, n_tokens, weights]
+      additionalProperties: false
+      properties:
+        layer: { type: integer, minimum: 1 }
+        n_tokens: { type: integer, minimum: 1 }
+        weights:
+          description: uint16, shape [n_head, n_tokens*(n_tokens+1)/2], scale 1/65535; packed index of (i, j≤i) = i(i+1)/2 + j.
+          $ref: "#/components/schemas/EncodedArray"
+    TokenEmbeddingsResponse:
+      type: object
+      required: [unique_ids, embeddings]
+      additionalProperties: false
+      properties:
+        unique_ids:
+          type: array
+          uniqueItems: true
+          items: { type: integer, minimum: 0 }
+        embeddings:
+          description: float32, shape [unique_ids.length, n_embd].
+          $ref: "#/components/schemas/EncodedArray"
+    ErrorCode:
+      enum:
+        - empty_input
+        - input_too_long_chars
+        - input_too_long_tokens
+        - invalid_request
+        - rate_limited
+        - busy
+        - model_loading
+        - internal
+    Error:
+      type: object
+      required: [error]
+      additionalProperties: false
+      properties:
+        error:
+          type: object
+          required: [code]
+          additionalProperties: false
+          properties:
+            code: { $ref: "#/components/schemas/ErrorCode" }
+            params:
+              description: Numbers or field names only — never user input.
+              type: object
+              additionalProperties:
+                oneOf: [{ type: integer }, { type: string, pattern: '^[a-z_]+$' }]
+  responses:
+    BadRequest:
+      description: "invalid_request (params.field names the offending field)."
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    InputRejected:
+      description: "empty_input | input_too_long_chars | input_too_long_tokens (params: limit, actual). Model not run."
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    RateLimited:
+      description: "rate_limited (params.retry_after_s)."
+      headers:
+        Retry-After: { schema: { type: integer } }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Unavailable:
+      description: "busy (queue full / wait exceeded; params.retry_after_s) | model_loading."
+      headers:
+        Retry-After: { schema: { type: integer } }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Internal:
+      description: "internal. Details are never returned or logged with input."
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
