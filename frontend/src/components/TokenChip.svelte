@@ -6,6 +6,7 @@
 <script lang="ts">
   import type { Token } from '../lib/data/runData';
   import { t } from '../lib/i18n/index';
+  import { tokenLabel } from '../lib/tokens/describe';
   import { NEWLINE_MARKER, SPACE_MARKER, tokenDisplay } from '../lib/tokens/display';
   import { tokenColor, tokenTextColor, type Theme } from '../lib/tokens/palette';
 
@@ -47,23 +48,7 @@
     ];
   });
 
-  const spoken = $derived.by(() => {
-    const parts: string[] = [];
-    if (display.kind === 'eos') parts.push(t('token.eos'));
-    else if (display.kind === 'partial') parts.push(t('token.partial', { hex: display.hex }));
-    else {
-      if (display.leadingSpace) parts.push(t('token.space'));
-      for (const s of segments) {
-        if (!s.marker) parts.push(`“${s.text}”`);
-        else
-          for (const ch of s.text) {
-            parts.push(ch === NEWLINE_MARKER ? t('token.newline') : t('token.space'));
-          }
-      }
-    }
-    const label = t('token.label', { position: position + 1, text: parts.join(', ') });
-    return origin === 'generated' ? `${label}, ${t('token.generated')}` : label;
-  });
+  const spoken = $derived(tokenLabel(token, position, origin));
 </script>
 
 <span

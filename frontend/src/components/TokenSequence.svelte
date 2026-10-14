@@ -5,6 +5,8 @@
 -->
 <script lang="ts">
   import { tokensAt, type RunData } from '../lib/data/runData';
+  import { duration } from '../lib/motion';
+  import { isJustAppended } from '../lib/state/appended';
   import type { Theme } from '../lib/tokens/palette';
   import TokenChip from './TokenChip.svelte';
 
@@ -33,12 +35,21 @@
   const tokens = $derived(tokensAt(run, step));
   const highlighted = $derived(new Set(highlight));
   const interactive = $derived(onfocustoken !== undefined || onhovertoken !== undefined);
+
+  /** The token that "Next token" just appended drops into place; every other chip just appears. */
+  function appear(_node: Element, { position }: { position: number }) {
+    return {
+      duration: isJustAppended(position) ? duration(260) : 0,
+      css: (p: number) =>
+        `opacity: ${p}; transform: translateY(${(1 - p) * -0.5}em) scale(${0.8 + 0.2 * p});`,
+    };
+  }
 </script>
 
 <ol class="token-sequence" aria-label={label}>
   {#each tokens as token, position (position)}
     {@const origin = position < run.nInput ? 'input' : 'generated'}
-    <li>
+    <li in:appear={{ position }}>
       {#if interactive}
         <button
           type="button"
