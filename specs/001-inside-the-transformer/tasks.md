@@ -464,7 +464,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 ### Implementation for User Story 4 (P3: KV cache)
 
 - [X] T086 [US4] Add a KV-cache panel to `frontend/src/views/Cost.svelte` (FR-026): `<Term id="kv-cache">`, `kvCacheBytes(config, nInput + k)` formatted with `formatBytes` (1 MB = 1,000,000 B), a two-sentence explanation of what the KV cache stores (keys and values of earlier tokens for every layer), the 32-bit precision noted, and an EstimateLabel
-- [ ] T087 [US4] Add all US4 strings (headline labels, table headers, component names, chart axis/summary, KV explanation, "theoretical estimate", "How we calculate") to `frontend/src/lib/i18n/{en,tr,de}.json`
+- [X] T087 [US4] Add all US4 strings (headline labels, table headers, component names, chart axis/summary, KV explanation, "theoretical estimate", "How we calculate") to `frontend/src/lib/i18n/{en,tr,de}.json`
 
 **Checkpoint**: The Cost view shows tested estimates, and each links to a formula anchor.
 
