@@ -8,6 +8,7 @@
 -->
 <script lang="ts">
   import type { Component } from 'svelte';
+  import CopyLinkButton from './components/CopyLinkButton.svelte';
   import ExamplePicker from './components/ExamplePicker.svelte';
   import FlowIndicator from './components/FlowIndicator.svelte';
   import GenerationControls from './components/GenerationControls.svelte';
@@ -343,6 +344,10 @@
     <div class="navigation">
       <FlowIndicator {current} />
       <ViewNav {current} onselect={(view) => viewState.setView(view)} />
+      <!-- Keyed by mode: a message about the other mode never stays on screen. -->
+      {#key viewState.mode}
+        <CopyLinkButton mode={viewState.mode} />
+      {/key}
     </div>
 
     {#if needsRun}
