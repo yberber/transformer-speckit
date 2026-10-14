@@ -479,7 +479,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 ### Tests for User Story 8 ⚠️
 
 - [X] T088 [P] [US8] Write `frontend/tests/unit/model/formulas.test.ts`: every `formulaId` emitted by `params.ts`, `flops.ts` and `kvcache.ts` (enumerate them by calling each function) exists in the `FORMULAS` registry, and every registry entry has title, expression and input keys in all locales
-- [ ] T089 [P] [US8] Write `frontend/tests/e2e/method.spec.ts` (`@method`): from the Cost and Architecture views, clicking each EstimateLabel opens `view=method` with the matching element focused and in view; the worked-example values equal the function outputs; in the interactive section, changing n and t updates the results immediately
+- [X] T089 [P] [US8] Write `frontend/tests/e2e/method.spec.ts` (`@method`): from the Cost and Architecture views, clicking each EstimateLabel opens `view=method` with the matching element focused and in view; the worked-example values equal the function outputs; in the interactive section, changing n and t updates the results immediately
 
 ### Implementation for User Story 8
 
