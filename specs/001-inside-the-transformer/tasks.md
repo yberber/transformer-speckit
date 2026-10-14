@@ -178,7 +178,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - the glossary ids are equal across locales, and `term` is identical (English) in all locales
   - every ApiError code in `contracts/inference-api.openapi.yaml` `ErrorCode` and every client code (`timeout`, `network`, `wake_timeout`, `version_mismatch`, `invalid_response`) has an `error.<code>` key
   - every example id in `index.json` has `example.<id>.title`
-- [ ] T035 [P] Implement `frontend/src/lib/motion.ts`: a reactive `reducedMotion` flag bound to `matchMedia('(prefers-reduced-motion: reduce)')`, and `duration(ms)` returning 0 when reduced (FR-036)
+- [X] T035 [P] Implement `frontend/src/lib/motion.ts`: a reactive `reducedMotion` flag bound to `matchMedia('(prefers-reduced-motion: reduce)')`, and `duration(ms)` returning 0 when reduced (FR-036)
 - [ ] T036 Implement `frontend/src/lib/state/viewState.svelte.ts`:
   - A `ViewState` class with `$state` fields: `mode` (`example`|`live`), `exampleId`, `view`, `layer`, `head`, `step`, `lang`, `theme` (`light`|`dark`|`system`).
   - Export `VIEWS = ['tokens','embeddings','blocks','attention','prediction','architecture','cost','method'] as const`. The first five are the "inside the machine" flow order (FR-021).
