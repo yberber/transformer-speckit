@@ -1,9 +1,10 @@
 <!--
   Compute cost (FR-022–FR-024, US4-1..3): theoretical FLOP estimates for reading the input
   (prefill), for the token added at the current step (decode) and the running total, then a
-  per-layer, per-component breakdown for either phase. Every number comes from flops.ts (tested
-  against the hand references, Principle II) and carries a "theoretical estimate" label with a
-  link to its formula on "How we calculate" (FR-027).
+  per-layer, per-component breakdown for either phase, the cost by context length (FR-025) and the
+  KV-cache memory (FR-026). Every number comes from flops.ts or kvcache.ts (tested against the
+  hand references, Principle II) and carries a "theoretical estimate" label with a link to its
+  formula on "How we calculate" (FR-027).
 -->
 <script lang="ts">
   import CostChart from '../components/CostChart.svelte';
@@ -13,7 +14,7 @@
   import { createTermRegistry } from '../components/termRegistry';
   import ViewIntro from '../components/ViewIntro.svelte';
   import { glossary, t } from '../lib/i18n/index';
-  import { formatCompact, formatNumber } from '../lib/i18n/format';
+  import { formatBytes, formatCompact, formatNumber } from '../lib/i18n/format';
   import { modelConfig } from '../lib/model/config';
   import {
     costAtStep,
@@ -22,6 +23,7 @@
     type CostEstimate,
     type FlopBreakdown,
   } from '../lib/model/flops';
+  import { kvCacheBytes } from '../lib/model/kvcache';
   import { methodHref, openFormula } from '../lib/state/methodLink';
   import type { ViewProps } from './types';
 
@@ -33,6 +35,9 @@
 
   const cost = $derived(run ? costAtStep(modelConfig, run.nInput, step) : null);
   const flops = $derived(glossary('flops').term);
+  /** Tokens in context at step k: the input plus the generated tokens. */
+  const contextLength = $derived(run ? run.nInput + step : 0);
+  const kv = $derived(run ? kvCacheBytes(modelConfig, contextLength) : null);
   const fmt = (n: number) => formatNumber(n);
 
   // --- headline figures -------------------------------------------------------------------
@@ -244,7 +249,22 @@
       {/if}
     </section>
 
-    <CostChart current={run.nInput + step} />
+    <CostChart current={contextLength} />
+
+    {#if kv}
+      <section class="kv surface" aria-labelledby="{uid}-kv" data-kv-cache data-estimate>
+        <h3 id="{uid}-kv">{t('cost.kv.title')}</h3>
+        <p class="kv-value">
+          <span class="num" data-kv-bytes data-value={kv.value}>{formatBytes(kv.value)}</span>
+          <span class="muted">{t('cost.kv.for', { count: contextLength })}</span>
+        </p>
+        <p class="kv-text"><Term id="kv-cache" /> {t('cost.kv.explanation')}</p>
+        <p class="kv-text muted">
+          {t('cost.kv.precision', { bytes: fmt(kv.value) })}
+        </p>
+        <EstimateLabel formulaId={kv.formulaId} what={t('cost.kv.title')} />
+      </section>
+    {/if}
   {/if}
 </section>
 
@@ -346,6 +366,39 @@
 
   .breakdown {
     margin-top: var(--space-6);
+  }
+
+  .kv {
+    display: grid;
+    gap: var(--space-2);
+    max-width: 44rem;
+    margin-top: var(--space-6);
+    padding: var(--space-4);
+  }
+
+  .kv h3,
+  .kv p {
+    margin: 0;
+  }
+
+  .kv-value {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-3);
+  }
+
+  .kv-value .num {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+  }
+
+  .kv-text {
+    max-width: 65ch;
+  }
+
+  .kv-text.muted {
+    font-size: var(--text-sm);
   }
 
   .breakdown h3 {
