@@ -28,7 +28,7 @@
   const views: Record<ViewId, () => Promise<ViewModule>> = {
     tokens: () => import('./views/Tokens.svelte'),
     embeddings: () => import('./views/Embeddings.svelte'),
-    blocks: () => import('./views/Placeholder.svelte'),
+    blocks: () => import('./views/Blocks.svelte'),
     attention: () => import('./views/Placeholder.svelte'),
     prediction: () => import('./views/Prediction.svelte'),
     architecture: () => import('./views/Placeholder.svelte'),

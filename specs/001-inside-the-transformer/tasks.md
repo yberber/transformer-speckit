@@ -337,7 +337,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 - [X] T066 [P] [US2] Create `frontend/src/components/LayerSelector.svelte`: Previous/Next buttons plus a direct `<select>` of layers `1..modelConfig.nLayer`, a label "Layer {n} of {total}" and `aria-live` on change. Bound to `viewState.layer`.
 - [X] T067 [P] [US2] Create `frontend/src/components/HeadSelector.svelte`: Previous/Next plus a direct `<select>` of heads `1..modelConfig.nHead`, bound to `viewState.head`
 - [X] T068 [P] [US2] Create `frontend/src/components/ChangeBars.svelte`: one row per token (TokenChip + horizontal bar + `formatPercent` value) for an array of change percentages, with a caption explaining "length of the update ÷ length of the token's vector before this part" (FR-016). Under `ShowDetails`, a table of the exact values.
-- [ ] T069 [US2] Create `frontend/src/views/Blocks.svelte` (FR-016, US2-2/3):
+- [X] T069 [US2] Create `frontend/src/views/Blocks.svelte` (FR-016, US2-2/3):
   - ViewIntro, `<Term id="layer">`, `<Term id="attention">`, `<Term id="mlp">`, LayerSelector.
   - A schematic of one block: input → layer norm → attention ({nHead} heads × {dHead} each) → add → layer norm → MLP (`nEmbd` → `nInner` → activation label from `activationLabelKey` → `nEmbd`) → add. All sizes come from `modelConfig`.
   - Two ChangeBars at the current step: attention part (`changeAt(...).attn`) and MLP part (`.mlp`).
