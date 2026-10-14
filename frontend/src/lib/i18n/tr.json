@@ -66,6 +66,7 @@
   "details.hide": "Ayrıntıları gizle",
   "table.show": "Tablo olarak göster",
   "table.hide": "Tabloyu gizle",
+  "strip.summary": "{label}: {min} ile {max} arasında {count} değer, ortalama {mean}",
   "term.explain": "“{term}” ne demek?",
   "token.label": "token {position}: {text}",
   "token.generated": "üretildi",

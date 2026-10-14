@@ -66,6 +66,7 @@
   "details.hide": "Details ausblenden",
   "table.show": "Als Tabelle anzeigen",
   "table.hide": "Tabelle ausblenden",
+  "strip.summary": "{label}: {count} Werte von {min} bis {max}, Mittelwert {mean}",
   "term.explain": "Was bedeutet „{term}“?",
   "token.label": "Token {position}: {text}",
   "token.generated": "erzeugt",

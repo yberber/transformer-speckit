@@ -66,6 +66,7 @@
   "details.hide": "Hide details",
   "table.show": "Show as table",
   "table.hide": "Hide table",
+  "strip.summary": "{label}: {count} values from {min} to {max}, mean {mean}",
   "term.explain": "What does “{term}” mean?",
   "token.label": "token {position}: {text}",
   "token.generated": "generated",
