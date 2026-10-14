@@ -514,7 +514,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 ### Tests for User Story 5 ⚠️
 
 - [X] T094 [P] [US5] Write `frontend/tests/unit/i18n/resolveLocale.test.ts`. Precedence: "`lang` in URL > stored preference (localStorage) > browser `navigator.languages` (first of `tr`/`de`/`en` matched by primary subtag) > `en`". Cases: `['fr-FR','de-DE']` → de; `['fr']` → en; an invalid URL lang is ignored and flagged as replaced; a throwing storage is ignored.
-- [ ] T095 [P] [US5] Write `frontend/tests/e2e/i18n.spec.ts` (`@i18n`):
+- [X] T095 [P] [US5] Write `frontend/tests/e2e/i18n.spec.ts` (`@i18n`):
   - **Default language**: contexts with `locale` tr-TR, de-DE, en-US and fr-FR each get the expected language, and `<html lang>` matches.
   - **Switching**: on each built main view, set a non-default example/layer/head/step/theme, switch to each language, and assert the state is unchanged and the visible text changed.
   - **Completeness**: assert that no `⟦` missing-key marker appears.
