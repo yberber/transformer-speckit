@@ -3,7 +3,8 @@
   the FORMULAS registry, addressed by its formula id (FR-027). Each section gives the expression,
   its named inputs with where each value comes from, and a worked GPT-2 small example for the
   current text. Every worked value comes from params.ts, flops.ts or kvcache.ts through the
-  registry, the same functions the rest of the site uses.
+  registry, the same functions the rest of the site uses. In the interactive panel (US8-3) the
+  visitor sets n and t, and every worked example is recomputed at once.
 -->
 <script lang="ts">
   import rawConfig from '../generated/gpt2-config.json';
@@ -13,9 +14,11 @@
   import { loadIndex } from '../lib/data/exampleSource';
   import { glossary, t, type MessageKey } from '../lib/i18n/index';
   import { formatBytes, formatNumber } from '../lib/i18n/format';
+  import { limits } from '../lib/limits';
   import { modelConfig } from '../lib/model/config';
   import {
     FORMULA_LIST,
+    FORMULAS,
     INPUT_SYMBOLS,
     generatedTokens,
     inputLabelKey,
@@ -37,10 +40,62 @@
   const uid = $props.id();
   const headingId = `${uid}-heading`;
 
-  /** Worked examples for the current text; before a run is loaded, the shortest valid one. */
-  const args = $derived<WorkedArgs>(run ? { n: run.nInput, t: run.nInput + step } : { n: 1, t: 1 });
-
   const fmt = (n: number) => formatNumber(n);
+
+  // --- token counts of the worked examples ------------------------------------------------
+
+  /** The current text; before a run is loaded, the shortest valid example. */
+  const textArgs = $derived<WorkedArgs>(
+    run ? { n: run.nInput, t: run.nInput + step } : { n: 1, t: 1 },
+  );
+
+  /**
+   * What the visitor typed, kept only for the text and step it was typed at: picking another
+   * example or step brings the worked examples back to the current text.
+   */
+  let edits = $state.raw<{ run: unknown; step: number; n?: string; t?: string } | null>(null);
+  const typed = $derived(edits && edits.run === run && edits.step === step ? edits : null);
+
+  function edit(key: 'n' | 't', value: string): void {
+    edits = { ...(typed ?? { run, step }), [key]: value };
+  }
+
+  const FIELDS = ['n', 't'] as const;
+  const RANGE = { n: limits.max_input_tokens, t: modelConfig.nPositions } as const;
+
+  interface Field {
+    text: string;
+    value: number;
+    invalid: boolean;
+  }
+
+  /** The typed text, the whole number in 1..max used for it, and whether it had to be changed. */
+  function field(key: 'n' | 't'): Field {
+    const fallback = textArgs[key];
+    const text = typed?.[key] ?? String(fallback);
+    const parsed = text.trim() === '' ? NaN : Number(text);
+    if (!Number.isFinite(parsed)) return { text, value: fallback, invalid: true };
+    const value = Math.min(RANGE[key], Math.max(1, Math.round(parsed)));
+    return { text, value, invalid: value !== parsed };
+  }
+
+  const nField = $derived(field('n'));
+  const tField = $derived(field('t'));
+  const args = $derived<WorkedArgs>({ n: nField.value, t: tField.value });
+  const custom = $derived(typed !== null && (args.n !== textArgs.n || args.t !== textArgs.t));
+
+  /** The four totals, announced when they change. */
+  const summary = $derived.by(() => {
+    const value = (id: string) => FORMULAS[id]!.variants[0]!.worked(modelConfig, args);
+    return t('method.interactive.summary', {
+      n: args.n,
+      t: args.t,
+      prefill: fmt(value('flops-prefill-total')),
+      decode: fmt(value('flops-decode-total')),
+      total: fmt(value('flops-running-total')),
+      kv: formatBytes(value('kv-cache-bytes')),
+    });
+  });
   const flops = $derived(glossary('flops').term);
 
   // --- assumptions ------------------------------------------------------------------------
@@ -148,11 +203,54 @@
     <li><Term id="kv-cache" /></li>
   </ul>
 
-  <p class="args" data-method-args data-n={args.n} data-t={args.t}>
-    {run
-      ? t('method.args.current', { n: args.n, t: args.t, count: generatedTokens(args) })
-      : t('method.args.fallback', { n: args.n, t: args.t })}
-  </p>
+  <section class="interactive surface" aria-labelledby="{uid}-interactive" data-interactive>
+    <h3 id="{uid}-interactive">{t('method.interactive.title')}</h3>
+    <p class="args" data-method-args data-n={args.n} data-t={args.t}>
+      {#if custom || !run}
+        {t('method.args.fallback', { n: args.n, t: args.t })}
+      {:else}
+        {t('method.args.current', { n: args.n, t: args.t, count: generatedTokens(args) })}
+      {/if}
+      {t('method.interactive.intro')}
+    </p>
+
+    <div class="fields">
+      {#each FIELDS as key (key)}
+        {@const f = key === 'n' ? nField : tField}
+        <div class="field">
+          <label for="{uid}-{key}">
+            {t(`method.interactive.${key}_label`, { max: fmt(RANGE[key]) })}
+          </label>
+          <input
+            id="{uid}-{key}"
+            type="number"
+            inputmode="numeric"
+            min="1"
+            max={RANGE[key]}
+            step="1"
+            value={f.text}
+            aria-invalid={f.invalid ? 'true' : undefined}
+            aria-describedby={f.invalid ? `${uid}-${key}-error` : undefined}
+            data-input={key}
+            oninput={(e) => edit(key, e.currentTarget.value)}
+          />
+          {#if f.invalid}
+            <p id="{uid}-{key}-error" class="invalid" data-validation={key}>
+              {t('method.interactive.invalid', { max: fmt(RANGE[key]), value: fmt(f.value) })}
+            </p>
+          {/if}
+        </div>
+      {/each}
+    </div>
+
+    {#if custom}
+      <button type="button" class="reset" data-action="reset-args" onclick={() => (edits = null)}>
+        {t('method.interactive.reset')}
+      </button>
+    {/if}
+
+    <p class="summary" aria-live="polite" data-method-summary>{summary}</p>
+  </section>
 
   <section class="assumptions surface" aria-labelledby="{uid}-assumptions" data-assumptions>
     <h3 id="{uid}-assumptions">{t('method.assumptions.title')}</h3>
@@ -279,9 +377,79 @@
     list-style: none;
   }
 
-  .args {
+  .interactive {
+    display: grid;
+    gap: var(--space-3);
+    max-width: 52rem;
+    margin-bottom: var(--space-5);
+    padding: var(--space-4);
+  }
+
+  .interactive h3,
+  .interactive p {
+    margin: 0;
+  }
+
+  .args,
+  .summary {
     max-width: 65ch;
-    margin: 0 0 var(--space-5);
+  }
+
+  .fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-5);
+  }
+
+  .field {
+    display: grid;
+    align-content: start;
+    gap: var(--space-1);
+    max-width: 20rem;
+  }
+
+  .field label {
+    font-weight: 600;
+  }
+
+  .field input {
+    width: 9rem;
+    min-height: 2.75rem;
+    padding: var(--space-1) var(--space-3);
+    font-family: var(--font-mono);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+  }
+
+  .field input[aria-invalid='true'] {
+    border: 2px solid var(--color-danger);
+  }
+
+  .invalid {
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--text-sm);
+    background: var(--color-danger-surface);
+    border-inline-start: 3px solid var(--color-danger);
+    border-radius: var(--radius-sm);
+  }
+
+  .reset {
+    justify-self: start;
+    min-height: 2.5rem;
+    padding: var(--space-1) var(--space-4);
+    font-weight: 600;
+    color: var(--color-accent);
+    background: transparent;
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-pill);
+  }
+
+  .summary {
+    padding: var(--space-2) var(--space-3);
+    font-weight: 600;
+    background: var(--color-surface-raised);
+    border-radius: var(--radius-sm);
   }
 
   .assumptions {
