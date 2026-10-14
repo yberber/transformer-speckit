@@ -706,7 +706,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
     - `step=abc` → 0
     - each replacement is listed in `replaced`
   - **Live mode**: `mode=live` ignores `ex`, and `serialize` has no parameter that accepts text.
-- [ ] T124 [P] [US7] Write `frontend/tests/e2e/share.spec.ts` (`@share`):
+- [X] T124 [P] [US7] Write `frontend/tests/e2e/share.spec.ts` (`@share`):
   - set `ex=long-…`, `view=attention`, `layer=5`, `head=3`, `step=3`, `lang=de`, then click "Copy link" (grant clipboard permissions)
   - open the link in a new browser context with locale `tr-TR`: the identical state and German UI (the link's lang overrides the browser)
   - an invalid link (`layer=40&step=999&view=nope`) → a valid fallback state, the notice is shown once, and the URL is rewritten
