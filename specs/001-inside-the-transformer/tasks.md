@@ -266,7 +266,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - `canAdvance` is true iff k < steps.
   - `endMessageKey`: `example.end.step_limit`, `example.end.eos`, `example.end.context_limit`.
   - `detectRepetition`: true iff, within `tokens[0, nInput+k)`, some sequence of 3 token ids occurs at least twice and the later occurrence includes a generated token.
-- [ ] T051 [P] [US1] Write `frontend/tests/e2e/example-mode.spec.ts` (`@example-mode`), run with `VITE_API_BASE_URL` unset. A `page.route` aborts every request whose origin ≠ the preview origin, and the test asserts that no request goes to any API path. It checks:
+- [X] T051 [P] [US1] Write `frontend/tests/e2e/example-mode.spec.ts` (`@example-mode`), run with `VITE_API_BASE_URL` unset. A `page.route` aborts every request whose origin ≠ the preview origin, and the test asserts that no request goes to any API path. It checks:
   - the landing state: example mode, first example selected, the "GPT-2 continues text" note visible
   - the picker lists 6 examples labelled 2 short / 2 medium / 2 long
   - the Tokens view: chips are visible; "Show details" shows the ID and exact text with `␣`
