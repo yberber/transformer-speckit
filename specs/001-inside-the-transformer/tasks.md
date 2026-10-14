@@ -350,7 +350,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - **Highlighting**: hover or focus emits `onhighlight([i, j])`, so the parent highlights both tokens in their colors.
   - **Table**: "Show as table" renders a `<table>` with row and column headers.
   - **Focused mode**: when the computed cell size is < 10 CSS px, switch automatically to a token picker plus a ranked list of that token's weights (and a single-row strip). The same data is shown.
-- [ ] T071 [US2] Create `frontend/src/views/Attention.svelte` (FR-017, US2-4/5/6):
+- [X] T071 [US2] Create `frontend/src/views/Attention.svelte` (FR-017, US2-4/5/6):
   - ViewIntro, `<Term id="attention">`, `<Term id="head">`, LayerSelector + HeadSelector.
   - Lazy `run.getAttention(viewState.layer)` with loading and error states; pass the current head's data sliced by `attentionAt(heads, step)` to Heatmap.
   - A TokenSequence above with highlights from the heatmap.

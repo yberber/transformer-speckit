@@ -29,7 +29,7 @@
     tokens: () => import('./views/Tokens.svelte'),
     embeddings: () => import('./views/Embeddings.svelte'),
     blocks: () => import('./views/Blocks.svelte'),
-    attention: () => import('./views/Placeholder.svelte'),
+    attention: () => import('./views/Attention.svelte'),
     prediction: () => import('./views/Prediction.svelte'),
     architecture: () => import('./views/Placeholder.svelte'),
     cost: () => import('./views/Placeholder.svelte'),

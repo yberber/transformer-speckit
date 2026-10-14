@@ -259,15 +259,6 @@
     color: var(--color-text);
   }
 
-  .details :global(.toggle) {
-    color: var(--color-panel-text);
-    border-color: var(--color-panel-border);
-  }
-
-  .details :global(.toggle:hover) {
-    background: var(--color-panel-raised);
-  }
-
   .load-error {
     padding: var(--space-4);
     background: var(--color-danger-surface);

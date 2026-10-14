@@ -129,6 +129,16 @@ samp,
   color: var(--color-panel-muted);
 }
 
+/* "Show details" toggles on a panel: the accent color is too dark there in the light theme. */
+.panel .show-details [data-show-details] {
+  color: var(--color-panel-text);
+  border-color: var(--color-panel-border);
+}
+
+.panel .show-details [data-show-details]:hover {
+  background: var(--color-panel-raised);
+}
+
 .muted {
   color: var(--color-text-muted);
 }
