@@ -27,7 +27,7 @@ Context could have marked "NEEDS CLARIFICATION" is resolved here; none remain op
 - **Decision**: Host on **GitHub Pages** via a GitHub Actions workflow (the build is also
   host-agnostic: Cloudflare Pages / Netlify work unchanged). All view state lives in the **query
   string** of a single `index.html`; the "How we calculate" formulas are addressed with a fragment
-  (`#formula-id`). Contract: [contracts/url-state.md](./contracts/url-state.md).
+  (`#formula-id`). Contract: [contracts/url-state.md](../../contracts/url-state.md).
 - **Rationale**: Query-string state needs no server-side rewrite rules (GitHub Pages has none) and
   is trivially shareable (FR-033). Fragments give stable deep links to individual formulas
   (FR-027, US8-1).
@@ -100,8 +100,8 @@ Context could have marked "NEEDS CLARIFICATION" is resolved here; none remain op
     text; 128 = live input limit + live step limit).
   - Sum vector (token + position) is computed in the browser (float32 addition, exact to the same
     rounding as the reference).
-  Contract: [contracts/example-data.md](./contracts/example-data.md) +
-  [contracts/example-data.schema.json](./contracts/example-data.schema.json).
+  Contract: [contracts/example-data.md](../../contracts/example-data.md) +
+  [contracts/example-data.schema.json](../../contracts/example-data.schema.json).
 - **Rationale**: Sizes from the clarified limits (long example ≤ 64 input + 20 steps = 84 tokens):
 
   | Data | Naive | Chosen | Tolerance check |

@@ -3,7 +3,7 @@
 **Feature**: `001-inside-the-transformer` | **Plan**: [plan.md](./plan.md)
 
 Runnable scenarios that prove the feature works end to end. Commands refer to the layout in
-[plan.md](./plan.md#project-structure); formats and limits are in [contracts/](./contracts/).
+[plan.md](./plan.md#project-structure); formats and limits are in [contracts/](../../contracts/).
 The README (repo root) carries the user-facing version of these steps (Principle IX).
 
 ## Prerequisites

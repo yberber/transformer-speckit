@@ -235,7 +235,7 @@ are committed and regenerated only by scripts.
 - [data-model.md](./data-model.md): ModelConfig, Limits, Example, Run, Token, GenerationStep,
   Prediction, LayerSnapshot, EmbeddingVectors, ParamGroup, CostEstimate, ViewState, GlossaryTerm,
   Locale catalog, ApiError.
-- [contracts/](./contracts/): `inference-api.openapi.yaml`, `example-data.schema.json`,
+- [contracts/](../../contracts/): `inference-api.openapi.yaml`, `example-data.schema.json`,
   `example-data.md`, `url-state.md`, `limits.json`.
 - [quickstart.md](./quickstart.md): validation scenarios Q1–Q12 mapped to stories, FRs and SCs.
 

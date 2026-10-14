@@ -3,7 +3,7 @@
 **Feature**: `001-inside-the-transformer` | **Date**: 2026-10-14 | **Plan**: [plan.md](./plan.md)
 
 Entities follow the spec's Key Entities. Wire formats are defined in
-[contracts/](./contracts/); this document defines meaning, relationships and validation rules.
+[contracts/](../../contracts/); this document defines meaning, relationships and validation rules.
 Symbols: d = `n_embd`, L = `n_layer`, H = `n_head`, f = MLP size, V = `vocab_size`,
 P = `n_positions` — all read from **ModelConfig**, never written as literals in code.
 
@@ -193,7 +193,7 @@ Formulas: research R10. Step semantics: cost at step k ≥ 1 = decode(n_input + 
 | theme | — | `light` \| `dark` \| `system` | `system` | no (localStorage) |
 | live text | — | string | "" | **never** (memory only) |
 
-Normalization rules and precedence: [contracts/url-state.md](./contracts/url-state.md). Invalid
+Normalization rules and precedence: [contracts/url-state.md](../../contracts/url-state.md). Invalid
 values clamp to nearest valid / default and raise a one-time "part of the link could not be
 restored" notice.
 
