@@ -428,7 +428,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
 ### Implementation for User Story 4 (P1: per-token and per-layer)
 
-- [ ] T081 [P] [US4] Implement `frontend/src/lib/model/flops.ts` (R10). Use the `CostEstimate` type: `{ kind: 'flops'|'bytes', phase: 'prefill'|'decode'|'total'|'kv_cache', component: 'qkv'|'attn_scores'|'attn_weighting'|'attn_out'|'mlp'|'pos_add'|'lm_head'|'all', layer: number|null, inputs, value, formulaId, isEstimate: true }`. Here value is an "integer (exact, BigInt-safe ≤ 2⁵³)"; assert `Number.isSafeInteger`.
+- [X] T081 [P] [US4] Implement `frontend/src/lib/model/flops.ts` (R10). Use the `CostEstimate` type: `{ kind: 'flops'|'bytes', phase: 'prefill'|'decode'|'total'|'kv_cache', component: 'qkv'|'attn_scores'|'attn_weighting'|'attn_out'|'mlp'|'pos_add'|'lm_head'|'all', layer: number|null, inputs, value, formulaId, isEstimate: true }`. Here value is an "integer (exact, BigInt-safe ≤ 2⁵³)"; assert `Number.isSafeInteger`.
   - **Per layer, prefill over n**:
     - qkv 6d²n
     - attn_scores d·n(n+1)
