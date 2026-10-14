@@ -106,19 +106,24 @@ test.describe('@i18n language switch', () => {
   const HEAD = '2';
   const STEP = '2';
 
+  /** A non-default example, layer, head, step and theme, then `view`. */
+  async function setState(page: Page, view: string): Promise<void> {
+    await page.goto('/');
+    await page.locator(`[data-example-picker] input[value="${example}"]`).check();
+    await expect(page.locator('[data-step-counter]')).toHaveAttribute('data-step', '0');
+    await openView(page, 'attention');
+    await page.locator('[data-layer-select]').selectOption(LAYER);
+    await page.locator('[data-head-select]').selectOption(HEAD);
+    for (let i = 0; i < Number(STEP); i++) await page.locator('[data-action="next"]').click();
+    await expect(page.locator('[data-step-counter]')).toHaveAttribute('data-step', STEP);
+    await page.locator('.theme-switch input[value="dark"]').check();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await openView(page, view);
+  }
+
   for (const view of VIEWS) {
     test(`@i18n switching on the ${view} view keeps the state`, async ({ page }) => {
-      await page.goto('/');
-      await page.locator(`[data-example-picker] input[value="${example}"]`).check();
-      await expect(page.locator('[data-step-counter]')).toHaveAttribute('data-step', '0');
-      await openView(page, 'attention');
-      await page.locator('[data-layer-select]').selectOption(LAYER);
-      await page.locator('[data-head-select]').selectOption(HEAD);
-      for (let i = 0; i < Number(STEP); i++) await page.locator('[data-action="next"]').click();
-      await expect(page.locator('[data-step-counter]')).toHaveAttribute('data-step', STEP);
-      await page.locator('.theme-switch input[value="dark"]').check();
-      await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-      await openView(page, view);
+      await setState(page, view);
 
       const section = page.locator(`section[data-view="${view}"]`);
       for (const locale of ['tr', 'de', 'en'] as const) {
@@ -147,6 +152,28 @@ test.describe('@i18n language switch', () => {
       await expect(page.locator('[data-head-label]')).toHaveAttribute('data-head', HEAD);
       await expect(page.locator('[data-step-counter]')).toHaveAttribute('data-step', STEP);
     });
+
+    test(`@i18n after switching, the ${view} view reads as if loaded in that language`, async ({
+      page,
+      browser,
+    }) => {
+      // Catches text computed once with the old language (e.g. a number formatted at start-up).
+      await setState(page, view);
+      await switchLanguage(page, 'de');
+      const switched = await page.locator(`section[data-view="${view}"]`).innerText();
+
+      const context = await browser.newContext({ locale: 'de-DE' });
+      try {
+        const fresh = await context.newPage();
+        await setState(fresh, view);
+        await expect(fresh.locator('html')).toHaveAttribute('lang', 'de');
+        await expect(fresh.locator(`section[data-view="${view}"]`)).toHaveText(switched, {
+          useInnerText: true,
+        });
+      } finally {
+        await context.close();
+      }
+    });
   }
 });
 
@@ -163,24 +190,36 @@ for (const locale of LOCALES) {
         await openView(page, view);
         await expect(page.locator('body')).not.toContainText(MISSING);
 
-        // Every first appearance of a term: the English term, then the explanation in the UI
-        // language (FR-030).
-        const terms = await page
-          .locator(`section[data-view="${view}"] dfn[lang="en"]`)
-          .evaluateAll((nodes) =>
-            nodes.map((dfn) => ({
-              term: dfn.textContent?.trim() ?? '',
-              explanation: dfn.nextElementSibling?.textContent?.trim() ?? '',
-            })),
-          );
-        expect(terms.length, 'each view introduces at least one term').toBeGreaterThan(0);
-        for (const { term, explanation } of terms) {
-          const id = Object.keys(glossaries.en).find((k) => glossaries.en[k]!.term === term);
-          expect(id, `"${term}" is an English glossary term`).toBeDefined();
-          expect(explanation).toBe(`(${glossaries[locale][id!]!.explanation})`);
+        // Every term: the English term with its explanation in the UI language (FR-030), inline
+        // at a main term's first appearance, behind the "?" toggle for a secondary term.
+        const section = page.locator(`section[data-view="${view}"]`);
+        const terms = await section.locator('[data-term]').evaluateAll((nodes) =>
+          nodes.map((node) => ({
+            id: node.getAttribute('data-term') ?? '',
+            term: node.querySelector('[lang="en"]')?.textContent?.trim() ?? '',
+            inline: node.querySelector('dfn') !== null,
+            explanation:
+              node.querySelector('.explanation, [role="note"]')?.textContent?.trim() ?? '',
+          })),
+        );
+        expect(terms.filter((t) => t.inline).length, 'main terms explained inline').toBeGreaterThan(
+          0,
+        );
+        for (const { id, term, inline, explanation } of terms) {
+          expect(term).toBe(glossaries.en[id]!.term);
+          const expected = glossaries[locale][id]!.explanation;
+          expect(explanation).toBe(inline ? `(${expected})` : expected);
         }
 
+        // Every glossary term the view mentions, details included, is explained in the view.
+        // "LM head" is the output layer, not an attention head.
         await openAllDetails(page);
+        const text = (await section.innerText()).replace(/\bLM[- ]head\b/gi, '');
+        const explained = new Set(terms.map((t) => t.id));
+        for (const [id, { term }] of Object.entries(glossaries.en)) {
+          const mentioned = new RegExp(`\\b${term.replace(' ', '\\s+')}`, 'i').test(text);
+          if (mentioned) expect(explained, `"${term}" is used in ${view}`).toContain(id);
+        }
         await expect(page.locator('body')).not.toContainText(MISSING);
       });
     }

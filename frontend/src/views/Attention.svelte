@@ -7,6 +7,7 @@
   import HeadSelector from '../components/HeadSelector.svelte';
   import Heatmap from '../components/Heatmap.svelte';
   import LayerSelector from '../components/LayerSelector.svelte';
+  import MoreTerms from '../components/MoreTerms.svelte';
   import Term from '../components/Term.svelte';
   import { createTermRegistry } from '../components/termRegistry';
   import TokenSequence from '../components/TokenSequence.svelte';
@@ -66,6 +67,7 @@
     <li><Term id="attention" /></li>
     <li><Term id="head" /></li>
   </ul>
+  <MoreTerms ids={['token', 'layer']} />
   <p class="masking" data-masking-note>{t('attention.masking')}</p>
 
   <div class="selectors">

@@ -7,6 +7,7 @@
 <script lang="ts">
   import ChangeBars from '../components/ChangeBars.svelte';
   import LayerSelector from '../components/LayerSelector.svelte';
+  import MoreTerms from '../components/MoreTerms.svelte';
   import Term from '../components/Term.svelte';
   import { createTermRegistry } from '../components/termRegistry';
   import ViewIntro from '../components/ViewIntro.svelte';
@@ -28,10 +29,10 @@
   /** One scale for both parts, so their bars can be compared. */
   const max = $derived(change ? Math.max(0, ...change.attn, ...change.mlp) : 0);
 
-  const sizes = {
+  const sizes = $derived({
     d: formatNumber(modelConfig.nEmbd),
     f: formatNumber(modelConfig.nInner),
-  };
+  });
   const activation = $derived(t(activationLabelKey() as MessageKey));
   const pulseMs = $derived(duration(1400));
 </script>
@@ -44,6 +45,7 @@
     <li><Term id="attention" /></li>
     <li><Term id="mlp" /></li>
   </ul>
+  <MoreTerms ids={['token', 'head']} />
 
   <LayerSelector />
 

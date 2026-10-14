@@ -5,6 +5,7 @@
   opens its exact values. The data loads when the view first opens, not with the page.
 -->
 <script lang="ts">
+  import MoreTerms from '../components/MoreTerms.svelte';
   import ShowDetails from '../components/ShowDetails.svelte';
   import Term from '../components/Term.svelte';
   import { createTermRegistry } from '../components/termRegistry';
@@ -95,6 +96,7 @@
 
   {#if run}
     <p class="term-line"><Term id="embedding" /></p>
+    <MoreTerms ids={['token']} />
     <p class="hint muted">{t('embeddings.size', { d: modelConfig.nEmbd })}</p>
 
     {#if failed}

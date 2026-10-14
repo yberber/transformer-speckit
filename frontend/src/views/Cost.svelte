@@ -9,6 +9,7 @@
 <script lang="ts">
   import CostChart from '../components/CostChart.svelte';
   import EstimateLabel from '../components/EstimateLabel.svelte';
+  import MoreTerms from '../components/MoreTerms.svelte';
   import ShowDetails from '../components/ShowDetails.svelte';
   import Term from '../components/Term.svelte';
   import { createTermRegistry } from '../components/termRegistry';
@@ -110,6 +111,7 @@
       <li><Term id="prefill" /></li>
       <li><Term id="decode" /></li>
     </ul>
+    <MoreTerms ids={['token', 'layer', 'attention', 'mlp', 'embedding']} />
 
     <p class="assumptions muted">{t('cost.assumptions')}</p>
 

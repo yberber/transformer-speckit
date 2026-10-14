@@ -33,7 +33,7 @@
   },
   "prefill": {
     "term": "prefill",
-    "explanation": "İlk yeni token üretilmeden önce giriş metnindeki tüm token'ların tek seferde işlenmesi."
+    "explanation": "İlk yeni token üretilmeden önce girdi metnindeki tüm token'ların tek seferde işlenmesi."
   },
   "decode": {
     "term": "decode",

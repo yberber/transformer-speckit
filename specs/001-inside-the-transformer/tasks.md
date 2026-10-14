@@ -527,7 +527,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - Options are labelled in their own language (English, Türkçe, Deutsch) with `lang` attributes.
   - It calls `setLocale` and persists `itt.lang` in localStorage (try/catch).
   - It updates `document.documentElement.lang` and leaves every other `viewState` field untouched.
-- [ ] T098 [US5] Do a translation pass over `frontend/src/lib/i18n/{tr,de}.json` and `glossary.{tr,de}.json`:
+- [X] T098 [US5] Do a translation pass over `frontend/src/lib/i18n/{tr,de}.json` and `glossary.{tr,de}.json`:
   - plain language, no ML jargon beyond the glossary terms
   - correct locale number formatting is used everywhere (audit all views for `toFixed`/raw number rendering and replace with `format.ts`)
   - each view's first glossary term occurrence uses `<Term>` (FR-030; audit all views)

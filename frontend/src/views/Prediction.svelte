@@ -5,6 +5,7 @@
   in the details table. "Next token" is in the generation controls the App shows above the view.
 -->
 <script lang="ts">
+  import MoreTerms from '../components/MoreTerms.svelte';
   import ShowDetails from '../components/ShowDetails.svelte';
   import Term from '../components/Term.svelte';
   import { createTermRegistry } from '../components/termRegistry';
@@ -55,6 +56,7 @@
       <li><Term id="logit" /></li>
       <li><Term id="probability-distribution" /></li>
     </ul>
+    <MoreTerms ids={['token']} />
 
     <div class="panel context">
       <h3 class="panel-title">{t('prediction.context')}</h3>

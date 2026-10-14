@@ -7,6 +7,7 @@
 -->
 <script lang="ts">
   import LayerSelector from '../components/LayerSelector.svelte';
+  import MoreTerms from '../components/MoreTerms.svelte';
   import ShowDetails from '../components/ShowDetails.svelte';
   import Term from '../components/Term.svelte';
   import { createTermRegistry } from '../components/termRegistry';
@@ -293,6 +294,7 @@
     <li><Term id="mlp" /></li>
     <li><Term id="embedding" /></li>
   </ul>
+  <MoreTerms ids={['token', 'head', 'logit']} />
 
   <div class="summary surface">
     <p class="total">

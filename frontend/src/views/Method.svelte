@@ -8,6 +8,7 @@
 -->
 <script lang="ts">
   import rawConfig from '../generated/gpt2-config.json';
+  import MoreTerms from '../components/MoreTerms.svelte';
   import Term from '../components/Term.svelte';
   import { createTermRegistry } from '../components/termRegistry';
   import ViewIntro from '../components/ViewIntro.svelte';
@@ -202,6 +203,7 @@
     <li><Term id="decode" /></li>
     <li><Term id="kv-cache" /></li>
   </ul>
+  <MoreTerms ids={['token', 'layer', 'attention', 'head', 'mlp', 'embedding']} />
 
   <section class="interactive surface" aria-labelledby="{uid}-interactive" data-interactive>
     <h3 id="{uid}-interactive">{t('method.interactive.title')}</h3>

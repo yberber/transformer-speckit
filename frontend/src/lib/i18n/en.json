@@ -129,6 +129,7 @@
   "heatmap.table_caption": "Rows: the token that looks. Columns: the token it looks at. Each row adds up to 1; · marks a masked cell.",
   "heatmap.masked_cell": "masked",
   "term.explain": "What does “{term}” mean?",
+  "term.also_used": "Also used here:",
   "token.label": "token {position}: {text}",
   "token.generated": "generated",
   "token.space": "space",

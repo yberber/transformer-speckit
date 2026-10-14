@@ -1,7 +1,8 @@
 <!--
   A technical term (FR-030, Principle III). The term stays English in every locale. Its first
   appearance in a view carries an inline plain-language explanation in the UI language; later
-  appearances offer the explanation behind a small toggle.
+  appearances offer the explanation behind a small toggle. `compact` asks for the toggle even at
+  the first appearance, for a view's secondary terms (MoreTerms), so the view stays light.
 -->
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
@@ -11,10 +12,13 @@
   let {
     id,
     label,
+    compact = false,
   }: {
     id: GlossaryId;
     /** The English word form used in the sentence (e.g. "tokens"); defaults to the term. */
     label?: string;
+    /** Explanation behind the toggle even at the first appearance. */
+    compact?: boolean;
   } = $props();
 
   const registry = getTermRegistry();
@@ -22,6 +26,7 @@
   // Decided once, at the term's position in the view; without a registry, always explain.
   const termId = untrack(() => id);
   const first = registry ? registry.claim(termId, owner) : true;
+  const inline = first && !untrack(() => compact);
   onDestroy(() => registry?.release(termId, owner));
 
   const entry = $derived(glossary(id));
@@ -29,14 +34,14 @@
   const noteId = $props.id();
 </script>
 
-{#if first}
-  <span class="term"
+{#if inline}
+  <span class="term" data-term={termId}
     ><dfn lang="en">{label ?? entry.term}</dfn>&#32;<span class="explanation"
       >({entry.explanation})</span
     ></span
   >
 {:else}
-  <span class="term"
+  <span class="term" data-term={termId}
     ><span lang="en">{label ?? entry.term}</span><button
       type="button"
       class="info"
