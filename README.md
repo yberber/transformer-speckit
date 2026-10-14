@@ -67,8 +67,12 @@ Frontend (run from `frontend/`):
   bytes, or if the initial load reaches 2,000,000 bytes, and prints a table of sizes. The initial
   load counts `index.html`, the entry chunk and its static imports with their CSS, the latin font
   files, `data/examples/index.json` and the default example's `core.json`.
-- `npm run lhci`: run Lighthouse CI against the preview build (its config,
-  `lighthouserc.json`, is not written yet).
+- `npm run lhci`: after `npm run build`, run Lighthouse CI (`lighthouserc.json`) against
+  `npm run preview` with the mobile preset and simulated throttling, 3 runs, median. It fails
+  unless the performance score is at least 0.9, Largest Contentful Paint at most 3,000 ms, Total
+  Blocking Time at most 200 ms and the total byte weight under 2,000,000 bytes (SC-011). It uses
+  the locally installed Chrome (set `CHROME_PATH` to use another) and writes reports only to
+  `frontend/.lighthouseci/`, never to a public server.
 
 Backend (run from `backend/`):
 

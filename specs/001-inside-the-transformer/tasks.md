@@ -237,7 +237,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - expect zero violations
 
   Placeholder views are checked too, so each real view is covered as soon as it replaces its placeholder. Locales take effect once US5's `resolveLocale` lands (T096); until then the tr/de runs render English and still have to pass.
-- [ ] T049c [P] Create `frontend/lighthouserc.json` (Principle VII, SC-011). Collect from `npm run preview` at `/` with the mobile preset (`formFactor: mobile`, simulated throttling, 3 runs, median). Assert:
+- [X] T049c [P] Create `frontend/lighthouserc.json` (Principle VII, SC-011). Collect from `npm run preview` at `/` with the mobile preset (`formFactor: mobile`, simulated throttling, 3 runs, median). Assert:
   - `categories:performance` ≥ 0.9
   - `largest-contentful-paint` `maxNumericValue` 3000 (SC-011 "first usable view within 3 s")
   - `total-blocking-time` `maxNumericValue` 200
