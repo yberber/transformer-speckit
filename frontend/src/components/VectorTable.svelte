@@ -1,7 +1,7 @@
 <!--
   Exact values of one token's three embedding vectors, one row per dimension (FR-015, FR-038). All
   nEmbd rows are in the table, but only the rows in view are rendered (fixed row height, spacer
-  rows above and below), so a 768-row table stays cheap. aria-rowcount/aria-rowindex tell
+  rows above and below), so a table with one row per dimension stays cheap. aria-rowcount/aria-rowindex tell
   assistive technology the real size. The scroll box is focusable, so the keyboard scrolls it.
 -->
 <script lang="ts">
