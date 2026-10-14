@@ -80,8 +80,8 @@ pinned to one commit of `openai-community/gpt2` by `MODEL_REVISION` in
 `backend/app/core/model.py`, the only place it is defined. The generator records it in every data
 file. The six example texts and their length categories live in `backend/tools/examples.toml`.
 
-Run from `backend/` (the first run downloads the pinned GPT-2 weights, about 550 MB, into the
-Hugging Face cache):
+Run from `backend/`, in this order: regenerate, verify, then `--check` (the first run downloads
+the pinned GPT-2 weights, about 550 MB, into the Hugging Face cache):
 
 - `uv run python -m tools.generate_examples`: regenerate the example data
   (`frontend/public/data/`), the bundled model config (`frontend/src/generated/gpt2-config.json`),
@@ -90,6 +90,15 @@ Hugging Face cache):
   every example meets the selection rules (token-count band, no trailing `?`, 20 steps or an
   end-of-text stop, a top-1/top-2 probability margin of at least 1e-3 at every step), every file
   is under 300,000 bytes, and every JSON file matches `contracts/example-data.schema.json`.
+- `uv run python -m tools.verify_examples`: verify the shipped data against reference GPT-2
+  runs (FR-041). For every example and every step it reruns the model on that prefix, through a
+  code path independent of the generator, and decodes the shipped files itself (checking each
+  SHA-256). It fails on any breach of the tolerances: tokens and top-10 IDs identical,
+  probabilities within 1e-4, attention within 1e-3, embeddings and change percentages within
+  0.1 % (relative). It prints one line per example and step, then `PASS`.
+- `uv run python -m tools.verify_examples --self-test`: corrupt an in-memory copy of the default
+  example (one probability, one attention weight, one embedding value, each just beyond its
+  tolerance) and fail unless every corruption is detected.
 - `uv run python -m tools.generate_examples --check`: regenerate in memory and fail if the
   committed files are stale. Texts, tokens, IDs, shapes, the config and embedding rows must be
   identical; values from matrix multiplications may differ in the last bits between CPUs, so
