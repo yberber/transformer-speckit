@@ -228,7 +228,8 @@
 
   .row {
     display: grid;
-    grid-template-columns: minmax(6rem, 10rem) 1fr;
+    /* minmax(0, …): a wide child (the vector table) scrolls in its own box, never the page. */
+    grid-template-columns: minmax(6rem, 10rem) minmax(0, 1fr);
     align-items: start;
     gap: var(--space-2) var(--space-4);
     padding-top: var(--space-3);
@@ -258,6 +259,7 @@
 
   .details {
     grid-column: 1 / -1;
+    min-width: 0;
     color: var(--color-text);
   }
 
@@ -280,7 +282,7 @@
 
   @media (max-width: 30rem) {
     .row {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 </style>

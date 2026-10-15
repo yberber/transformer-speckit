@@ -171,14 +171,15 @@ samp,
   top: var(--space-2);
 }
 
-/* Reduced motion: same final state, no movement (FR-036). */
+/* Reduced motion: same final state, no movement (FR-036). No animation or transition runs at
+   all (none of them carries information or fires events the app waits for); script-driven
+   motion uses duration() from lib/motion.ts. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    animation: none !important;
+    transition: none !important;
     scroll-behavior: auto !important;
   }
 }
