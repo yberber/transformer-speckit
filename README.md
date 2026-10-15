@@ -76,9 +76,10 @@ Frontend (run from `frontend/`):
   projects use a build without an API (live mode hidden); the `live` project runs the `@live`
   and `@privacy` specs against a second build in `frontend/dist-live/` whose API
   (`VITE_API_BASE_URL=http://api.test`) is mocked in the browser from
-  `contracts/fixtures/api/`. Run one group with `--grep`, e.g.
-  `npm run test:e2e -- --grep @live`. Run `npx playwright install chromium` once before the
-  first run.
+  `contracts/fixtures/api/`; it also runs the live-mode cases of the `@a11y` and `@keyboard`
+  suites. Run one group with `--grep` (see "Focused runs" below). Run
+  `npx playwright install --with-deps chromium` once before the first run (`--with-deps` also
+  installs the system libraries Chromium needs on Linux).
 - `npm run test:e2e:fullstack`: Playwright `@fullstack` tests against a build that talks to the
   real backend on port 7860 (needs the GPT-2 weights). It sets `E2E_FULLSTACK=1` and starts the
   backend itself with `uv run uvicorn` in `../backend` and `ALLOWED_ORIGINS` set to the test
@@ -103,6 +104,32 @@ Backend (run from `backend/`):
 - `uv run ruff check .`: lint the Python code.
 - `uv run pytest`: run the backend tests. Tests marked `model` need the GPT-2 weights; deselect
   them with `uv run pytest -m "not model"`.
+
+### Focused runs
+
+The validation scenarios in `specs/001-inside-the-transformer/quickstart.md` (Q1–Q11) run
+single groups of tests. Frontend, from `frontend/`:
+
+- `npm run test:e2e -- --grep @example-mode`: example mode with no server, also with the
+  network blocked after load (Q1).
+- `npm run test:unit -- model/`: parameter, FLOP and KV-cache calculations against the
+  hand-computed references in `tests/reference/gpt2-small.md` (Q4).
+- `npm run test:e2e -- --grep @live`: live mode against the mocked API (Q7).
+- `npm run test:e2e -- --grep @privacy`: the live-mode privacy canary never reaches the URL or
+  browser storage (Q9).
+- `npm run test:unit -- i18n url palette`: translation completeness, URL state and color
+  palette tests (Q10).
+- `npm run test:e2e -- --grep "@a11y|@keyboard|@i18n|@share"`: axe checks, keyboard-only use,
+  languages and shareable links (Q10). `@responsive` (no sideways scrolling at 360 px, reduced
+  motion) runs the same way.
+
+Backend, from `backend/`:
+
+- `uv run pytest tests/contract`: responses validate against the contract (Q5).
+- `uv run pytest tests/integration/test_live_matches_examples.py`: live runs equal the shipped
+  examples (Q6; needs the GPT-2 weights).
+- `uv run pytest tests/privacy`: the privacy canary never appears in logs or error responses
+  (Q9).
 
 ## Regenerate example data
 
