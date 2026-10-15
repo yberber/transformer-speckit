@@ -747,7 +747,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - keep the Pages `deploy` job dependent on every check job
 - [X] T136 [P] Extend `.github/workflows/backend.yml` (from T049d) with a `fullstack` job that starts the backend and runs `npm run test:e2e:fullstack`
 - [X] T137 [P] Implement `backend/tools/deploy_space.py` (`--space <user>/<space>`, requires `HF_TOKEN`): stage `backend/` (excluding `.venv`, `tests`, `tools`, caches) plus `contracts/` into a temp dir, then `huggingface_hub.HfApi().upload_folder(repo_id=space, repo_type="space", folder_path=staging)`. Create `.github/workflows/space-deploy.yml` (manual `workflow_dispatch`, uses the `HF_TOKEN` secret). Add the deploy command, `HF_TOKEN` and `ALLOWED_ORIGINS` to the README "Deploy" section.
-- [ ] T138 Do the final README review (Principle IX). The README has been kept current since T008a. Check that every section is complete and correct:
+- [X] T138 Do the final README review (Principle IX). The README has been kept current since T008a. Check that every section is complete and correct:
   - project overview and the two components
   - prerequisites (Node 22, Python 3.12, uv, optional Docker)
   - run locally, in example mode and with the backend (`VITE_API_BASE_URL`)

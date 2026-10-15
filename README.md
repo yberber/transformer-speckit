@@ -19,17 +19,30 @@ The spec, plan and task list live in `specs/001-inside-the-transformer/`.
 ## Prerequisites
 
 - Node.js 22 (see `frontend/.nvmrc`) and npm
-- Python 3.12 and [uv](https://docs.astral.sh/uv/) (uv can install Python 3.12 for you)
-- Optional: Docker, to build the inference service image
+- Python 3.12 and [uv](https://docs.astral.sh/uv/) 0.4 or newer (uv can install Python 3.12
+  for you)
+- Optional: Docker, to build and run the inference service image locally
+- For the backend only: about 1 GB of disk and a network connection on first use, for the
+  pinned GPT-2 small weights (downloaded once into the Hugging Face cache). Example mode needs
+  neither.
 
 ## Run locally
 
-Install dependencies:
+Install dependencies, from the repository root:
 
 ```sh
-cd backend && uv sync     # Python 3.12 env from backend/uv.lock (CPU-only torch)
-cd frontend && npm ci     # Node dependencies from frontend/package-lock.json
+(cd frontend && npm ci && npx playwright install --with-deps chromium)  # Node deps + test browser
+(cd backend && uv sync)   # Python 3.12 env from backend/uv.lock (CPU-only torch)
 ```
+
+**Example mode, no server.** From `frontend/`, with `VITE_API_BASE_URL` unset:
+`npm run build && npm run preview`, then open the printed URL. All six examples and every view
+work from the static files; live mode is hidden. This is exactly what GitHub Pages serves
+when no inference service is configured.
+
+**With the backend (live mode).** Start the service from `backend/` (first command below, with
+`ALLOWED_ORIGINS=http://localhost:5173`), then from `frontend/` run
+`VITE_API_BASE_URL=http://localhost:7860 npm run dev` and switch to live mode in the header.
 
 Frontend (run from `frontend/`):
 
@@ -55,10 +68,6 @@ Backend inference service (run from `backend/`):
   `/attention` and `/token-embeddings`, `GATE_MAX_WAITING` (8) requests waiting for the model
   and `GATE_QUEUE_WAIT_S` (30) seconds each may wait; `TORCH_THREADS` (2) CPU threads for the
   model; `LIMITS_PATH` to read `limits.json` from somewhere other than `contracts/`.
-
-To use the local service from the frontend, set `VITE_API_BASE_URL` when starting or building
-it, e.g. `VITE_API_BASE_URL=http://localhost:7860 npm run dev` from `frontend/`. Live mode
-appears only in builds where this variable is set.
 
 ## Test
 
@@ -139,7 +148,10 @@ pinned to one commit of `openai-community/gpt2` by `MODEL_REVISION` in
 file. The six example texts and their length categories live in `backend/tools/examples.toml`.
 
 Run from `backend/`, in this order: regenerate, verify, then `--check` (the first run downloads
-the pinned GPT-2 weights, about 550 MB, into the Hugging Face cache):
+the pinned GPT-2 weights, about 550 MB, into the Hugging Face cache). On the same pinned
+revision and lockfile, regenerating changes nothing: `git diff --stat` stays empty. To move to
+another model revision, change `MODEL_REVISION`, regenerate, verify, and commit the new data
+together with the change:
 
 - `uv run python -m tools.generate_examples`: regenerate the example data
   (`frontend/public/data/`), the bundled model config (`frontend/src/generated/gpt2-config.json`),
@@ -246,9 +258,16 @@ this up themselves.
 - **Privacy**: text typed in live mode is sent only in POST request bodies and is never stored
   or logged anywhere: not in files, server or proxy logs, analytics or error reports, and not in
   the URL or browser storage. The site has no accounts and no analytics.
-- **Budgets** (checked automatically, values in `contracts/limits.json`): every example data
-  file < 300,000 bytes, initial page load < 2,000,000 bytes, and a Lighthouse performance score
-  of at least 90 in example mode.
+- **Budgets** (hard limits, checked automatically in CI; Principle VII): every example data
+  file < 300,000 bytes and initial page load < 2,000,000 bytes (both values in
+  `contracts/limits.json`, checked by `npm run check:budgets`), and in example mode a
+  Lighthouse performance score of at least 90 with Largest Contentful Paint ≤ 3,000 ms and
+  Total Blocking Time ≤ 200 ms on the mobile preset (`lighthouserc.json`, `npm run lhci`). A
+  budget may only be raised after the constitution (`.specify/memory/constitution.md`) is
+  amended.
+- **Live limits** (`contracts/limits.json`, enforced by the service and shown in the UI): at
+  most 1,000 characters and 64 input tokens per text, 64 generated tokens, and a 60 s wait
+  limit including wake-up; per-client rate limits as listed under "Run locally".
 - **Contracts**: the single authoritative contract set is the repo-root `contracts/` directory.
   It holds the OpenAPI description of the inference API, the JSON Schema and binary layouts of
   the example data, the URL-state contract, the shared product limits and test fixtures. Both
