@@ -166,8 +166,25 @@ rm -rf backend/contracts
 docker run --rm -p 7860:7860 -e ALLOWED_ORIGINS=http://localhost:4173 inside-the-transformer
 ```
 
-In the Space settings, set the variable `ALLOWED_ORIGINS` to the GitHub Pages origin (e.g.
-`https://<user>.github.io`). The upload script for the Space is not set up yet.
+To deploy, run from `backend/` with a Hugging Face write token in `HF_TOKEN` (create one at
+huggingface.co/settings/tokens):
+
+- `uv run python -m tools.deploy_space --space <user>/<space>`: stage `backend/` (without
+  `.venv`, `tests`, `tools` and caches) plus the repo-root `contracts/` in a temporary directory
+  and upload it to the Space in one commit, removing files that earlier deploys left behind. The
+  Space then builds the image itself. Create the Space once beforehand as a Docker Space.
+- `uv run python -m tools.deploy_space --space <user>/<space> --dry-run`: list the staged
+  files without uploading; needs no token.
+
+The same upload runs in GitHub Actions: the manual `space-deploy` workflow
+(`.github/workflows/space-deploy.yml`, Actions → space-deploy → Run workflow) uses the
+repository secret `HF_TOKEN` and deploys to the Space given as its input, or to the repository
+variable `HF_SPACE`.
+
+In the Space settings (Settings → Variables and secrets), set the variable `ALLOWED_ORIGINS` to
+the GitHub Pages origin, e.g. `https://<user>.github.io` (an origin has no path). Without it,
+the browser blocks every live-mode request. Then point the site at the Space by setting the
+repository variable `VITE_API_BASE_URL` to the Space URL (`https://<user>-<space>.hf.space`).
 
 ## CI
 
@@ -182,6 +199,9 @@ Two GitHub Actions workflows run on every push and pull request:
   GPT-2 weights are cached under `~/.cache/huggingface`, keyed on `MODEL_REVISION`),
   `tools.generate_examples --check`, `tools.verify_examples` and `tools.verify_examples
   --self-test`.
+
+A third workflow, `.github/workflows/space-deploy.yml`, runs only when started by hand and
+deploys the inference service to its Space (see Deploy).
 
 Changes merge only with both workflows green. The repository owner must protect `main` in
 Settings → Branches (or Rules) and mark the check jobs of both workflows as required status

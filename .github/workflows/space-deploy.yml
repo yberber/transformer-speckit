@@ -1,0 +1,40 @@
+# Manual deploy of the inference service to its Hugging Face Docker Space (research R21):
+# uploads backend/ (without tests, tools and caches) plus contracts/ in one commit. The Space
+# then builds the image itself. Needs the `HF_TOKEN` secret (a Hugging Face write token); the
+# Space is the `space` input or, if that is empty, the `HF_SPACE` repository variable.
+name: space-deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      space:
+        description: "Space repository, <user>/<space> (default: the HF_SPACE variable)"
+        required: false
+        type: string
+
+concurrency:
+  group: space-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  deploy:
+    name: deploy to the Space
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+      - run: uv sync --locked --no-dev
+      - name: upload backend/ and contracts/
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          SPACE: ${{ inputs.space || vars.HF_SPACE }}
+        run: |
+          test -n "$SPACE" || { echo "set the space input or the HF_SPACE variable"; exit 1; }
+          uv run --no-sync python -m tools.deploy_space --space "$SPACE"
