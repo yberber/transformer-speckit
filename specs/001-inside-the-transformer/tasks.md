@@ -764,7 +764,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - whether the Space's start-up reply carries CORS headers for the Pages origin, and which R13 "waking" row the browser actually hit (check in DevTools: a readable HTML reply, or a CORS failure followed by an opaque `no-cors` probe)
   - that the deployed site shows "waking up", not "unavailable", while the Space starts
 - [ ] T141 (Manual, SC-005) Run a usability session with ≥ 5 participants who have no ML background. The tasks are: pick an example; find which earlier token a chosen token attends to most in a given layer and head; generate two tokens; explain in their own words that the model predicts one token at a time. Record the protocol, results (≥ 4 of 5 within 10 minutes) and follow-ups in `specs/001-inside-the-transformer/usability-study.md`.
-- [ ] T142 Do a final constitution Quality Gates review: check all 9 gates from `.specify/memory/constitution.md` against the implementation and CI results, and record pass/fail with evidence links in `specs/001-inside-the-transformer/checklists/quality-gates.md`
+- [X] T142 Do a final constitution Quality Gates review: check all 9 gates from `.specify/memory/constitution.md` against the implementation and CI results, and record pass/fail with evidence links in `specs/001-inside-the-transformer/checklists/quality-gates.md`
 
 ---
 
