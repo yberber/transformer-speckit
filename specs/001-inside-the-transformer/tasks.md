@@ -741,7 +741,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 - [X] T132 [P] Write `frontend/tests/e2e/responsive-motion.spec.ts` (`@responsive`). On the `mobile` project (360 px), check that every main view has `document.documentElement.scrollWidth ≤ clientWidth` (FR-039). With `page.emulateMedia({ reducedMotion: 'reduce' })`, generate a token and switch views, then assert `document.getAnimations().length === 0` and that the same final DOM state is reached (FR-036).
 - [X] T133 [P] With every view built and the live chunk in place, confirm that `lhci` (config from T049c) still passes all four assertions (performance ≥ 0.9, LCP ≤ 3,000 ms, TBT ≤ 200 ms, total size < 2,000,000 B) and that `check:budgets` passes. If anything fails, fix the build. A budget may only be raised after a constitution amendment (Principle VII).
 - [X] T134 [P] Extend `frontend/tests/unit/readme-doc-check.test.ts` (from T049a; Principle IX): also extract every `npm run …`, `npx …` and `uv run …` command from `specs/001-inside-the-transformer/quickstart.md` and assert each appears in the root `README.md`
-- [ ] T135 [P] Extend `.github/workflows/frontend.yml` (from T049d):
+- [X] T135 [P] Extend `.github/workflows/frontend.yml` (from T049d):
   - pass `VITE_BASE` and `VITE_API_BASE_URL` from repo variables to `build`
   - make sure `test:e2e` runs the full default matrix (chromium + mobile, including @a11y, @keyboard, @i18n, @share, @privacy, @live, @responsive)
   - keep the Pages `deploy` job dependent on every check job

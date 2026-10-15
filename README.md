@@ -176,7 +176,8 @@ The API fixtures are recorded the same way, from `backend/`:
 **Static site (GitHub Pages).** Every push to `main` runs the `frontend` workflow; its `deploy`
 job publishes `frontend/dist` to GitHub Pages only after all frontend check jobs have passed.
 One-time setup by the repository owner: in Settings → Pages, set the source to "GitHub
-Actions". The build uses `VITE_BASE=/<repository name>/`. Live mode stays hidden, and the site
+Actions". The build uses `VITE_BASE=/<repository name>/`, or the repository variable
+`VITE_BASE` when set (e.g. `/` for a custom domain). Live mode stays hidden, and the site
 works fully in example mode, until the repository variable `VITE_API_BASE_URL` (Settings →
 Secrets and variables → Actions → Variables) is set to the inference service URL.
 
@@ -219,9 +220,13 @@ Two GitHub Actions workflows run on every push and pull request:
 
 - `.github/workflows/frontend.yml`: `static` (ESLint, `svelte-check`, API types up to date),
   `test` (unit tests, including the architecture-literal scan and the README doc check, and
-  contract tests), `build` (production build and `check:budgets`), `e2e` (Playwright on the
-  `chromium` and `mobile` projects, including the `@a11y` axe suite) and `lighthouse`
-  (`npm run lhci`). On `main`, `deploy` publishes to GitHub Pages after all of them pass.
+  contract tests), `build` (production build with `VITE_BASE` and `VITE_API_BASE_URL` from the
+  repository variables, and `check:budgets`), `e2e` (the full default Playwright matrix:
+  `chromium` and `mobile` with `@example-mode`, `@a11y`, `@keyboard`, `@i18n`, `@share` and
+  `@responsive`, and `live` with `@live` and `@privacy`; a guard step fails if any of these
+  suites is missing from a project) and `lighthouse` (`npm run lhci` on a build with
+  `VITE_API_BASE_URL` set as deployed). On `main`, `deploy` publishes to GitHub Pages after all
+  of them pass.
 - `.github/workflows/backend.yml`: `checks` runs `ruff check`, `pytest` with all markers (the
   GPT-2 weights are cached under `~/.cache/huggingface`, keyed on `MODEL_REVISION`),
   `tools.generate_examples --check`, `tools.verify_examples` and `tools.verify_examples

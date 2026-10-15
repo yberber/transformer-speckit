@@ -52,9 +52,10 @@ jobs:
     name: build and budgets
     runs-on: ubuntu-latest
     env:
-      # GitHub Pages serves the site from /<repo>/. Live mode stays hidden while the repository
-      # variable VITE_API_BASE_URL is unset.
-      VITE_BASE: /${{ github.event.repository.name }}/
+      # From repository variables. GitHub Pages serves the site from /<repo>/ unless VITE_BASE
+      # says otherwise (e.g. "/" for a custom domain). Live mode stays hidden while
+      # VITE_API_BASE_URL is unset.
+      VITE_BASE: ${{ vars.VITE_BASE || format('/{0}/', github.event.repository.name) }}
       VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
     steps:
       - uses: actions/checkout@v7
@@ -83,8 +84,21 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      # Default projects: chromium + mobile run every spec present, including @a11y; live runs
-      # @live and @privacy against a second build with a mocked API (no server needed).
+      # The full default matrix, no server needed: chromium (1280 px) and mobile (360 px) run
+      # every suite except the live ones; the `live` project runs @live and @privacy, and the
+      # live-mode cases of @a11y, @keyboard and @share, against a second build with a mocked
+      # API. This guard fails if a suite drops out of the matrix (a tag or project filter
+      # changed) instead of letting it pass silently with zero tests.
+      - name: every e2e suite is in the default matrix
+        run: |
+          npx playwright test --list > "$RUNNER_TEMP/e2e-list.txt"
+          need() {
+            grep -q -- "\[$1\] .*$2" "$RUNNER_TEMP/e2e-list.txt" || { echo "::error::no $2 tests in the $1 project"; exit 1; }
+          }
+          for project in chromium mobile; do
+            for tag in @example-mode @a11y @keyboard @i18n @share @responsive; do need "$project" "$tag"; done
+          done
+          for tag in @live @privacy @a11y @keyboard; do need live "$tag"; done
       - run: npm run test:e2e
       - if: failure()
         uses: actions/upload-artifact@v7
@@ -104,7 +118,11 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
+      # The deployed variant, live chunk included (live mode is never the default, so the page
+      # measured is example mode). VITE_BASE is left out: Lighthouse loads the site from "/".
       - run: npm run build
+        env:
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
       - run: npm run lhci
 
   deploy:
