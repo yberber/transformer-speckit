@@ -13,7 +13,7 @@
   import { createTermRegistry } from '../components/termRegistry';
   import ViewIntro from '../components/ViewIntro.svelte';
   import { glossary, t, type MessageKey } from '../lib/i18n/index';
-  import { formatNumber, formatPercent } from '../lib/i18n/format';
+  import { formatCompact, formatNumber, formatPercent } from '../lib/i18n/format';
   import { activationLabelKey, modelConfig } from '../lib/model/config';
   import {
     paramGroups,
@@ -36,6 +36,7 @@
 
   const groups = paramGroups(modelConfig);
   const total = totalParams(modelConfig);
+  const perBlock = perBlockParams(modelConfig);
   const layer = $derived(viewState.layer);
 
   // --- selection --------------------------------------------------------------------------
@@ -299,11 +300,11 @@
   <div class="summary surface">
     <p class="total">
       <span class="total-label">{t('architecture.summary.total')}</span>
-      <span class="total-value" data-total-params>{fmt(total)}</span>
+      <span class="total-value" data-total-params data-value={total}>{formatCompact(total)}</span>
     </p>
-    <p class="muted per-block">
+    <p class="muted per-block" data-per-block-params data-value={perBlock}>
       {t('architecture.summary.per_block', {
-        count: fmt(perBlockParams(modelConfig)),
+        count: formatCompact(perBlock),
         n: fmt(modelConfig.nLayer),
       })}
     </p>
@@ -317,6 +318,20 @@
         onclick={(e) => openFormula(e, 'params-total')}>{t('estimate.how')}</a
       >
     </p>
+    <div data-summary-details>
+      <ShowDetails>
+        <dl class="exact">
+          <div>
+            <dt>{t('architecture.summary.exact_total')}</dt>
+            <dd class="num" data-exact="total">{fmt(total)}</dd>
+          </div>
+          <div>
+            <dt>{t('architecture.summary.exact_per_block')}</dt>
+            <dd class="num" data-exact="per-block">{fmt(perBlock)}</dd>
+          </div>
+        </dl>
+      </ShowDetails>
+    </div>
   </div>
 
   <p class="help">{t('architecture.diagram_help')}</p>
@@ -725,6 +740,31 @@
   .per-block,
   .note {
     font-size: var(--text-sm);
+  }
+
+  .exact {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  .exact div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-1) var(--space-3);
+    padding-block: var(--space-1);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .exact dt {
+    color: var(--color-text);
+  }
+
+  .exact dd {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
   }
 
   .formula-link {

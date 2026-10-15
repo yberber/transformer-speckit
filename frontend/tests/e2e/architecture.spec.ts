@@ -17,6 +17,9 @@ const count = (shape: number[]) => shape.reduce((a, b) => a * b, 1);
 const total = Object.entries(shapes)
   .filter(([name]) => name !== TIED)
   .reduce((sum, [, shape]) => sum + count(shape), 0);
+const perBlock = Object.entries(shapes)
+  .filter(([name]) => name.startsWith('h.0.'))
+  .reduce((sum, [, shape]) => sum + count(shape), 0);
 
 const COMPONENTS = [
   'wte',
@@ -32,6 +35,7 @@ const COMPONENTS = [
 ];
 
 const fmt = new Intl.NumberFormat('en-US');
+const compact = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 });
 const pct3 = new Intl.NumberFormat('en-US', {
   style: 'percent',
   minimumFractionDigits: 3,
@@ -60,7 +64,26 @@ test.describe('@architecture', () => {
     await expect(diagram.locator('[data-repeat-label]')).toHaveText(
       `× ${fmt.format(config.n_layer)}`,
     );
-    await expect(view.locator('[data-total-params]')).toHaveText(fmt.format(total));
+  });
+
+  test('@architecture the summary is compact; the exact counts are behind "Show details"', async ({
+    page,
+  }) => {
+    await openArchitecture(page);
+    const view = page.locator('section[data-view="architecture"]');
+    const totalParams = view.locator('[data-total-params]');
+    await expect(totalParams).toHaveAttribute('data-value', String(total));
+    await expect(totalParams).toHaveText(compact.format(total));
+    const perBlockParams = view.locator('[data-per-block-params]');
+    await expect(perBlockParams).toHaveAttribute('data-value', String(perBlock));
+    await expect(perBlockParams).toContainText(compact.format(perBlock));
+    await expect(perBlockParams).not.toContainText(fmt.format(perBlock));
+
+    const exact = view.locator('[data-summary-details] [data-exact]');
+    await expect(exact).toHaveCount(0);
+    await view.locator('[data-summary-details] [data-show-details]').click();
+    await expect(view.locator('[data-exact="total"]')).toHaveText(fmt.format(total));
+    await expect(view.locator('[data-exact="per-block"]')).toHaveText(fmt.format(perBlock));
   });
 
   test('@architecture Tab and Enter open a panel for every weight and bias', async ({ page }) => {

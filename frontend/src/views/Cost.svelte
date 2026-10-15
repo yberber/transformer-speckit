@@ -102,6 +102,78 @@
   });
 </script>
 
+<!--
+  The per-layer table: compact numbers by default, the same table with exact integers behind
+  "Show details" (FR-032).
+-->
+{#snippet costTable(b: FlopBreakdown, exact: boolean)}
+  {@const show = exact ? fmt : formatCompact}
+  {@const label = exact ? t('cost.table.label_exact') : t('cost.table.label')}
+  <!-- A scrolling region must be focusable, so keyboard users can scroll it (WCAG 2.1.1). -->
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+  <div
+    class="scroll-x table-wrap"
+    role="region"
+    aria-label={label}
+    aria-describedby="{uid}-caption"
+    tabindex="0"
+  >
+    <table data-cost-table={exact ? 'exact' : 'compact'} data-phase={phase}>
+      <caption class="visually-hidden">{label}</caption>
+      <thead>
+        <tr>
+          <th scope="col">{t('cost.col.part')}</th>
+          {#each LAYER_COMPONENTS as c (c)}
+            <th scope="col" class="end">
+              <a
+                href={methodHref(FORMULA_IDS[c])}
+                data-formula-link={FORMULA_IDS[c]}
+                onclick={(e) => openFormula(e, FORMULA_IDS[c])}>{t(`cost.component.${c}`)}</a
+              >
+            </th>
+          {/each}
+          <th scope="col" class="end">{t('cost.col.total')}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {#each layers as layer (layer)}
+          {@const row = layerRow(b, layer)}
+          {@const sum = row.reduce((s, e) => s + e.value, 0)}
+          <tr data-row="layer-{layer}">
+            <th scope="row">{t('layer.option', { n: layer })}</th>
+            {#each row as e (e.component)}
+              <td class="num" data-cell={e.component} data-value={e.value}>{show(e.value)}</td>
+            {/each}
+            <td class="num" data-cell="total" data-value={sum}>{show(sum)}</td>
+          </tr>
+        {/each}
+        {#each NON_LAYER as component (component)}
+          {@const e = nonLayer(b, component)}
+          <tr class="non-layer" data-row={component}>
+            <th scope="row">
+              <a
+                href={methodHref(e.formulaId)}
+                data-formula-link={e.formulaId}
+                onclick={(ev) => openFormula(ev, e.formulaId)}>{t(`cost.component.${component}`)}</a
+              >
+            </th>
+            {#each LAYER_COMPONENTS as c (c)}
+              <td class="num empty"><span aria-hidden="true">–</span></td>
+            {/each}
+            <td class="num" data-cell="total" data-value={e.value}>{show(e.value)}</td>
+          </tr>
+        {/each}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th scope="row" colspan={LAYER_COMPONENTS.length + 1}>{t('cost.row.total')}</th>
+          <td class="num" data-cell="total" data-value={b.total.value}>{show(b.total.value)}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+{/snippet}
+
 <section class="view" data-view={view} aria-labelledby={headingId}>
   <ViewIntro {view} {headingId} />
 
@@ -180,71 +252,12 @@
       {#if table}
         <!-- The long description sits outside the scrolling box, so narrow screens show it all. -->
         <p class="muted table-note" id="{uid}-caption">{caption} {t('cost.table.same_note')}</p>
-        <!-- A scrolling region must be focusable, so keyboard users can scroll it (WCAG 2.1.1). -->
-        <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-        <div
-          class="scroll-x table-wrap"
-          role="region"
-          aria-label={t('cost.table.label')}
-          aria-describedby="{uid}-caption"
-          tabindex="0"
-        >
-          <table data-cost-table data-phase={phase}>
-            <caption class="visually-hidden">{t('cost.table.label')}</caption>
-            <thead>
-              <tr>
-                <th scope="col">{t('cost.col.part')}</th>
-                {#each LAYER_COMPONENTS as c (c)}
-                  <th scope="col" class="end">
-                    <a
-                      href={methodHref(FORMULA_IDS[c])}
-                      data-formula-link={FORMULA_IDS[c]}
-                      onclick={(e) => openFormula(e, FORMULA_IDS[c])}>{t(`cost.component.${c}`)}</a
-                    >
-                  </th>
-                {/each}
-                <th scope="col" class="end">{t('cost.col.total')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {#each layers as layer (layer)}
-                {@const row = layerRow(table, layer)}
-                {@const sum = row.reduce((s, e) => s + e.value, 0)}
-                <tr data-row="layer-{layer}">
-                  <th scope="row">{t('layer.option', { n: layer })}</th>
-                  {#each row as e (e.component)}
-                    <td class="num" data-cell={e.component} data-value={e.value}>{fmt(e.value)}</td>
-                  {/each}
-                  <td class="num" data-cell="total" data-value={sum}>{fmt(sum)}</td>
-                </tr>
-              {/each}
-              {#each NON_LAYER as component (component)}
-                {@const e = nonLayer(table, component)}
-                <tr class="non-layer" data-row={component}>
-                  <th scope="row">
-                    <a
-                      href={methodHref(e.formulaId)}
-                      data-formula-link={e.formulaId}
-                      onclick={(ev) => openFormula(ev, e.formulaId)}
-                      >{t(`cost.component.${component}`)}</a
-                    >
-                  </th>
-                  {#each LAYER_COMPONENTS as c (c)}
-                    <td class="num empty"><span aria-hidden="true">–</span></td>
-                  {/each}
-                  <td class="num" data-cell="total" data-value={e.value}>{fmt(e.value)}</td>
-                </tr>
-              {/each}
-            </tbody>
-            <tfoot>
-              <tr>
-                <th scope="row" colspan={LAYER_COMPONENTS.length + 1}>{t('cost.row.total')}</th>
-                <td class="num" data-cell="total" data-value={table.total.value}>
-                  {fmt(table.total.value)}
-                </td>
-              </tr>
-            </tfoot>
-          </table>
+        {@render costTable(table, false)}
+        <div data-cost-table-details>
+          <ShowDetails>
+            {@render costTable(table, true)}
+            <p class="muted unit-note">{t('cost.exact_unit', { unit: flops })}</p>
+          </ShowDetails>
         </div>
       {:else}
         <p class="no-token" data-no-token>{t('cost.decode.none')}</p>
@@ -261,9 +274,13 @@
           <span class="muted">{t('cost.kv.for', { count: contextLength })}</span>
         </p>
         <p class="kv-text"><Term id="kv-cache" /> {t('cost.kv.explanation')}</p>
-        <p class="kv-text muted">
-          {t('cost.kv.precision', { bytes: fmt(kv.value) })}
-        </p>
+        <div data-kv-details>
+          <ShowDetails>
+            <p class="kv-text muted" data-kv-exact data-value={kv.value}>
+              {t('cost.kv.precision', { bytes: fmt(kv.value) })}
+            </p>
+          </ShowDetails>
+        </div>
         <EstimateLabel formulaId={kv.formulaId} what={t('cost.kv.title')} />
       </section>
     {/if}

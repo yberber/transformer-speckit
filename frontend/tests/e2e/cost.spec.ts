@@ -118,7 +118,7 @@ test.describe('@cost', () => {
     page,
   }) => {
     const view = await openCost(page, K);
-    const table = view.locator('table[data-cost-table]');
+    const table = view.locator('table[data-cost-table="compact"]');
     const t = example.nInput + K;
 
     await view.locator('[data-phase-toggle] input[value="decode"]').check();
@@ -133,7 +133,8 @@ test.describe('@cost', () => {
         'data-value',
         String(perLayer.attn_scores_per_t * t),
       );
-      await expect(row.locator('[data-cell="mlp"]')).toHaveText(fmt.format(perLayer.mlp));
+      // Compact by default (FR-032); the exact integers are behind "Show details".
+      await expect(row.locator('[data-cell="mlp"]')).toHaveText(compact.format(perLayer.mlp));
     }
     await expect(table.locator('tr[data-row="pos_add"] [data-cell="total"]')).toHaveAttribute(
       'data-value',
@@ -148,11 +149,25 @@ test.describe('@cost', () => {
       String(decode(t)),
     );
 
+    await expect(table.locator('tfoot [data-cell="total"]')).toHaveText(compact.format(decode(t)));
+
+    const exact = view.locator('table[data-cost-table="exact"]');
+    await expect(exact).toHaveCount(0);
+    await view.locator('[data-cost-table-details] [data-show-details]').click();
+    await expect(exact.locator('tbody tr')).toHaveCount(config.n_layer + 2);
+    await expect(exact.locator('tr[data-row="layer-1"] [data-cell="mlp"]')).toHaveText(
+      fmt.format(perLayer.mlp),
+    );
+    await expect(exact.locator('tfoot [data-cell="total"]')).toHaveText(fmt.format(decode(t)));
+
     await view.locator('[data-phase-toggle] input[value="prefill"]').check();
     await expect(table.locator('tbody tr')).toHaveCount(config.n_layer + 2);
     await expect(table.locator('tfoot [data-cell="total"]')).toHaveAttribute(
       'data-value',
       String(prefill(example.nInput)),
+    );
+    await expect(exact.locator('tfoot [data-cell="total"]')).toHaveText(
+      fmt.format(prefill(example.nInput)),
     );
   });
 
@@ -174,7 +189,7 @@ test.describe('@cost', () => {
     }
 
     // Every column of the per-layer table names its formula too.
-    const headerLinks = view.locator('table[data-cost-table] thead a[data-formula-link]');
+    const headerLinks = view.locator('table[data-cost-table="compact"] thead a[data-formula-link]');
     await expect(headerLinks).toHaveCount(5);
 
     await view.locator('[data-cost-figure="decode"] a[data-formula-link]').click();
@@ -207,7 +222,14 @@ test.describe('@cost', () => {
     await expect(kv).toHaveAttribute('data-value', String(kvBytes(example.nInput)));
     await expect(kv).toHaveText(bytesText(kvBytes(example.nInput)));
 
+    // The exact byte count is behind "Show details" (FR-032).
+    const exact = view.locator('[data-kv-cache] [data-kv-exact]');
+    await expect(exact).toHaveCount(0);
+    await view.locator('[data-kv-details] [data-show-details]').click();
+    await expect(exact).toContainText(fmt.format(kvBytes(example.nInput)));
+
     await page.locator('[data-action="next"]').click();
     await expect(kv).toHaveAttribute('data-value', String(kvBytes(example.nInput + 1)));
+    await expect(exact).toContainText(fmt.format(kvBytes(example.nInput + 1)));
   });
 });
