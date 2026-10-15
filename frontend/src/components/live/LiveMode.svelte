@@ -7,7 +7,7 @@
 -->
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
-  import { API_BASE_URL } from '../../lib/api/client';
+  import { SPACE_URL } from '../../lib/api/client';
   import type { RunData } from '../../lib/data/runData';
   import { t, type MessageKey } from '../../lib/i18n/index';
   import { limits } from '../../lib/limits';
@@ -155,9 +155,9 @@
   {#if shownError}
     <div class="error" role="alert" data-live-error data-code={shownError.code}>
       <p>{t(errorKey(shownError.code), shownError.params)}</p>
-      {#if shownError.code === 'wake_timeout'}
+      {#if shownError.code === 'wake_timeout' && SPACE_URL}
         <p>
-          <a href={API_BASE_URL} target="_blank" rel="noopener noreferrer" data-space-link>
+          <a href={SPACE_URL} target="_blank" rel="noopener noreferrer" data-space-link>
             {t('live.space_link')}
           </a>
         </p>

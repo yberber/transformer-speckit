@@ -67,7 +67,10 @@ export default defineConfig({
             url: `http://localhost:${livePort}`,
             reuseExistingServer: !process.env.CI,
             timeout: 120_000,
-            env: { VITE_API_BASE_URL: 'http://api.test' },
+            env: {
+              VITE_API_BASE_URL: 'http://api.test',
+              VITE_SPACE_URL: 'https://huggingface.co/spaces/test-user/test-space',
+            },
           },
         ]),
   ],

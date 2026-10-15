@@ -11,7 +11,14 @@ const en = JSON.parse(readFileSync(new URL('en.json', I18N), 'utf-8')) as Catalo
 const de = JSON.parse(readFileSync(new URL('de.json', I18N), 'utf-8')) as Catalog;
 const limits = JSON.parse(
   readFileSync(new URL('../../../contracts/limits.json', import.meta.url), 'utf-8'),
-) as { max_input_tokens: number; max_new_tokens: number; max_input_chars: number };
+) as {
+  max_input_tokens: number;
+  max_new_tokens: number;
+  max_input_chars: number;
+  wait_limit_s: number;
+};
+/** VITE_SPACE_URL of the `live` build (playwright.config.ts). */
+const SPACE_URL = 'https://huggingface.co/spaces/test-user/test-space';
 
 interface Token {
   id: number;
@@ -197,6 +204,21 @@ test('@live a starting page without CORS headers is waking, not unavailable', as
   await expect(status(page)).toHaveAttribute('data-state', 'waking');
   await expect(status(page)).toHaveAttribute('data-state', 'ready', { timeout: 20_000 });
   await expect(liveError(page)).toHaveCount(0);
+});
+
+test('@live a service that does not wake in time links to its Space page', async ({ page }) => {
+  // Fake timers: the wait limit passes without waiting for it.
+  await page.clock.install();
+  await mockApi(page, { health: (route) => startingPage(route) });
+  await enterLive(page);
+  await runText(page, 'The quick brown fox');
+  await expect(status(page)).toHaveAttribute('data-state', 'waking');
+  await page.clock.fastForward((limits.wait_limit_s + 1) * 1000);
+  await expect(liveError(page)).toHaveAttribute('data-code', 'wake_timeout');
+  const link = liveError(page).locator('a[data-space-link]');
+  await expect(link).toHaveAttribute('href', SPACE_URL);
+  await expect(link).toHaveText(en['live.space_link']!);
+  await expect(liveError(page).locator('[data-action="back-to-examples"]')).toBeVisible();
 });
 
 test('@live Cancel stops waiting and returns to idle', async ({ page }) => {

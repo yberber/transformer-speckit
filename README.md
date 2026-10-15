@@ -49,7 +49,8 @@ Frontend (run from `frontend/`):
 - `npm run dev`: start the Vite dev server with hot reload.
 - `npm run build`: build the static site into `frontend/dist/`. Set `VITE_BASE=/<repo>/` when
   the site is served from a sub-path (GitHub Pages). Live mode is hidden unless
-  `VITE_API_BASE_URL` is set at build time.
+  `VITE_API_BASE_URL` is set at build time. `VITE_SPACE_URL` (optional) is the Space page that
+  the "model did not wake up" message links to.
 - `npm run preview`: serve the built `frontend/dist/` locally.
 
 Backend inference service (run from `backend/`):
@@ -224,7 +225,10 @@ variable `HF_SPACE`.
 In the Space settings (Settings → Variables and secrets), set the variable `ALLOWED_ORIGINS` to
 the GitHub Pages origin, e.g. `https://<user>.github.io` (an origin has no path). Without it,
 the browser blocks every live-mode request. Then point the site at the Space by setting the
-repository variable `VITE_API_BASE_URL` to the Space URL (`https://<user>-<space>.hf.space`).
+repository variable `VITE_API_BASE_URL` to the Space URL (`https://<user>-<space>.hf.space`),
+and set `VITE_SPACE_URL` to the Space page (`https://huggingface.co/spaces/<user>/<space>`):
+when the service does not wake up within the wait limit, the message links there, since a
+visit to that page can wake a sleeping Space. Without it, the message shows no link.
 
 ## CI
 
@@ -232,8 +236,8 @@ Two GitHub Actions workflows run on every push and pull request:
 
 - `.github/workflows/frontend.yml`: `static` (ESLint, `svelte-check`, API types up to date),
   `test` (unit tests, including the architecture-literal scan and the README doc check, and
-  contract tests), `build` (production build with `VITE_BASE` and `VITE_API_BASE_URL` from the
-  repository variables, and `check:budgets`), `e2e` (the full default Playwright matrix:
+  contract tests), `build` (production build with `VITE_BASE`, `VITE_API_BASE_URL` and
+  `VITE_SPACE_URL` from the repository variables, and `check:budgets`), `e2e` (the full default Playwright matrix:
   `chromium` and `mobile` with `@example-mode`, `@a11y`, `@keyboard`, `@i18n`, `@share` and
   `@responsive`, and `live` with `@live` and `@privacy`; a guard step fails if any of these
   suites is missing from a project) and `lighthouse` (`npm run lhci` on a build with

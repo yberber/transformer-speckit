@@ -353,6 +353,13 @@ export type ApiClient = ReturnType<typeof createApiClient>;
 /** The API this build talks to; empty means live mode is not offered (Principle V). */
 export const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL ?? '';
 
+/**
+ * The service's Space page on huggingface.co (e.g. https://huggingface.co/spaces/<user>/<space>),
+ * linked when the service does not wake in time: a visit there can wake a sleeping Space (R13).
+ * Empty hides the link.
+ */
+export const SPACE_URL: string = import.meta.env.VITE_SPACE_URL ?? '';
+
 let defaultClient: ApiClient | null = null;
 
 export function apiClient(): ApiClient {
