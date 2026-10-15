@@ -101,8 +101,6 @@
   let reload = $state(0);
   /** The step from the link is checked against the first run that loads. */
   let linkStepPending = true;
-  /** Input token counts for the picker, filled in as examples load. */
-  const tokenCounts: Record<string, number> = $state({});
 
   async function startExamples(): Promise<void> {
     indexFailed = false;
@@ -134,14 +132,12 @@
       (run) => {
         if (cancelled) return;
         loaded = { id, run };
-        tokenCounts[id] = run.nInput;
         // In live mode the steps come from the live run (onLiveRun).
         if (viewState.mode === 'example') {
           if (linkStepPending && clampStep(viewState.step, run).replaced) raiseLinkNotice();
           viewState.setRunSteps(run.steps);
         }
         linkStepPending = false;
-        prefetchOthers();
       },
       () => {
         if (!cancelled) failedId = id;
@@ -151,28 +147,6 @@
       cancelled = true;
     };
   });
-
-  let prefetched = false;
-
-  /**
-   * After the first example is on screen, load the other examples' core.json while the browser
-   * is idle: the picker can then show every token count, and switching is instant. Failures are
-   * ignored here; they show up only if the visitor picks that example.
-   */
-  function prefetchOthers(): void {
-    if (prefetched || !index) return;
-    prefetched = true;
-    const ids = index.examples.map((e) => e.id);
-    const idle = globalThis.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 200));
-    idle(() => {
-      for (const id of ids) {
-        loadExample(id).then(
-          (run) => (tokenCounts[id] = run.nInput),
-          () => {},
-        );
-      }
-    });
-  }
 
   const exampleRun = $derived(loaded && loaded.id === viewState.exampleId ? loaded.run : null);
 
@@ -344,7 +318,7 @@
         <button type="button" onclick={startExamples}>{t('action.retry')}</button>
       </div>
     {:else}
-      <ExamplePicker examples={index?.examples ?? null} {tokenCounts} />
+      <ExamplePicker examples={index?.examples ?? null} />
     {/if}
 
     <div class="navigation">

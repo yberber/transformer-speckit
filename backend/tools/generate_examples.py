@@ -50,7 +50,7 @@ SHAPES_OUT = Path("frontend/tests/reference/param-shapes.json")
 # Directories owned by the generator: cleared before writing, compared file by file in --check.
 MANAGED_DIRS = [EXAMPLES_DIR, MODEL_DIR, TINY_DIR]
 
-FORMAT_VERSION = "1.0.0"
+FORMAT_VERSION = "1.1.0"
 ID_PATTERN = re.compile(r"^[a-z0-9-]{1,40}$")
 BANDS = {"short": (5, 15), "medium": (20, 35), "long": (50, 64)}
 PER_LENGTH = 2
@@ -205,11 +205,13 @@ def generate(limits: Limits) -> Outputs:
     out: Outputs = {}
     errors: list[str] = []
     docs: list[tuple[str, Path, Any]] = []
+    n_input: dict[str, int] = {}
 
     for example in examples:
         print(f"  {example['id']} …", file=sys.stderr)
         run = compute_run(gpt2.tokenize(example["text"]), limits.example_steps)
         errors += check_run(example, run, limits)
+        n_input[example["id"]] = run.n_input
         rel_dir = EXAMPLES_DIR / example["id"]
         docs.append(
             ("ExampleCore", rel_dir / "core.json", example_files(out, rel_dir, example, run))
@@ -219,7 +221,13 @@ def generate(limits: Limits) -> Outputs:
         "format_version": FORMAT_VERSION,
         "model": model_ref(),
         "examples": [
-            {"id": e["id"], "length": e["length"], "core": f"{e['id']}/core.json"} for e in examples
+            {
+                "id": e["id"],
+                "length": e["length"],
+                "n_input": n_input[e["id"]],
+                "core": f"{e['id']}/core.json",
+            }
+            for e in examples
         ],
         "position_embeddings": position_shards(out, limits),
     }

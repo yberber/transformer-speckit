@@ -39,7 +39,7 @@ interface Core {
 const readJson = <T>(url: URL): T => JSON.parse(readFileSync(url, 'utf-8')) as T;
 const index = readJson<{
   model: { revision: string };
-  examples: { id: string; length: keyof typeof BANDS; core: string }[];
+  examples: { id: string; length: keyof typeof BANDS; n_input: number; core: string }[];
   position_embeddings: FileEntry[];
 }>(new URL('index.json', EXAMPLES));
 const cores = index.examples.map((e) => ({
@@ -104,6 +104,13 @@ describe('example data against contracts/example-data.schema.json', () => {
       expect(index.examples.find((e) => e.id === core.example.id)?.length).toBe(
         core.example.length,
       );
+    }
+  });
+
+  it("lists each example's input token count in index.json, equal to its core.json", () => {
+    for (const { core } of cores) {
+      const entry = index.examples.find((e) => e.id === core.example.id);
+      expect(entry?.n_input, core.example.id).toBe(core.run.n_input);
     }
   });
 

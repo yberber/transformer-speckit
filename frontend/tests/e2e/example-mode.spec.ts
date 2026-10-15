@@ -81,6 +81,10 @@ async function expectStep(page: Page, k: number): Promise<void> {
 test('@example-mode landing state: example mode, first example, text-completion note', async ({
   page,
 }) => {
+  const coreRequests: string[] = [];
+  page.on('request', (r) => {
+    if (r.url().endsWith('/core.json')) coreRequests.push(new URL(r.url()).pathname);
+  });
   await page.goto('/');
   await expect(page.locator('[data-app]')).toHaveAttribute('data-mode', 'example');
   await expect(page.locator('[data-intro-note]')).toBeVisible();
@@ -103,6 +107,10 @@ test('@example-mode landing state: example mode, first example, text-completion 
       String(core.run.n_input),
     );
   }
+  // Every count comes from index.json: only the default example's core.json loads
+  // (contracts/example-data.md rule 1).
+  await page.waitForLoadState('networkidle');
+  expect(coreRequests).toEqual([expect.stringMatching(`/${index.examples[0]!.id}/core.json$`)]);
 
   // No API configured: live mode is hidden.
   await expect(page.locator('[data-mode-switch]')).toHaveCount(0);

@@ -12,11 +12,18 @@ const TINY = new URL('contracts/fixtures/data/tiny-example/', ROOT);
 const PUBLIC_DATA = new URL('frontend/public/data/', ROOT);
 
 const realIndex = JSON.parse(readFileSync(new URL('examples/index.json', PUBLIC_DATA), 'utf-8'));
+const tinyCore = JSON.parse(readFileSync(new URL('core.json', TINY), 'utf-8'));
 const index = {
   ...realIndex,
-  examples: [{ id: 'tiny-example', length: 'short', core: 'tiny-example/core.json' }],
+  examples: [
+    {
+      id: 'tiny-example',
+      length: 'short',
+      n_input: tinyCore.run.n_input,
+      core: 'tiny-example/core.json',
+    },
+  ],
 };
-const tinyCore = JSON.parse(readFileSync(new URL('core.json', TINY), 'utf-8'));
 
 function f32(url: URL): Float32Array {
   const buf = readFileSync(url);

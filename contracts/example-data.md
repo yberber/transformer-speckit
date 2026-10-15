@@ -1,4 +1,4 @@
-# Contract: Example Data Files (v1.0.0)
+# Contract: Example Data Files (v1.1.0)
 
 Interface between the generator (`backend/tools/generate_examples.py`, Python) and the frontend
 (`frontend/src/lib/data/`, TypeScript). JSON shapes:
@@ -11,7 +11,8 @@ output and the verifier decodes files independently; the frontend decodes commit
 ```text
 data/
 ├── examples/
-│   ├── index.json                    # ExampleIndex — first entry is the default example
+│   ├── index.json                    # ExampleIndex — first entry is the default example;
+│   │                                 #   each entry carries the example's n_input
 │   └── <example-id>/
 │       ├── core.json                 # ExampleCore (RunCore + file index)
 │       ├── embeddings-token.f32      # wte rows for the example's unique token IDs
@@ -58,12 +59,15 @@ entries of each head — no re-packing needed.
 
 1. **Budget**: every file < 300,000 bytes raw (`bytes` field, checked by generator and by
    `check-budgets.mjs`). Initial load fetches only `index.json` and the default `core.json`;
-   embeddings and attention files load when their view first opens.
+   embeddings and attention files load when their view first opens. Another example's
+   `core.json` loads only when the visitor picks that example: the picker reads every example's
+   token count from `n_input` in `index.json`.
 2. **Integrity**: `sha256` of each binary is checked by the verifier and by a frontend unit test
    over the committed files; the browser checks `byteLength` against `shape`.
 3. **Consistency**: `run.tokens.length = n_input + steps`; `predictions.length = steps + 1`;
    `layers.length = attention.length = n_layer`; change arrays and attention T equal
-   `tokens.length`; `predictions[k-1].candidates[0].id = tokens[n_input + k − 1].id` for k ≥ 1.
+   `tokens.length`; `predictions[k-1].candidates[0].id = tokens[n_input + k − 1].id` for k ≥ 1;
+   each `index.json` entry's `n_input` equals `run.n_input` in the `core.json` it names.
 4. **Number formatting in JSON**: probabilities and change percentages are written with
    7 significant digits.
 5. **Tolerances** (verified by `verify_examples.py` against per-step HF reference runs):
@@ -73,3 +77,8 @@ entries of each head — no re-packing needed.
    frontend refuses live mode if the service's revision differs.
 7. **Failure isolation**: a missing/corrupt file affects only its example and view; the frontend
    shows a translated error there and keeps everything else usable.
+
+## Changes
+
+- **1.1.0**: `index.json` entries gain the required `n_input` (input token count), so the initial
+  load stays at `index.json` + the default `core.json` while the picker shows every count (rule 1).

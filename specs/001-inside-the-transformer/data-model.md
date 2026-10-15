@@ -62,6 +62,8 @@ From `contracts/limits.json`: `max_input_tokens` 64, `max_new_tokens` 64, `max_i
 
 Token-count bands (input): short 5–15, medium 20–35, long 50–64 (≤ `max_input_tokens`).
 Exactly six examples; one is the default (first in `index.json`).
+`index.json` lists each example's `id`, `length` and input token count `n_input` (equal to its
+`run.n_input`), so the picker shows every count without loading the other examples' runs.
 
 ## Run
 

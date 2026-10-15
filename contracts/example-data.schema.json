@@ -115,7 +115,7 @@
       "required": ["format_version", "example", "model", "run", "files"],
       "additionalProperties": false,
       "properties": {
-        "format_version": { "const": "1.0.0" },
+        "format_version": { "const": "1.1.0" },
         "example": {
           "type": "object",
           "required": ["id", "length", "text"],
@@ -160,7 +160,7 @@
       "required": ["format_version", "model", "examples", "position_embeddings"],
       "additionalProperties": false,
       "properties": {
-        "format_version": { "const": "1.0.0" },
+        "format_version": { "const": "1.1.0" },
         "model": { "$ref": "#/$defs/ModelRef" },
         "examples": {
           "type": "array",
@@ -168,11 +168,16 @@
           "maxItems": 6,
           "items": {
             "type": "object",
-            "required": ["id", "length", "core"],
+            "required": ["id", "length", "n_input", "core"],
             "additionalProperties": false,
             "properties": {
               "id": { "type": "string", "pattern": "^[a-z0-9-]{1,40}$" },
               "length": { "enum": ["short", "medium", "long"] },
+              "n_input": {
+                "description": "Input token count of the example; equals run.n_input in its core.json. Lets the picker show every count without loading the other examples.",
+                "type": "integer",
+                "minimum": 1
+              },
               "core": { "type": "string", "pattern": "^[a-z0-9./-]+$" }
             }
           }

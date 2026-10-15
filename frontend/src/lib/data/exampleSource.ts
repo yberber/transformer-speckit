@@ -26,6 +26,8 @@ interface BinaryFile extends ArraySpec {
 export interface ExampleEntry {
   id: string;
   length: ExampleLength;
+  /** Input token count, so the picker needs no other example's core.json. */
+  n_input: number;
   core: string;
 }
 
@@ -79,11 +81,18 @@ function assertIndex(obj: unknown): asserts obj is ExampleIndex {
   const i = obj as Partial<ExampleIndex> | null;
   if (
     !i ||
-    i.format_version !== '1.0.0' ||
+    i.format_version !== '1.1.0' ||
     !i.model ||
     !Array.isArray(i.examples) ||
     i.examples.length === 0 ||
-    !i.examples.every((e) => e && typeof e.id === 'string' && typeof e.core === 'string') ||
+    !i.examples.every(
+      (e) =>
+        e &&
+        typeof e.id === 'string' &&
+        typeof e.core === 'string' &&
+        Number.isInteger(e.n_input) &&
+        e.n_input >= 1,
+    ) ||
     !Array.isArray(i.position_embeddings)
   ) {
     throw new DataFormatError('index.json does not match ExampleIndex');
@@ -92,7 +101,7 @@ function assertIndex(obj: unknown): asserts obj is ExampleIndex {
 
 function assertCore(obj: unknown, id: string): asserts obj is ExampleCore {
   const c = obj as Partial<ExampleCore> | null;
-  if (!c || c.format_version !== '1.0.0' || c.example?.id !== id || !c.model || !c.files) {
+  if (!c || c.format_version !== '1.1.0' || c.example?.id !== id || !c.model || !c.files) {
     throw new DataFormatError('core.json does not match ExampleCore');
   }
   assertRunCore(c.run, 'example');

@@ -1,5 +1,5 @@
 {
-  "format_version": "1.0.0",
+  "format_version": "1.1.0",
   "model": {
     "id": "openai-community/gpt2",
     "revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e",
@@ -12,31 +12,37 @@
     {
       "id": "short-once-upon",
       "length": "short",
+      "n_input": 9,
       "core": "short-once-upon/core.json"
     },
     {
       "id": "short-coffee",
       "length": "short",
+      "n_input": 11,
       "core": "short-coffee/core.json"
     },
     {
       "id": "medium-sun",
       "length": "medium",
+      "n_input": 29,
       "core": "medium-sun/core.json"
     },
     {
       "id": "medium-train",
       "length": "medium",
+      "n_input": 25,
       "core": "medium-train/core.json"
     },
     {
       "id": "long-lighthouse",
       "length": "long",
+      "n_input": 55,
       "core": "long-lighthouse/core.json"
     },
     {
       "id": "long-library",
       "length": "long",
+      "n_input": 52,
       "core": "long-library/core.json"
     }
   ],

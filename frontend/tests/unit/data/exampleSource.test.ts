@@ -9,11 +9,12 @@ const TINY = new URL('contracts/fixtures/data/tiny-example/', ROOT);
 const PUBLIC_DATA = new URL('frontend/public/data/', ROOT);
 
 const realIndex = JSON.parse(readFileSync(new URL('examples/index.json', PUBLIC_DATA), 'utf-8'));
+const tinyCore = JSON.parse(readFileSync(new URL('core.json', TINY), 'utf-8'));
+const tinyEntry = { id: 'tiny-example', length: 'short', core: 'tiny-example/core.json' };
 const index = {
   ...realIndex,
-  examples: [{ id: 'tiny-example', length: 'short', core: 'tiny-example/core.json' }],
+  examples: [{ ...tinyEntry, n_input: tinyCore.run.n_input }],
 };
-const tinyCore = JSON.parse(readFileSync(new URL('core.json', TINY), 'utf-8'));
 
 type Override = (path: string) => Response | undefined;
 
@@ -118,7 +119,7 @@ describe('example source', () => {
   it('isolates a broken core.json to its example', async () => {
     const t = server((path) =>
       path.endsWith('tiny-example/core.json')
-        ? Response.json({ format_version: '1.0.0' })
+        ? Response.json({ format_version: '1.1.0' })
         : undefined,
     );
     const err = await t.source.loadExample('tiny-example').catch((e: unknown) => e);
@@ -126,6 +127,17 @@ describe('example source', () => {
     const unknown = await t.source.loadExample('nope').catch((e: unknown) => e);
     expect((unknown as ExampleLoadError).kind).toBe('unknown_example');
     expect(await t.source.loadPositionEmbeddings(1)).toHaveLength(modelConfig.nEmbd);
+  });
+
+  it('rejects an index.json entry without its input token count', async () => {
+    const t = server((path) =>
+      path === '/data/examples/index.json'
+        ? Response.json({ ...index, examples: [tinyEntry] })
+        : undefined,
+    );
+    const err = await t.source.loadIndex().catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(ExampleLoadError);
+    expect((err as ExampleLoadError).kind).toBe('format');
   });
 
   it('assembles position embeddings from the shards it needs, each fetched once', async () => {

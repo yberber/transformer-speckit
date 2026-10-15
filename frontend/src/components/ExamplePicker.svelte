@@ -12,12 +12,9 @@
 
   let {
     examples,
-    tokenCounts = {},
   }: {
-    /** null while index.json is loading. */
+    /** null while index.json is loading; each entry carries its input token count. */
     examples: ExampleEntry[] | null;
-    /** Input token count per example ID, for the examples loaded so far. */
-    tokenCounts?: Record<string, number>;
   } = $props();
 
   const LENGTHS: readonly ExampleLength[] = ['short', 'medium', 'long'];
@@ -60,7 +57,6 @@
           {/each}
         {/if}
         {#each group.examples ?? [] as example (example.id)}
-          {@const count = tokenCounts[example.id]}
           <label class="option" data-example-option={example.id}>
             <input
               type="radio"
@@ -71,10 +67,7 @@
             />
             <span class="text">
               <span class="title">{t(titleKey(example.id))}</span>
-              <!-- The line is always there, so the card does not grow when the count arrives. -->
-              <span class="count">
-                {#if count !== undefined}{t('example.token_count', { count })}{:else}&nbsp;{/if}
-              </span>
+              <span class="count">{t('example.token_count', { count: example.n_input })}</span>
             </span>
           </label>
         {/each}
