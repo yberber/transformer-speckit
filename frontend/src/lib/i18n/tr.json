@@ -390,7 +390,7 @@
   "mode.live": "Kendi metniniz",
   "live.empty": "Bu görünümü kendi metninizle görmek için yukarıya bir metin yazın ve Çalıştır'a basın.",
   "live.load_failed": "Canlı mod yüklenemedi. Örnekler çalışmaya devam ediyor.",
-  "live.end.step_limit": "Metin burada bitiyor: canlı modda model en fazla bu kadar yeni token ekler.",
+  "live.end.step_limit": "Metin burada bitiyor: canlı modda model en fazla {limit} yeni token ekler.",
   "live.end.eos": "Model metin sonu işaretini seçti, bu yüzden metin burada bitiyor.",
   "live.end.context_limit": "Metin, modelin bir kerede okuyabileceği en büyük uzunluğa ulaştı, bu yüzden burada bitiyor.",
   "live.continue": "Canlı modda devam et",

@@ -126,6 +126,11 @@ test('@live a run shows every view and steps like example mode', async ({ page }
     'data-stop-reason',
     runFixture.run.stop_reason,
   );
+  // The recorded run ends at its step limit; the message names the live limit (FR-013).
+  expect(runFixture.run.stop_reason).toBe('step_limit');
+  await expect(page.locator('[data-end-message]')).toContainText(
+    fill(en['live.end.step_limit']!, { limit: limits.max_new_tokens }),
+  );
   await page.locator('[data-action="back"]').click();
   await expectStep(page, STEPS - 1);
 

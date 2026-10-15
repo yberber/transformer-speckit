@@ -9,6 +9,7 @@
   import { tick, type Snippet } from 'svelte';
   import type { RunData } from '../lib/data/runData';
   import { t } from '../lib/i18n/index';
+  import { limits } from '../lib/limits';
   import { clearAppended, markAppended } from '../lib/state/appended';
   import { canAdvance, detectRepetition, endMessageKey } from '../lib/state/generation';
   import { viewState } from '../lib/state/viewState.svelte';
@@ -104,7 +105,7 @@
 
   {#if run && atEnd}
     <div class="message end" data-end-message data-stop-reason={run.stopReason}>
-      <p>{t(endMessageKey(run.stopReason, run.source))}</p>
+      <p>{t(endMessageKey(run.stopReason, run.source), { limit: limits.max_new_tokens })}</p>
       {#if run.stopReason === 'eos'}
         <p class="muted">{t('example.end.eos_marker')}</p>
       {/if}
