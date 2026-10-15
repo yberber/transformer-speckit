@@ -758,7 +758,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
   - privacy guarantees, budgets, and the contracts location
 
   T134 must pass.
-- [ ] T139 Run quickstart Q1–Q7 and Q9–Q11 locally from a clean checkout (`npm ci`, `uv sync`) and fix any failure. Every command must pass as written in `specs/001-inside-the-transformer/quickstart.md`.
+- [X] T139 Run quickstart Q1–Q7 and Q9–Q11 locally from a clean checkout (`npm ci`, `uv sync`) and fix any failure. Every command must pass as written in `specs/001-inside-the-transformer/quickstart.md`.
 - [ ] T140 Deploy the frontend (Pages) and backend (Space) and run quickstart Q8 (wake-up behavior). Record under the R13 open item in `specs/001-inside-the-transformer/research.md`:
   - whether an API request alone wakes the sleeping Space; if it does not, confirm the `wake_timeout` message links to the Space page
   - whether the Space's start-up reply carries CORS headers for the Pages origin, and which R13 "waking" row the browser actually hit (check in DevTools: a readable HTML reply, or a CORS failure followed by an opaque `no-cors` probe)
