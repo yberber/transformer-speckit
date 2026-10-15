@@ -230,14 +230,15 @@ Two GitHub Actions workflows run on every push and pull request:
 - `.github/workflows/backend.yml`: `checks` runs `ruff check`, `pytest` with all markers (the
   GPT-2 weights are cached under `~/.cache/huggingface`, keyed on `MODEL_REVISION`),
   `tools.generate_examples --check`, `tools.verify_examples` and `tools.verify_examples
-  --self-test`.
+  --self-test`; `fullstack` runs `npm run test:e2e:fullstack`, which starts the real backend
+  (same cached weights) and runs the `@fullstack` browser tests against it.
 
 A third workflow, `.github/workflows/space-deploy.yml`, runs only when started by hand and
 deploys the inference service to its Space (see Deploy).
 
 Changes merge only with both workflows green. The repository owner must protect `main` in
 Settings → Branches (or Rules) and mark the check jobs of both workflows as required status
-checks: `static`, `test`, `build`, `e2e`, `lighthouse` and `checks`. The workflows cannot set
+checks: `static`, `test`, `build`, `e2e`, `lighthouse`, `checks` and `fullstack`. The workflows cannot set
 this up themselves.
 
 ## Privacy, budgets and contracts
