@@ -8,6 +8,11 @@
   weight, and both tokens are highlighted through `onhighlight`. "Show as table" gives the same
   numbers as a table. When cells would be narrower than 10 CSS px (phones, long texts), the view
   switches to a focused mode: pick one token and see its weights as a ranked list and a strip.
+  The ranked rows are one tab stop (arrow keys move between them); focusing or hovering a row
+  highlights its pair and shows its weight in the readout, with the exact value on demand.
+
+  `select` lets the page choose a pair from outside (a focused or hovered token): it becomes the
+  active cell, or the focused-mode token and its ranked row.
 -->
 <script lang="ts">
   import { packedIndex } from '../lib/data/binary';
@@ -26,6 +31,7 @@
     nInput,
     theme,
     label,
+    select = null,
     onhighlight,
   }: {
     /** One head's packed causal triangle for exactly `tokens.length` tokens. */
@@ -36,6 +42,8 @@
     theme: Theme;
     /** Accessible name of the grid, e.g. "Attention of layer 5, head 3". */
     label: string;
+    /** [query, key] pair chosen outside the heatmap, or null. */
+    select?: [number, number] | null;
     /** Called with [query, key] positions of the active or hovered cell, or null. */
     onhighlight?: (pair: [number, number] | null) => void;
   } = $props();
@@ -198,7 +206,7 @@
       );
     };
     if (hover) outline(hover[0], hover[1], '#ffffff', Math.max(1, dpr));
-    if (focused) outline(ai, aj, focusColor, Math.max(2, 2 * dpr));
+    if (focused || select) outline(ai, aj, focusColor, Math.max(2, 2 * dpr));
   });
 
   // --- table and focused mode -------------------------------------------------------------
@@ -212,6 +220,37 @@
       (a, b) => b.w - a.w || a.j - b.j,
     ),
   );
+
+  /** The ranked row that holds the tab stop (by key position); the top row by default. */
+  let rankKey = $state<number | null>(null);
+  const activeKey = $derived(rankKey !== null && rankKey <= focusRow ? rankKey : ranked[0]!.j);
+  let rankHover = $state<number | null>(null);
+  let rankFocused = $state(false);
+  /** The pair the focused-mode readout describes: the hovered row, else the active one. */
+  const shownKey = $derived(rankHover !== null && rankHover <= focusRow ? rankHover : activeKey);
+  let rankedList: HTMLOListElement | undefined = $state();
+
+  function onRankKey(e: KeyboardEvent): void {
+    const at = ranked.findIndex((r) => r.j === activeKey);
+    const to: Record<string, number> = {
+      ArrowDown: at + 1,
+      ArrowUp: at - 1,
+      Home: 0,
+      End: ranked.length - 1,
+    };
+    if (!(e.key in to)) return;
+    e.preventDefault();
+    const next = ranked[Math.max(0, Math.min(ranked.length - 1, to[e.key]!))]!;
+    rankedList?.querySelector<HTMLElement>(`[data-key="${next.j}"]`)?.focus();
+  }
+
+  $effect(() => {
+    if (!select) return;
+    const [i, j] = select;
+    active = [i, j];
+    focusToken = i;
+    rankKey = j;
+  });
 
   let stripCanvas: HTMLCanvasElement | undefined = $state();
   let stripWidth = $state(0);
@@ -311,7 +350,8 @@
       value={focusRow}
       onchange={(e) => {
         focusToken = Number(e.currentTarget.value);
-        onhighlight?.([focusToken, focusToken]);
+        rankKey = null;
+        onhighlight?.([focusToken, activeKey]);
       }}
     >
       {#each tokens as _, i (i)}
@@ -328,16 +368,58 @@
         data-focus-strip
       ></canvas>
     </div>
-    <ol class="ranked" aria-label={t('heatmap.ranked', { pos: focusRow + 1 })} data-ranked-list>
+    <p class="readout" aria-live="polite" data-heatmap-readout>
+      {cellText(focusRow, shownKey)}
+    </p>
+    <ShowDetails>
+      <p class="exact" data-heatmap-exact>
+        {t('heatmap.exact', { weight: sig7(weight(focusRow, shownKey)) })}
+      </p>
+    </ShowDetails>
+    <ol
+      class="ranked"
+      aria-label={t('heatmap.ranked', { pos: focusRow + 1 })}
+      data-ranked-list
+      bind:this={rankedList}
+    >
       {#each ranked as r (r.j)}
         <li>
-          <span class="chip">
-            <TokenChip token={tokens[r.j]!} position={r.j} {theme} origin={origin(r.j)} />
-          </span>
-          <span class="bar" aria-hidden="true">
-            <span class="fill" style:width="{r.w * 100}%"></span>
-          </span>
-          <span class="num" data-weight>{dec3(r.w)}</span>
+          <button
+            type="button"
+            class="rank"
+            class:on={r.j === shownKey}
+            tabindex={r.j === activeKey ? 0 : -1}
+            data-key={r.j}
+            data-active={r.j === activeKey}
+            onfocus={() => {
+              rankFocused = true;
+              rankKey = r.j;
+              rankHover = null;
+              onhighlight?.([focusRow, r.j]);
+            }}
+            onblur={() => {
+              rankFocused = false;
+              onhighlight?.(null);
+            }}
+            onclick={() => (rankKey = r.j)}
+            onmouseenter={() => {
+              rankHover = r.j;
+              onhighlight?.([focusRow, r.j]);
+            }}
+            onmouseleave={() => {
+              rankHover = null;
+              onhighlight?.(rankFocused ? [focusRow, activeKey] : null);
+            }}
+            onkeydown={onRankKey}
+          >
+            <span class="chip">
+              <TokenChip token={tokens[r.j]!} position={r.j} {theme} origin={origin(r.j)} />
+            </span>
+            <span class="bar" aria-hidden="true">
+              <span class="fill" style:width="{r.w * 100}%"></span>
+            </span>
+            <span class="num" data-weight>{dec3(r.w)}</span>
+          </button>
         </li>
       {/each}
     </ol>
@@ -514,11 +596,24 @@
     list-style: none;
   }
 
-  .ranked li {
+  .rank {
     display: grid;
     grid-template-columns: minmax(4rem, 8rem) 1fr 3.5rem;
     align-items: center;
     gap: var(--space-2);
+    width: 100%;
+    padding: 2px var(--space-1);
+    font: inherit;
+    color: inherit;
+    text-align: start;
+    background: none;
+    border: 0;
+    border-radius: var(--radius-sm);
+  }
+
+  .rank:hover,
+  .rank.on {
+    background: var(--color-panel-raised);
   }
 
   .chip {

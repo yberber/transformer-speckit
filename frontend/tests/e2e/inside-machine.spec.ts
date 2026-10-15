@@ -57,12 +57,26 @@ const pct1 = (v: number) =>
 const dec3 = (v: number) => en({ minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(v);
 const sig6 = (v: number) =>
   en({ minimumSignificantDigits: 6, maximumSignificantDigits: 6 }).format(v);
+const sig7 = (v: number) =>
+  en({ minimumSignificantDigits: 7, maximumSignificantDigits: 7 }).format(v);
+
+/** Layer 1, head 1 of an example: weight(i, j) and the keys of row i, largest weight first. */
+function firstHead(example: { core: Core; url: URL }) {
+  const heads = decode(example.core.files.attention[0]!, example.url, 'uint16');
+  const weight = (i: number, j: number) => heads[(i * (i + 1)) / 2 + j]!;
+  const ranked = (i: number) =>
+    Array.from({ length: i + 1 }, (_, j) => j).sort((a, b) => weight(i, b) - weight(i, a) || a - b);
+  return { weight, ranked };
+}
 
 test.use({ locale: 'en-US' });
 
 async function openView(page: Page, view: string): Promise<void> {
   await page.locator(`nav a[data-view="${view}"]`).click();
   await expect(page.locator(`section[data-view="${view}"]`)).toBeVisible();
+  // Park the pointer in the page margin: when focus scrolls the page, Chrome hovers whatever is
+  // under a resting pointer, and a hovered token would move the heatmap's selection.
+  await page.mouse.move(0, 0);
 }
 
 async function selectExample(page: Page, id: string): Promise<void> {
@@ -236,6 +250,46 @@ test.describe('@layers', () => {
     }
   });
 
+  test('@layers attention: focusing or hovering a token selects its strongest pair', async ({
+    page,
+  }) => {
+    const n = first.core.run.n_input;
+    const { weight, ranked } = firstHead(first);
+    await openView(page, 'attention');
+    const view = page.locator('section[data-view="attention"]');
+    const grid = view.locator('[data-heatmap-grid]');
+    await expect(view.locator('[data-heatmap]')).toHaveAttribute('data-mode', 'grid');
+    await expect(grid).toHaveAttribute('data-size', String(n));
+    const sequence = view.locator('[data-token-sequence]');
+    const chip = (p: number) => sequence.locator(`[data-position="${p}"]`);
+    const readout = view.locator('[data-heatmap-readout]');
+
+    // Keyboard: the last token and the token it attends to most.
+    const k = n - 1;
+    const key = ranked(k)[0]!;
+    await sequence.locator('button').nth(k).focus();
+    await expect(grid).toHaveAttribute('data-active', `${k},${key}`);
+    await expect(chip(k)).toHaveClass(/highlighted/);
+    await expect(chip(key)).toHaveClass(/highlighted/);
+    await expect(readout).toContainText(`from token ${k + 1} (`);
+    await expect(readout).toContainText(`to token ${key + 1} (`);
+    await expect(readout).toContainText(`: ${dec3(weight(k, key))}`);
+
+    // The exact weight of that pair is available on demand.
+    await view.locator('[data-heatmap] [data-show-details]').click();
+    await expect(view.locator('[data-heatmap-exact]')).toContainText(sig7(weight(k, key)));
+
+    // Pointer: hovering another token moves the selection to its pair.
+    const m = Math.floor(n / 2);
+    const mKey = ranked(m)[0]!;
+    await chip(m).hover();
+    await expect(grid).toHaveAttribute('data-active', `${m},${mKey}`);
+    await expect(chip(m)).toHaveClass(/highlighted/);
+    await expect(chip(mKey)).toHaveClass(/highlighted/);
+    await expect(readout).toContainText(`: ${dec3(weight(m, mKey))}`);
+    await expect(view.locator('[data-heatmap-exact]')).toContainText(sig7(weight(m, mKey)));
+  });
+
   test('@layers advancing a step adds a row and a column', async ({ page }) => {
     const n = first.core.run.n_input;
     await openView(page, 'attention');
@@ -252,6 +306,54 @@ test.describe('@layers', () => {
     await openView(page, 'blocks');
     await expect(page.locator('[data-change-bars="mlp"] [data-change-row]')).toHaveCount(n + 1);
   });
+});
+
+test('@layers focused mode: tokens and ranked rows select a pair with its exact weight', async ({
+  page,
+}) => {
+  // A phone-width viewport on every project, so the longest example uses focused mode.
+  await page.setViewportSize({ width: 360, height: 780 });
+  const { weight, ranked } = firstHead(longest);
+  await page.goto('/');
+  await selectExample(page, longest.core.example.id);
+  await openView(page, 'attention');
+  const view = page.locator('section[data-view="attention"]');
+  await expect(view.locator('[data-heatmap]')).toHaveAttribute('data-mode', 'focused');
+  const sequence = view.locator('[data-token-sequence]');
+  const chip = (p: number) => sequence.locator(`[data-position="${p}"]`);
+  const readout = view.locator('[data-heatmap-readout]');
+  const list = view.locator('[data-ranked-list]');
+
+  // Focusing a token picks it and its strongest key.
+  const k = 10;
+  const order = ranked(k);
+  await sequence.locator('button').nth(k).focus();
+  await expect(view.locator('select[data-focus-token]')).toHaveValue(String(k));
+  const active = list.locator('button[data-active="true"]');
+  await expect(active).toHaveAttribute('data-key', String(order[0]));
+  await expect(chip(k)).toHaveClass(/highlighted/);
+  await expect(chip(order[0]!)).toHaveClass(/highlighted/);
+  await expect(readout).toContainText(`: ${dec3(weight(k, order[0]!))}`);
+
+  // The ranked rows are one tab stop; arrow keys move, and the focused row's pair is highlighted.
+  await expect(list.locator('button[tabindex="0"]')).toHaveCount(1);
+  await active.focus();
+  await page.keyboard.press('ArrowDown');
+  await expect(page.locator(':focus')).toHaveAttribute('data-key', String(order[1]));
+  await expect(chip(k)).toHaveClass(/highlighted/);
+  await expect(chip(order[1]!)).toHaveClass(/highlighted/);
+  await expect(readout).toContainText(`to token ${order[1]! + 1} (`);
+  await expect(readout).toContainText(`: ${dec3(weight(k, order[1]!))}`);
+
+  // The exact weight (7 significant digits) is available on demand.
+  await view.locator('[data-heatmap] [data-show-details]').click();
+  await expect(view.locator('[data-heatmap-exact]')).toContainText(sig7(weight(k, order[1]!)));
+
+  // Hovering a row highlights its pair too.
+  await list.locator(`[data-key="${order[2]}"]`).hover();
+  await expect(chip(order[2]!)).toHaveClass(/highlighted/);
+  await expect(readout).toContainText(`to token ${order[2]! + 1} (`);
+  await expect(view.locator('[data-heatmap-exact]')).toContainText(sig7(weight(k, order[2]!)));
 });
 
 test('@layers mobile: long contexts switch the heatmap to focused mode', async ({

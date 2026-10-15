@@ -1,7 +1,9 @@
 <!--
   Attention (FR-017, US2-4/5/6): pick any layer and any head and see, for every token up to the
   current step, how much it looks at each earlier token. A layer's attention file loads the first
-  time that layer is shown. Focusing or hovering a cell highlights both tokens in the text above.
+  time that layer is shown. Focusing or hovering a cell highlights both tokens in the text above;
+  focusing or hovering a token there highlights it and the token it attends to most in the shown
+  head, and moves the heatmap to that pair (US2-5).
 -->
 <script lang="ts">
   import HeadSelector from '../components/HeadSelector.svelte';
@@ -12,6 +14,7 @@
   import { createTermRegistry } from '../components/termRegistry';
   import TokenSequence from '../components/TokenSequence.svelte';
   import ViewIntro from '../components/ViewIntro.svelte';
+  import { packedIndex } from '../lib/data/binary';
   import { attentionAt, tokensAt } from '../lib/data/runData';
   import { t } from '../lib/i18n/index';
   import { viewState } from '../lib/state/viewState.svelte';
@@ -57,7 +60,24 @@
   );
   const tokens = $derived(run ? tokensAt(run, step) : []);
 
-  let highlight = $state<number[]>([]);
+  // The latest interaction wins: focusing a token drops a stale hover, and using the heatmap
+  // drops the token's pair.
+  let tokenFocus = $state<number | null>(null);
+  let tokenHover = $state<number | null>(null);
+
+  /** The focused or hovered token and the earlier token it attends to most (first on ties). */
+  const pair = $derived.by<[number, number] | null>(() => {
+    const i = tokenHover ?? tokenFocus;
+    if (!weights || i === null || i >= tokens.length) return null;
+    let best = 0;
+    for (let j = 1; j <= i; j++) {
+      if (weights[packedIndex(i, j)]! > weights[packedIndex(i, best)]!) best = j;
+    }
+    return [i, best];
+  });
+
+  let gridHighlight = $state<number[]>([]);
+  const highlight = $derived(pair ? [...new Set(pair)] : gridHighlight);
 </script>
 
 <section class="view" data-view={view} aria-labelledby={headingId}>
@@ -84,6 +104,11 @@
         theme={viewState.resolvedTheme}
         {highlight}
         label={t('attention.sequence')}
+        onfocustoken={(position) => {
+          tokenFocus = position;
+          if (position !== null) tokenHover = null;
+        }}
+        onhovertoken={(position) => (tokenHover = position)}
       />
     </div>
 
@@ -102,7 +127,12 @@
           nInput={run.nInput}
           theme={viewState.resolvedTheme}
           label={t('attention.grid_label', { layer, head })}
-          onhighlight={(pair) => (highlight = pair ? [...new Set(pair)] : [])}
+          select={pair}
+          onhighlight={(cell) => {
+            gridHighlight = cell ? [...new Set(cell)] : [];
+            tokenFocus = null;
+            tokenHover = null;
+          }}
         />
       {/if}
     </div>

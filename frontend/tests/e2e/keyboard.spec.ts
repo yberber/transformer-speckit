@@ -198,6 +198,8 @@ test.describe('@keyboard', () => {
       // Wide screens: one grid widget with a roving active cell.
       const grid = view.locator('[data-heatmap-grid]');
       await tabTo(page, grid);
+      // Tabbing past the tokens above moved the active cell to the last token's pair.
+      await press(page, 'Control+Home');
       await expect(grid).toHaveAttribute('data-active', '0,0');
       await press(page, 'ArrowDown');
       await press(page, 'ArrowRight');
