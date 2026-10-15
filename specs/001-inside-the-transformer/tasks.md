@@ -733,7 +733,7 @@ Web application (plan.md → Project Structure): `frontend/`, `backend/`, the au
 
 **Purpose**: Release completeness of the gates that have run in CI since Phase 2 (T049a–T049d), remaining e2e matrices, deployment, documentation and release validation
 
-- [ ] T130 [P] Extend `frontend/tests/e2e/a11y.spec.ts` (from T049b; FR-044, SC-007) for release:
+- [X] T130 [P] Extend `frontend/tests/e2e/a11y.spec.ts` (from T049b; FR-044, SC-007) for release:
   - assert that no view root carries `data-placeholder`, so all 8 main views are real
   - add the live-mode states (mocked API, as in T113) to the matrix: input form, waking status and an error message, × theme × lang
   - the zero-violations expectation is unchanged
